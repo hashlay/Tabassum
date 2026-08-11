@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { VideoHighlight } from '../types';
 import { Play, X, Download, Share2, Video } from 'lucide-react';
+import { getMediaUrl } from '../utils/mediaUrl';
 
 export const VideoHighlights: React.FC = () => {
   const [activeVideo, setActiveVideo] = useState<VideoHighlight | null>(null);
@@ -88,14 +89,14 @@ export const VideoHighlights: React.FC = () => {
                 <div className="relative aspect-video rounded-xl overflow-hidden bg-[#18181B] border border-[#333338] shadow-md group-hover:border-[#FF2B2B]/60 transition-all">
                   {video.thumbnailUrl ? (
                     <img
-                      src={video.thumbnailUrl}
+                      src={getMediaUrl(video.thumbnailUrl)}
                       alt={video.title}
                       className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                       referrerPolicy="no-referrer"
                     />
                   ) : (
                     <video 
-                      src={video.videoUrl} 
+                      src={getMediaUrl(video.videoUrl)} 
                       className="w-full h-full object-cover opacity-80"
                       preload="metadata"
                     />
@@ -139,7 +140,7 @@ export const VideoHighlights: React.FC = () => {
           <div className="max-w-5xl w-full bg-[#18181B] border border-white/15 rounded-xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
             <div className="relative aspect-video bg-black flex-shrink-0">
               <video
-                src={activeVideo.videoUrl}
+                src={getMediaUrl(activeVideo.videoUrl)}
                 title={activeVideo.title}
                 className="w-full h-full object-contain"
                 autoPlay

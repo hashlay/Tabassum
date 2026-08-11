@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { GalleryItem } from '../types';
-import { ZoomIn, ArrowRight, X, ChevronLeft, ChevronRight, Download, Share2, Check, Send, Copy, Image as ImageIcon } from 'lucide-react';
+import { getMediaUrl } from '../utils/mediaUrl';
 
 interface GallerySectionProps {
   onNavigate?: (sectionId: string) => void;
@@ -151,7 +151,7 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
                 {/* Image Frame */}
                 <div className="relative aspect-[4/3] overflow-hidden bg-black">
                   <img
-                    src={item.imageUrl}
+                    src={getMediaUrl(item.imageUrl)}
                     alt={item.title}
                     className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                     referrerPolicy="no-referrer"

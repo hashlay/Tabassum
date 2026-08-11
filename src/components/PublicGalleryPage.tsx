@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { GalleryItem } from '../types';
 import { Search, ZoomIn, Download, Share2, Check, Send, Copy, X, ChevronLeft, ChevronRight, Filter, Sparkles, RefreshCw } from 'lucide-react';
+import { getMediaUrl } from '../utils/mediaUrl';
 import { useFestival } from '../context/FestivalContext';
 
 export const PublicGalleryPage: React.FC = () => {
@@ -211,7 +212,7 @@ export const PublicGalleryPage: React.FC = () => {
               {/* Image Frame */}
               <div className="relative aspect-[4/3] overflow-hidden bg-black">
                 <img
-                  src={item.imageUrl}
+                  src={getMediaUrl(item.imageUrl)}
                   alt={item.title}
                   className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                   referrerPolicy="no-referrer"
