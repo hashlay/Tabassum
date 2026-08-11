@@ -320,11 +320,8 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       
       // Get all results for this participant (both individual & group results)
       const participantResults = results.filter(r => 
-        r.codeNumber === found.chestNumber?.toString() || 
-        r.codeNumber === username.trim() ||
-        r.participantName === found.fullName ||
-        (r.raw && r.raw.teamMemberIds && Array.isArray(r.raw.teamMemberIds) && r.raw.teamMemberIds.includes(found.id)) ||
-        (r.raw && r.raw.participantId === found.id)
+        (r.participantId === found.id || (r.raw && r.raw.participantId === found.id)) ||
+        (r.raw && r.raw.teamMemberIds && Array.isArray(r.raw.teamMemberIds) && r.raw.teamMemberIds.includes(found.id))
       );
       
       const updatedParticipant: ParticipantProfile = {

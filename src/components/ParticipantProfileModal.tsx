@@ -111,22 +111,62 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
     });
   }, [allResults]);
 
-  // Dynamically compute ALL declared results (both Individual AND Group/Team results)
+  // Dynamically compute ALL declared results for ONLY this participant's registered programs
   const participantDeclaredResults = useMemo(() => {
     if (!p) return [];
+
+    // Collect all competition IDs and clean Program names this participant is registered for
+    const registeredCompIds = new Set<string>();
+    const registeredCompNames = new Set<string>();
+
+    if (Array.isArray(p.schedule)) {
+      p.schedule.forEach((sc: any) => {
+        if (sc.competitionId) registeredCompIds.add(sc.competitionId);
+        if (sc.id) registeredCompIds.add(sc.id);
+        if (sc.program) {
+          const cleanProgName = sc.program.replace(/\s*\([^)]*Group[^)]*\)/gi, '').trim();
+          registeredCompNames.add(cleanProgName.toLowerCase());
+          registeredCompNames.add(sc.program.toLowerCase());
+        }
+      });
+    }
+
+    if (Array.isArray(p.registeredPrograms)) {
+      p.registeredPrograms.forEach((prog: any) => {
+        if (prog.competitionId) registeredCompIds.add(prog.competitionId);
+        if (prog.id) registeredCompIds.add(prog.id);
+        if (prog.program) {
+          const cleanProgName = prog.program.replace(/\s*\([^)]*Group[^)]*\)/gi, '').trim();
+          registeredCompNames.add(cleanProgName.toLowerCase());
+          registeredCompNames.add(prog.program.toLowerCase());
+        }
+        if (prog.name) {
+          registeredCompNames.add(prog.name.toLowerCase());
+        }
+      });
+    }
 
     const resultsList: any[] = [];
     const seenCompKeys = new Set<string>();
 
     (allResults || []).forEach((r: any) => {
-      // STRICT ID MATCHING for individuals
+      // 1. MUST be registered for this competition
+      const rCompId = r.competitionId || r.raw?.competitionId;
+      const rEventName = (r.eventName || r.program || '').toLowerCase();
+
+      const isRegisteredComp = (
+        (rCompId && registeredCompIds.has(rCompId)) ||
+        (rEventName && registeredCompNames.has(rEventName))
+      );
+
+      if (!isRegisteredComp) return;
+
+      // 2. STRICT PARTICIPATION MATCHING (ID based)
       const isIndividualMatch = (
         r.participantId === p.id ||
-        r.codeNumber === p.codeNumber ||
         (r.raw && r.raw.participantId === p.id)
       );
 
-      // STRICT ID MATCHING for group teams
       const isGroupMatch = (
         r.participationType === 'group' ||
         r.participationType === 'Group Event' ||
@@ -148,66 +188,42 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
       }
     });
 
-    if (resultsList.length > 0) return resultsList;
-
-    // Fallback to p.results
-    return p.results || [];
+    return resultsList;
   }, [allResults, p]);
 
   // Filter posters where this participant or their group team won Rank 1, 2, or 3
   const participantPosters = useMemo(() => {
     if (!p) return [];
 
-    const wonCompKeys = new Set(
-      participantDeclaredResults
-        .filter(r => r.rank === 1 || r.rank === 2 || r.rank === 3)
-        .map(r => r.competitionId || `${r.eventName}__${r.category}`)
+    const wonRanks = participantDeclaredResults.filter(
+      r => r.rank === 1 || r.rank === 2 || r.rank === 3
     );
 
+    if (wonRanks.length === 0) return [];
+
+    const wonCompIds = new Set(wonRanks.map(r => r.competitionId || r.raw?.competitionId).filter(Boolean));
+    const wonCompNames = new Set(wonRanks.map(r => (r.eventName || '').toLowerCase()));
+
     return competitionPosters.filter(poster => {
-      if (wonCompKeys.has(poster.key)) return true;
-      return poster.results.some(r =>
-        r.participantId === p.id ||
-        r.codeNumber === p.codeNumber ||
-        (r.raw && r.raw.participantId === p.id) ||
-        (r.raw && Array.isArray(r.raw.teamMemberIds) && r.raw.teamMemberIds.includes(p.id))
-      );
+      const firstRes = poster.results?.[0];
+      if (!firstRes) return false;
+      const compId = firstRes.competitionId || firstRes.raw?.competitionId;
+      const eventName = (firstRes.eventName || '').toLowerCase();
+
+      return (compId && wonCompIds.has(compId)) || (eventName && wonCompNames.has(eventName));
     });
   }, [competitionPosters, participantDeclaredResults, p]);
 
-  // Dynamically compute published certificates directly from allResults live sync (Only candidate's personal certificate)
+  // Dynamically compute published certificates directly from candidate's declared results (Only Rank 1, 2, 3 where published)
   const participantCertificates = useMemo(() => {
     if (!p) return [];
 
-    const liveCertificates = (allResults || []).filter(r => {
-      if (!r.certificatePublished) return false;
-      if (!r.rank || r.rank < 1 || r.rank > 3) return false;
-
-      // STRICT ID MATCHING for individuals
-      const isIndividualMatch = (
-        r.participantId === p.id ||
-        r.codeNumber === p.codeNumber ||
-        (r.raw && r.raw.participantId === p.id)
-      );
-
-      // STRICT ID MATCHING for group teams
-      const isGroupMatch = (
-        r.participationType === 'group' ||
-        r.participationType === 'Group Event' ||
-        r.participationType === 'Group' ||
-        r.raw?.participationType === 'group'
-      ) && (
-        r.raw && Array.isArray(r.raw.teamMemberIds) && r.raw.teamMemberIds.includes(p.id)
-      );
-
-      return isIndividualMatch || isGroupMatch;
+    return participantDeclaredResults.filter(r => {
+      const isPublished = r.certificatePublished || r.raw?.certificatePublished;
+      const isTopRank = r.rank >= 1 && r.rank <= 3;
+      return isPublished && isTopRank;
     });
-
-    if (liveCertificates.length > 0) return liveCertificates;
-
-    // Fallback to p.results
-    return (p.results || []).filter(r => (r.rank === 1 || r.rank === 2 || r.rank === 3) && r.certificatePublished);
-  }, [allResults, p, cleanName]);
+  }, [participantDeclaredResults, p]);
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-[#0D0D0F] animate-in fade-in duration-200 overflow-y-auto">
