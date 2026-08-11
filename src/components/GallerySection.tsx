@@ -139,43 +139,49 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-10">
             {displayItems.map((item, index) => (
-              <div 
+              <div
                 key={item.id}
                 onClick={() => {
                   setActiveItem(item);
                   setCopied(false);
                   setShowShareMenu(false);
                 }}
-                className={`group cursor-pointer relative rounded-xl overflow-hidden bg-[#18181B] border border-white/5 ${
-                  index === 0 ? 'md:col-span-2 md:row-span-2' : ''
-                }`}
-                style={index === 0 ? { aspectRatio: '4/3' } : { aspectRatio: '1/1' }}
+                className="group relative bg-[#161619] border border-[#2A2A32] rounded-xl overflow-hidden cursor-pointer shadow-md hover:border-[#FF2B2B] transition-all duration-300 flex flex-col"
               >
-                <img
-                  src={item.imageUrl}
-                  alt={item.title}
-                  className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-in-out"
-                  loading={index < 4 ? "eager" : "lazy"}
-                />
-                
-                {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
-                
-                {/* Content Overlay */}
-                <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="text-[9px] sm:text-[10px] text-[#FF2B2B] font-mono font-bold uppercase tracking-wider mb-1 block">
-                        {item.category}
-                      </span>
-                      <h3 className="text-white text-xs sm:text-sm font-bold line-clamp-1 group-hover:text-[#FF2B2B] transition-colors">
-                        {item.title}
-                      </h3>
-                    </div>
-                    <div className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform scale-90 group-hover:scale-100">
-                      <ZoomIn className="w-4 h-4 text-white" />
-                    </div>
+                {/* Image Frame */}
+                <div className="relative aspect-[4/3] overflow-hidden bg-black">
+                  <img
+                    src={item.imageUrl}
+                    alt={item.title}
+                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                    referrerPolicy="no-referrer"
+                    loading={index < 4 ? "eager" : "lazy"}
+                  />
+
+                  {/* Hover Gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-90 transition-opacity" />
+
+                  {/* Category Badge */}
+                  <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded text-[9px] font-mono font-bold text-zinc-300 uppercase border border-white/10">
+                    {item.category}
                   </div>
+
+                  {/* Zoom Icon Button */}
+                  <div className="absolute top-2 right-2 bg-[#FF2B2B] p-1 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity shadow-md">
+                    <ZoomIn className="w-3 h-3 text-white" />
+                  </div>
+                </div>
+
+                {/* Title & Info */}
+                <div className="p-2.5 bg-[#141417] border-t border-[#25252D] flex flex-col justify-between flex-1">
+                  <h3 className="text-xs font-bold text-white line-clamp-1 group-hover:text-[#FF2B2B] transition-colors">
+                    {item.title}
+                  </h3>
+                  {item.date && (
+                    <span className="text-[10px] font-mono text-zinc-400 mt-1 block">
+                      {item.date}
+                    </span>
+                  )}
                 </div>
               </div>
             ))}
