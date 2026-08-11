@@ -147,28 +147,29 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
                   setCopied(false);
                   setShowShareMenu(false);
                 }}
-                className="group relative bg-[#161619] border border-[#2A2A32] rounded-xl overflow-hidden cursor-pointer shadow-md hover:border-[#FF2B2B] transition-all duration-300 flex flex-col"
+                className="group relative bg-[#161619] border border-[#2A2A32] rounded-xl overflow-hidden cursor-pointer shadow-md sm:hover:border-[#FF2B2B] transition-colors duration-300 flex flex-col"
               >
                 {/* Image Frame */}
                 <div className="relative aspect-[4/3] overflow-hidden bg-black">
                   <img
                     src={getMediaUrl(item.imageUrl)}
                     alt={item.title}
-                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover will-change-transform sm:group-hover:scale-105 transition-transform duration-500"
                     referrerPolicy="no-referrer"
                     loading={index < 4 ? "eager" : "lazy"}
+                    decoding="async"
                   />
 
                   {/* Hover Gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-90 transition-opacity" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 sm:group-hover:opacity-90 transition-opacity" />
 
                   {/* Category Badge */}
-                  <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded text-[9px] font-mono font-bold text-zinc-300 uppercase border border-white/10">
+                  <div className="absolute top-2 left-2 bg-black/70 px-2 py-0.5 rounded text-[9px] font-mono font-bold text-zinc-300 uppercase border border-white/10">
                     {item.category}
                   </div>
 
                   {/* Zoom Icon Button */}
-                  <div className="absolute top-2 right-2 bg-[#FF2B2B] p-1 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity shadow-md">
+                  <div className="absolute top-2 right-2 bg-[#FF2B2B] p-1 rounded-full text-white opacity-0 sm:group-hover:opacity-100 transition-opacity shadow-md">
                     <ZoomIn className="w-3 h-3 text-white" />
                   </div>
                 </div>
@@ -192,7 +193,7 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
 
       {/* Lightbox Preview Modal */}
       {activeItem && (
-        <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex flex-col items-center justify-center p-4 animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 bg-black/95 flex flex-col items-center justify-center p-4">
           <button
             onClick={() => {
               setActiveItem(null);
@@ -222,10 +223,11 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
             {/* Image Box */}
             <div className="relative w-full max-h-[65vh] aspect-video bg-black rounded-xl overflow-hidden border border-white/15 shadow-2xl flex items-center justify-center">
               <img
-                src={activeItem.imageUrl}
+                src={getMediaUrl(activeItem.imageUrl)}
                 alt={activeItem.title}
                 className="w-full h-full object-contain"
                 referrerPolicy="no-referrer"
+                decoding="async"
               />
             </div>
 
@@ -234,7 +236,7 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
               <button
                 type="button"
                 onClick={() => handleDownload(activeItem.imageUrl, activeItem.title)}
-                className="px-4 py-2 bg-black/60 hover:bg-[#FF2B2B] border border-white/20 hover:border-[#FF2B2B] text-white text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-all duration-200 flex items-center gap-1.5 shadow-md cursor-pointer"
+                className="px-4 py-2 bg-black/60 hover:bg-[#FF2B2B] border border-white/20 hover:border-[#FF2B2B] text-white text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-colors duration-200 flex items-center gap-1.5 shadow-md cursor-pointer min-h-[44px]"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>DOWNLOAD</span>
@@ -243,7 +245,7 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
               <button
                 type="button"
                 onClick={() => handleShare(activeItem)}
-                className="px-4 py-2 bg-black/60 hover:bg-[#FF2B2B] border border-white/20 hover:border-[#FF2B2B] text-white text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-all duration-200 flex items-center gap-1.5 shadow-md cursor-pointer"
+                className="px-4 py-2 bg-black/60 hover:bg-[#FF2B2B] border border-white/20 hover:border-[#FF2B2B] text-white text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-colors duration-200 flex items-center gap-1.5 shadow-md cursor-pointer min-h-[44px]"
               >
                 {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Share2 className="w-3.5 h-3.5" />}
                 <span>{copied ? 'COPIED!' : 'SHARE'}</span>

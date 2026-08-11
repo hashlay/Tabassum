@@ -67,6 +67,7 @@ export const LiveStreamSection: React.FC = () => {
                     className="w-full h-full border-0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
+                    loading="lazy"
                   />
                 ) : (
                   <div className="text-zinc-500 font-mono text-sm uppercase tracking-widest flex items-center gap-2">
