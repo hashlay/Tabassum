@@ -200,7 +200,7 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
                       return <ResultsSection key="results" onNavigate={handleNavigate} />;
                     case 'smile':
                     case 'photohub':
-                      return <SmilePhotoPortal key="smile" />;
+                      return <SmilePhotoPortal key="smile" cmsSettings={cmsData?.cmsSettings} />;
                     case 'gallery':
                       return <GallerySection key="gallery" onNavigate={handleNavigate} />;
                     case 'live_stream':
@@ -217,7 +217,7 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
                 <HeroSection onNavigate={handleNavigate} cmsSettings={cmsData?.cmsSettings} heroMedia={cmsData?.heroMedia} />
                 <AboutSection onOpenConceptModal={() => setIsConceptModalOpen(true)} cmsSettings={cmsData?.cmsSettings} />
                 <ResultsSection onNavigate={handleNavigate} />
-                <SmilePhotoPortal />
+                <SmilePhotoPortal cmsSettings={cmsData?.cmsSettings} />
                 <GallerySection onNavigate={handleNavigate} />
                 <LiveStreamSection />
                 <VideoHighlights />

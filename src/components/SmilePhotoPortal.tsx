@@ -1,20 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
 import QRCode from 'react-qr-code';
-import { QrCode, Camera, ExternalLink, RefreshCw } from 'lucide-react';
+import { QrCode, Camera, ExternalLink } from 'lucide-react';
 import { useFestival } from '../context/FestivalContext';
 
-export const SmilePhotoPortal: React.FC = () => {
-  const { eventSettings } = useFestival();
-  const [scanning, setScanning] = useState(false);
-  const driveLink = eventSettings?.photoHubDriveLink || 'https://drive.google.com/drive/folders/1cQNek6Q2EiThqdFrUDb1I8cfsmQneP1J';
+interface SmilePhotoPortalProps {
+  cmsSettings?: any;
+}
 
-  const handleSimulateScan = () => {
-    setScanning(true);
-    setTimeout(() => {
-      setScanning(false);
-      window.open(driveLink, '_blank', 'noreferrer');
-    }, 1200);
-  };
+export const SmilePhotoPortal: React.FC<SmilePhotoPortalProps> = ({ cmsSettings }) => {
+  const { eventSettings } = useFestival();
+  
+  // Link set by admin in CMS Website Studio (or event settings fallback)
+  const driveLink = cmsSettings?.photoHubDriveLink || eventSettings?.photoHubDriveLink || 'https://drive.google.com/drive/folders/1cQNek6Q2EiThqdFrUDb1I8cfsmQneP1J';
 
   return (
     <section id="smile" className="py-10 sm:py-14 bg-[#0A0A0A] relative overflow-hidden border-b border-white/10 font-sans">
@@ -40,7 +37,7 @@ export const SmilePhotoPortal: React.FC = () => {
         <div className="max-w-sm mx-auto bg-[#141416] border border-white/15 rounded-2xl p-6 sm:p-8 text-center relative overflow-hidden shadow-xl group">
           <div className="absolute inset-0 bg-gradient-to-b from-[#FF2B2B]/5 via-transparent to-transparent opacity-50" />
 
-          {/* QR Frame Container */}
+          {/* QR Frame Container - Clickable to Drive */}
           <a
             href={driveLink}
             target="_blank"
@@ -64,16 +61,16 @@ export const SmilePhotoPortal: React.FC = () => {
             </span>
           </a>
 
-          {/* Centered Scan & Access Drive Button */}
+          {/* Real Red Button Link Directing to Admin Dashboard Drive Link */}
           <a
             href={driveLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full py-3 bg-gradient-to-r from-[#FF2B2B] to-[#B30000] hover:from-[#FF4444] hover:to-[#E60000] text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg shadow-[#FF2B2B]/25 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer group"
+            className="w-full py-3.5 bg-gradient-to-r from-[#FF2B2B] to-[#B30000] hover:from-[#FF4444] hover:to-[#E60000] text-white text-xs font-extrabold uppercase tracking-wider rounded-xl shadow-lg shadow-[#FF2B2B]/30 hover:shadow-[#FF2B2B]/50 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer group border border-[#FF2B2B]/50 active:scale-[0.98]"
           >
-            <QrCode className="w-3.5 h-3.5" />
-            <span>Scan QR / Open Photo Drive</span>
-            <ExternalLink className="w-3.5 h-3.5 opacity-70 group-hover:opacity-100" />
+            <QrCode className="w-4 h-4" />
+            <span>SCAN QR / OPEN PHOTO DRIVE</span>
+            <ExternalLink className="w-4 h-4 opacity-80 group-hover:opacity-100 group-hover:translate-x-0.5 transition-transform" />
           </a>
         </div>
       </div>
