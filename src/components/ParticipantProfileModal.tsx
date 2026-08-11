@@ -111,12 +111,57 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
     });
   }, [allResults]);
 
+  // Dynamically compute ALL declared results (both Individual AND Group/Team results)
+  const participantDeclaredResults = useMemo(() => {
+    if (!p) return [];
+
+    const resultsList: any[] = [];
+    const seenCompKeys = new Set<string>();
+
+    (allResults || []).forEach((r: any) => {
+      const isIndividualMatch = (
+        r.participantId === p.id ||
+        r.codeNumber === p.codeNumber ||
+        r.participantName === cleanName ||
+        r.participantName === p.name ||
+        (r.raw && r.raw.participantId === p.id)
+      );
+
+      const isGroupMatch = (
+        r.participationType === 'group' ||
+        r.participationType === 'Group Event' ||
+        r.participationType === 'Group' ||
+        r.raw?.participationType === 'group'
+      ) && (
+        (r.raw && Array.isArray(r.raw.teamMemberIds) && r.raw.teamMemberIds.includes(p.id)) ||
+        (r.raw && r.raw.unitId === p.unitId && r.raw.competitionId && p.schedule?.some((s: any) => s.programId === r.raw.competitionId || s.program === r.eventName)) ||
+        (r.participantName && (r.participantName.includes(cleanName) || (p.department && r.participantName.includes(p.department))))
+      );
+
+      if (isIndividualMatch || isGroupMatch) {
+        const uniqueKey = r.id || `${r.competitionId}_${r.rank}_${r.participantName}`;
+        if (!seenCompKeys.has(uniqueKey)) {
+          seenCompKeys.add(uniqueKey);
+          resultsList.push({
+            ...r,
+            isGroupEvent: isGroupMatch && !isIndividualMatch
+          });
+        }
+      }
+    });
+
+    if (resultsList.length > 0) return resultsList;
+
+    // Fallback to p.results
+    return p.results || [];
+  }, [allResults, p, cleanName]);
+
   // Filter posters where this participant or their group team won Rank 1, 2, or 3
   const participantPosters = useMemo(() => {
     if (!p) return [];
 
     const wonCompKeys = new Set(
-      (p.results || [])
+      participantDeclaredResults
         .filter(r => r.rank === 1 || r.rank === 2 || r.rank === 3)
         .map(r => r.competitionId || `${r.eventName}__${r.category}`)
     );
@@ -131,9 +176,9 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
         (r.raw && Array.isArray(r.raw.teamMemberIds) && r.raw.teamMemberIds.includes(p.id))
       );
     });
-  }, [competitionPosters, p, cleanName]);
+  }, [competitionPosters, participantDeclaredResults, p, cleanName]);
 
-  // Dynamically compute published certificates directly from allResults live sync
+  // Dynamically compute published certificates directly from allResults live sync (Only candidate's personal certificate)
   const participantCertificates = useMemo(() => {
     if (!p) return [];
 
@@ -141,13 +186,24 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
       if (!r.certificatePublished) return false;
       if (!r.rank || r.rank < 1 || r.rank > 3) return false;
 
-      return (
+      const isIndividualMatch = (
         r.codeNumber === p.codeNumber ||
         r.participantName === cleanName ||
         r.participantName === p.name ||
-        (r.raw && r.raw.participantId === p.id) ||
-        (r.raw && Array.isArray(r.raw.teamMemberIds) && r.raw.teamMemberIds.includes(p.id))
+        (r.raw && r.raw.participantId === p.id)
       );
+
+      const isGroupMatch = (
+        r.participationType === 'group' ||
+        r.participationType === 'Group Event' ||
+        r.participationType === 'Group' ||
+        r.raw?.participationType === 'group'
+      ) && (
+        (r.raw && Array.isArray(r.raw.teamMemberIds) && r.raw.teamMemberIds.includes(p.id)) ||
+        (r.raw && r.raw.unitId === p.unitId && r.raw.competitionId && p.schedule?.some((s: any) => s.programId === r.raw.competitionId || s.program === r.eventName))
+      );
+
+      return isIndividualMatch || isGroupMatch;
     });
 
     if (liveCertificates.length > 0) return liveCertificates;
@@ -299,13 +355,13 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
             </h4>
           </div>
 
-          {(!p.results || p.results.length === 0) ? (
+          {participantDeclaredResults.length === 0 ? (
             <div className="bg-black/30 border border-white/10 rounded-3xl p-8 text-center text-sm text-zinc-400 font-mono">
               No results declared yet for your programs.
             </div>
           ) : (
             <div className="space-y-4">
-              {p.results.map((res) => {
+              {participantDeclaredResults.map((res) => {
                 const rawMarks = res.totalMark ?? res.marks ?? (res.raw ? (res.raw.totalMark ?? res.raw.judge1Mark) : undefined);
                 let computedGrade = res.grade;
                 if (rawMarks !== undefined && rawMarks !== null) {
@@ -320,21 +376,35 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                   else computedGrade = 'D';
                 }
 
+                const isGroup = res.isGroupEvent || res.participationType === 'group' || res.participationType === 'Group Event' || res.participationType === 'Group' || (res.raw && res.raw.participationType === 'group');
+
                 return (
-                  <div key={res.id} className="bg-[#18181B] border border-white/10 rounded-3xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 transition-all">
+                  <div key={res.id || `res-${Math.random()}`} className="bg-[#18181B] border border-white/10 rounded-3xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 transition-all">
                     <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 rounded-2xl bg-amber-500/20 border border-amber-500/40 text-amber-500 flex items-center justify-center font-black text-2xl shrink-0 shadow-inner">
-                        #{res.rank}
+                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-2xl shrink-0 shadow-inner ${
+                        res.rank === 1 ? 'bg-amber-500/20 border border-amber-500/40 text-amber-400' :
+                        res.rank === 2 ? 'bg-slate-300/20 border border-slate-300/40 text-slate-200' :
+                        res.rank === 3 ? 'bg-amber-700/20 border border-amber-700/40 text-amber-600' :
+                        'bg-emerald-500/20 border border-emerald-500/40 text-emerald-400'
+                      }`}>
+                        {res.rank ? `#${res.rank}` : 'Pass'}
                       </div>
                       <div className="space-y-1">
-                        <h5 className="text-lg font-bold text-white tracking-tight">{res.eventName}</h5>
+                        <div className="flex items-center gap-2">
+                          <h5 className="text-lg font-bold text-white tracking-tight">{res.eventName}</h5>
+                          {isGroup && (
+                            <span className="text-[10px] font-mono font-bold uppercase px-2.5 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-500/40 text-indigo-300">
+                              Group / Team
+                            </span>
+                          )}
+                        </div>
                         <p className="text-sm text-zinc-400 font-mono">
                           Grade: <strong className="text-emerald-400">{computedGrade || 'A'}</strong>{rawMarks !== undefined ? <> • Total Marks: <strong className="text-amber-400">{rawMarks} marks</strong></> : null}
                         </p>
                       </div>
                     </div>
                     <div className="text-xs font-mono text-zinc-400 bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl text-center self-start md:self-center">
-                      {res.participationType || 'Individual Event'}
+                      {isGroup ? 'Group Team Event' : 'Individual Event'}
                     </div>
                   </div>
                 );
