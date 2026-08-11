@@ -119,23 +119,21 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
     const seenCompKeys = new Set<string>();
 
     (allResults || []).forEach((r: any) => {
+      // STRICT ID MATCHING for individuals
       const isIndividualMatch = (
         r.participantId === p.id ||
         r.codeNumber === p.codeNumber ||
-        r.participantName === cleanName ||
-        r.participantName === p.name ||
         (r.raw && r.raw.participantId === p.id)
       );
 
+      // STRICT ID MATCHING for group teams
       const isGroupMatch = (
         r.participationType === 'group' ||
         r.participationType === 'Group Event' ||
         r.participationType === 'Group' ||
         r.raw?.participationType === 'group'
       ) && (
-        (r.raw && Array.isArray(r.raw.teamMemberIds) && r.raw.teamMemberIds.includes(p.id)) ||
-        (r.raw && r.raw.unitId === p.unitId && r.raw.competitionId && p.schedule?.some((s: any) => s.programId === r.raw.competitionId || s.program === r.eventName)) ||
-        (r.participantName && (r.participantName.includes(cleanName) || (p.department && r.participantName.includes(p.department))))
+        r.raw && Array.isArray(r.raw.teamMemberIds) && r.raw.teamMemberIds.includes(p.id)
       );
 
       if (isIndividualMatch || isGroupMatch) {
@@ -154,7 +152,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
 
     // Fallback to p.results
     return p.results || [];
-  }, [allResults, p, cleanName]);
+  }, [allResults, p]);
 
   // Filter posters where this participant or their group team won Rank 1, 2, or 3
   const participantPosters = useMemo(() => {
@@ -169,14 +167,13 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
     return competitionPosters.filter(poster => {
       if (wonCompKeys.has(poster.key)) return true;
       return poster.results.some(r =>
+        r.participantId === p.id ||
         r.codeNumber === p.codeNumber ||
-        r.participantName === cleanName ||
-        r.participantName === p.name ||
         (r.raw && r.raw.participantId === p.id) ||
         (r.raw && Array.isArray(r.raw.teamMemberIds) && r.raw.teamMemberIds.includes(p.id))
       );
     });
-  }, [competitionPosters, participantDeclaredResults, p, cleanName]);
+  }, [competitionPosters, participantDeclaredResults, p]);
 
   // Dynamically compute published certificates directly from allResults live sync (Only candidate's personal certificate)
   const participantCertificates = useMemo(() => {
@@ -186,21 +183,21 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
       if (!r.certificatePublished) return false;
       if (!r.rank || r.rank < 1 || r.rank > 3) return false;
 
+      // STRICT ID MATCHING for individuals
       const isIndividualMatch = (
+        r.participantId === p.id ||
         r.codeNumber === p.codeNumber ||
-        r.participantName === cleanName ||
-        r.participantName === p.name ||
         (r.raw && r.raw.participantId === p.id)
       );
 
+      // STRICT ID MATCHING for group teams
       const isGroupMatch = (
         r.participationType === 'group' ||
         r.participationType === 'Group Event' ||
         r.participationType === 'Group' ||
         r.raw?.participationType === 'group'
       ) && (
-        (r.raw && Array.isArray(r.raw.teamMemberIds) && r.raw.teamMemberIds.includes(p.id)) ||
-        (r.raw && r.raw.unitId === p.unitId && r.raw.competitionId && p.schedule?.some((s: any) => s.programId === r.raw.competitionId || s.program === r.eventName))
+        r.raw && Array.isArray(r.raw.teamMemberIds) && r.raw.teamMemberIds.includes(p.id)
       );
 
       return isIndividualMatch || isGroupMatch;
