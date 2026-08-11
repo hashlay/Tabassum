@@ -368,6 +368,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                       <CertificateImage 
                         participantName={cleanName}
                         competitionName={res.eventName}
+                        competitionId={res.competitionId}
                         rank={res.rank || 1}
                         className="w-full h-full object-contain"
                         onLoadUrl={(url) => {

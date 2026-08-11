@@ -4,13 +4,14 @@ import { useFestival } from '../context/FestivalContext';
 interface CertificateImageProps {
   participantName: string;
   competitionName: string;
+  competitionId?: string;
   rank: number;
   className?: string;
   onLoadUrl?: (url: string) => void;
 }
 
 export const CertificateImage: React.FC<CertificateImageProps> = ({ 
-  participantName, competitionName, rank, className = '', onLoadUrl 
+  participantName, competitionName, competitionId, rank, className = '', onLoadUrl 
 }) => {
   const { eventSettings } = useFestival();
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -97,7 +98,10 @@ export const CertificateImage: React.FC<CertificateImageProps> = ({
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
-      const templateConfig = eventSettings?.certificateTemplateConfig?.[rank] || {};
+      const compKey = `${competitionId || competitionName}_${rank}`;
+      const compSpecificConfig = eventSettings?.certificateTemplateConfig?.[compKey];
+      const globalRankConfig = eventSettings?.certificateTemplateConfig?.[rank] || {};
+      const templateConfig = compSpecificConfig || globalRankConfig;
       const nameX = templateConfig.nameX ?? (rank === 1 ? -151 : -125);
       const nameY = templateConfig.nameY ?? 461;
       const compX = templateConfig.compX ?? (rank === 1 ? -37 : -30);
