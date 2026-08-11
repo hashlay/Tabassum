@@ -6,12 +6,14 @@ import { useFestival } from '../context/FestivalContext';
 interface HeaderProps {
   activeSection: string;
   onNavigate: (sectionId: string) => void;
+  cmsSettings?: any;
+  dragBlocks?: any[];
 }
 
-export const Header: React.FC<HeaderProps> = ({ activeSection, onNavigate }) => {
+export const Header: React.FC<HeaderProps> = ({ activeSection, onNavigate, cmsSettings, dragBlocks }) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { authUser, openLoginModal, setActiveModalView, cmsSettings } = useFestival();
+  const { authUser, openLoginModal, setActiveModalView } = useFestival();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -21,17 +23,56 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, onNavigate }) => 
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const navLinks: { id: string; label: string; isLive?: boolean; badge?: string }[] = [
-    { id: 'hero', label: 'Home' },
-    { id: 'about', label: 'About' },
-    { id: 'results', label: 'Results' },
-    { id: 'team-points', label: 'Team Points' },
-    { id: 'posters', label: 'Posters' },
-    { id: 'smile', label: 'Photo Hub' },
-    { id: 'live', label: 'Live Stream', isLive: false },
-    { id: 'gallery', label: 'Gallery' },
-    { id: 'highlights', label: 'Highlights' },
-  ];
+  const getDynamicNavLinks = () => {
+    const defaultLinks = [
+      { id: 'hero', label: 'Home' },
+      { id: 'about', label: 'About' },
+      { id: 'results', label: 'Results' },
+      { id: 'team-points', label: 'Team Points' },
+      { id: 'posters', label: 'Posters' },
+      { id: 'smile', label: 'Photo Hub' },
+      { id: 'live', label: 'Live Stream' },
+      { id: 'gallery', label: 'Gallery' },
+      { id: 'highlights', label: 'Highlights' },
+    ];
+
+    const blocks = dragBlocks || cmsSettings?.dragBlocks || cmsSettings?.layoutSections;
+    if (!blocks || !Array.isArray(blocks) || blocks.length === 0) {
+      return defaultLinks;
+    }
+
+    const enabledBlocks = blocks.filter((b: any) => b.enabled !== false).sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
+
+    const links: { id: string; label: string; isLive?: boolean }[] = [];
+    links.push({ id: 'hero', label: 'Home' });
+
+    enabledBlocks.forEach((block: any) => {
+      const type = block.type || block.id;
+      if (type === 'about') {
+        links.push({ id: 'about', label: 'About' });
+      } else if (type === 'announcements' || type === 'results_announced') {
+        links.push({ id: 'results', label: 'Results' });
+      } else if (type === 'results' || type === 'standings') {
+        links.push({ id: 'team-points', label: 'Team Points' });
+      } else if (type === 'smile' || type === 'photohub') {
+        links.push({ id: 'smile', label: 'Photo Hub' });
+      } else if (type === 'gallery') {
+        links.push({ id: 'gallery', label: 'Gallery' });
+      } else if (type === 'live_stream' || type === 'live_stages') {
+        links.push({ id: 'live', label: 'Live Stream' });
+      } else if (type === 'highlights') {
+        links.push({ id: 'highlights', label: 'Highlights' });
+      }
+    });
+
+    if (!links.some(l => l.id === 'posters')) {
+      links.splice(Math.min(4, links.length), 0, { id: 'posters', label: 'Posters' });
+    }
+
+    return links;
+  };
+
+  const navLinks = getDynamicNavLinks();
 
   const handleLinkClick = (id: string) => {
     onNavigate(id);

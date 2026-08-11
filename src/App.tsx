@@ -169,7 +169,7 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
 
   return (
     <div className="min-h-screen bg-[#0D0D0D] text-white selection:bg-emerald-500 font-sans antialiased overflow-x-hidden relative">
-      <Header activeSection={pageView === 'home' ? activeSection : pageView} onNavigate={handleNavigate} />
+      <Header activeSection={pageView === 'home' ? activeSection : pageView} onNavigate={handleNavigate} cmsSettings={cmsData?.cmsSettings} dragBlocks={cmsData?.dragBlocks} />
 
       <main>
         {pageView === 'gallery' ? (
@@ -198,13 +198,11 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
                       return <AboutSection key="about" onOpenConceptModal={() => setIsConceptModalOpen(true)} cmsSettings={cmsData.cmsSettings} />;
                     case 'results':
                       return <ResultsSection key="results" onNavigate={handleNavigate} />;
+                    case 'smile':
+                    case 'photohub':
+                      return <SmilePhotoPortal key="smile" />;
                     case 'gallery':
-                      return (
-                        <React.Fragment key="gallery_group">
-                          <GallerySection onNavigate={handleNavigate} />
-                          <SmilePhotoPortal />
-                        </React.Fragment>
-                      );
+                      return <GallerySection key="gallery" onNavigate={handleNavigate} />;
                     case 'live_stream':
                     case 'live_stages':
                       return <LiveStreamSection key="live_stream" />;
@@ -219,8 +217,8 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
                 <HeroSection onNavigate={handleNavigate} cmsSettings={cmsData?.cmsSettings} heroMedia={cmsData?.heroMedia} />
                 <AboutSection onOpenConceptModal={() => setIsConceptModalOpen(true)} cmsSettings={cmsData?.cmsSettings} />
                 <ResultsSection onNavigate={handleNavigate} />
-                <GallerySection onNavigate={handleNavigate} />
                 <SmilePhotoPortal />
+                <GallerySection onNavigate={handleNavigate} />
                 <LiveStreamSection />
                 <VideoHighlights />
               </>
