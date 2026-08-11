@@ -327,7 +327,7 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
                                 </td>
                                 <td className="py-3 px-4 text-right">
                                   {(() => {
-                                    const m = res.totalMark ?? res.marks ?? (res.raw ? res.raw.totalMark : 0);
+                                    const m = res.averageMark ?? (res.raw ? res.raw.averageMark : undefined) ?? res.totalMark ?? res.marks ?? (res.raw ? res.raw.totalMark : 0);
                                     let g = res.grade;
                                     if (m > 0) {
                                       if (m >= 90) g = 'A+';

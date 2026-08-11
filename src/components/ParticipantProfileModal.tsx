@@ -359,7 +359,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
           ) : (
             <div className="space-y-4">
               {participantDeclaredResults.map((res) => {
-                const rawMarks = res.totalMark ?? res.marks ?? (res.raw ? (res.raw.totalMark ?? res.raw.judge1Mark) : undefined);
+                const rawMarks = res.averageMark ?? (res.raw ? res.raw.averageMark : undefined) ?? res.totalMark ?? res.marks ?? (res.raw ? (res.raw.totalMark ?? res.raw.judge1Mark) : undefined);
                 let computedGrade = res.grade;
                 if (rawMarks !== undefined && rawMarks !== null) {
                   const m = Number(rawMarks);
