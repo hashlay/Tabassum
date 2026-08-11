@@ -1,0 +1,397 @@
+
+export function getDefaultThemeConfig(): any {
+
+  return {
+    titleColor: '#fbbf24',
+    winnerColor: '#ffffff',
+    unitColor: '#34d399',
+    titleSize: 36,
+    resultLabelText: 'RESULT',
+    resultLabelX: 470,
+    resultLabelY: 180,
+    resultLabelSize: 28,
+    resultLabelColor: '#ffffff',
+    resultNumX: 600,
+    resultNumY: 180,
+    resultNumSize: 28,
+    resultNumColor: '#ffffff',
+    categorySize: 32,
+    compNameSize: 52,
+    winnerSize: 44,
+    unitSize: 30,
+    rankSize: 38,
+    titleX: 540,
+    titleY: 110,
+    categoryX: 540,
+    categoryY: 260,
+    compNameX: 540,
+    compNameY: 330,
+    rank1BadgeX: 140,
+    rank1BadgeY: 460,
+    rank1NameX: 260,
+    rank1NameY: 448,
+    rank1UnitX: 260,
+    rank1UnitY: 483,
+    rank2BadgeX: 140,
+    rank2BadgeY: 640,
+    rank2NameX: 260,
+    rank2NameY: 628,
+    rank2UnitX: 260,
+    rank2UnitY: 663,
+    rank3BadgeX: 140,
+    rank3BadgeY: 820,
+    rank3NameX: 260,
+    rank3NameY: 808,
+    rank3UnitX: 260,
+    rank3UnitY: 843,
+    fontFamily: 'sans-serif',
+    uppercaseNames: false,
+    rankBadgeShape: 'pill',
+    rank1Color: '#fbbf24',
+    rank2Color: '#e2e8f0',
+    rank3Color: '#d97706',
+    rankTextColor: '#000000',
+    rank1Text: 'Rank 1',
+    rank2Text: 'Rank 2',
+    rank3Text: 'Rank 3',
+    showFooter: true,
+    showFooterBg: false,
+    footerLine1: '',
+    footerLine2: '',
+
+    // Block Letters (Uppercase) options
+    campusNameUppercase: true,
+    festNameUppercase: true,
+    resultLabelUppercase: true,
+    resultNumUppercase: false,
+    categoryUppercase: true,
+    compNameUppercase: false,
+    winnerUppercase: false,
+    unitUppercase: true,
+  };
+}
+
+// Migrate old flat config to per-theme (same logic as PosterSettingsView)
+
+export function migrateOldConfig(templateConfig: any, defaultThemes: string[]): any {
+  if (templateConfig.themeConfigs) {
+    return templateConfig;
+  }
+  const oldConf = { ...templateConfig };
+  const customThemes = oldConf.customThemes || defaultThemes;
+  const themeRules = oldConf.themeRules || [];
+  delete oldConf.customThemes;
+  delete oldConf.themeRules;
+
+  if (oldConf.badgeX !== undefined) {
+    oldConf.resultLabelX = oldConf.resultLabelX ?? (oldConf.badgeX - 60);
+    oldConf.resultLabelY = oldConf.resultLabelY ?? oldConf.badgeY;
+    oldConf.resultLabelSize = oldConf.resultLabelSize ?? (oldConf.badgeSize ?? 28);
+    oldConf.resultNumX = oldConf.resultNumX ?? (oldConf.badgeX + 60);
+    oldConf.resultNumY = oldConf.resultNumY ?? oldConf.badgeY;
+    oldConf.resultNumSize = oldConf.resultNumSize ?? (oldConf.badgeSize ?? 28);
+  }
+
+  const wsx = oldConf.winnersStartX ?? 140;
+  const wsy = oldConf.winnersStartY ?? 460;
+  oldConf.rank1BadgeX = oldConf.rank1BadgeX ?? wsx;
+  oldConf.rank1BadgeY = oldConf.rank1BadgeY ?? wsy;
+  oldConf.rank1NameX = oldConf.rank1NameX ?? (wsx + 120);
+  oldConf.rank1NameY = oldConf.rank1NameY ?? (wsy - 12);
+  oldConf.rank1UnitX = oldConf.rank1UnitX ?? (wsx + 120);
+  oldConf.rank1UnitY = oldConf.rank1UnitY ?? (wsy + 23);
+  oldConf.rank2BadgeX = oldConf.rank2BadgeX ?? wsx;
+  oldConf.rank2BadgeY = oldConf.rank2BadgeY ?? (wsy + 180);
+  oldConf.rank2NameX = oldConf.rank2NameX ?? (wsx + 120);
+  oldConf.rank2NameY = oldConf.rank2NameY ?? (wsy + 168);
+  oldConf.rank2UnitX = oldConf.rank2UnitX ?? (wsx + 120);
+  oldConf.rank2UnitY = oldConf.rank2UnitY ?? (wsy + 203);
+  oldConf.rank3BadgeX = oldConf.rank3BadgeX ?? wsx;
+  oldConf.rank3BadgeY = oldConf.rank3BadgeY ?? (wsy + 360);
+  oldConf.rank3NameX = oldConf.rank3NameX ?? (wsx + 120);
+  oldConf.rank3NameY = oldConf.rank3NameY ?? (wsy + 348);
+  oldConf.rank3UnitX = oldConf.rank3UnitX ?? (wsx + 120);
+  oldConf.rank3UnitY = oldConf.rank3UnitY ?? (wsy + 383);
+  oldConf.rank1Text = oldConf.rank1Text ?? ((oldConf.rankPrefix ?? 'Rank ') + '1');
+  oldConf.rank2Text = oldConf.rank2Text ?? ((oldConf.rankPrefix ?? 'Rank ') + '2');
+  oldConf.rank3Text = oldConf.rank3Text ?? ((oldConf.rankPrefix ?? 'Rank ') + '3');
+
+  const themeConfigs: any = {};
+  customThemes.forEach((_: any, idx: number) => {
+    themeConfigs[idx] = { ...getDefaultThemeConfig(), ...oldConf };
+  });
+
+  return { customThemes, themeRules, themeConfigs };
+}
+
+
+
+export const renderPosterToCanvas = async (
+  canvas: HTMLCanvasElement,
+  compResults: any[],
+  eventSettings: any,
+  compName: string,
+  categoryName: string,
+  compIdx: number
+) => {
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const rawTemplateConfig = eventSettings?.posterTemplateConfig || {};
+  const defaultThemes = [
+    'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDgwIiBoZWlnaHQ9IjEzNTAiPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZzEiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMDIwNjE3Ii8+PHN0b3Agb2Zmc2V0PSI1MCUiIHN0b3AtY29sb3I9IiMwZjE3MmEiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMxZTFiNGIiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMTA4MCIgaGVpZ2h0PSIxMzUwIiBmaWxsPSJ1cmwoI2cxKSIvPjwvc3ZnPg==',
+    'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDgwIiBoZWlnaHQ9IjEzNTAiPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZzIiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMDIyYzIyIi8+PHN0b3Agb2Zmc2V0PSI1MCUiIHN0b3AtY29sb3I9IiMwNjRlM2IiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwNjVmNDYiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMTA4MCIgaGVpZ2h0PSIxMzUwIiBmaWxsPSJ1cmwoI2cyKSIvPjwvc3ZnPg==',
+    'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDgwIiBoZWlnaHQ9IjEzNTAiPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZzMiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNDUwYTBhIi8+PHN0b3Agb2Zmc2V0PSI1MCUiIHN0b3AtY29sb3I9IiM4ODEzMzciLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM5ZjEyMzkiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMTA4MCIgaGVpZ2h0PSIxMzUwIiBmaWxsPSJ1cmwoI2czKSIvPjwvc3ZnPg==',
+    'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDgwIiBoZWlnaHQ9IjEzNTAiPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZzQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMDkwOTBiIi8+PHN0b3Agb2Zmc2V0PSI1MCUiIHN0b3AtY29sb3I9IiMxODE4MWIiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMyNzI3MmEiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMTA4MCIgaGVpZ2h0PSIxMzUwIiBmaWxsPSJ1cmwoI2c0KSIvPjwvc3ZnPg=='
+  ];
+  const migratedConfig = migrateOldConfig({
+    ...rawTemplateConfig,
+    customThemes: rawTemplateConfig.customThemes || defaultThemes
+  }, defaultThemes);
+
+  const customThemes: string[] = migratedConfig.customThemes || defaultThemes;
+  const themeRules: any[] = migratedConfig.themeRules || [];
+  const themeConfigs: any = migratedConfig.themeConfigs || {};
+
+  const getThemeIndexForResult = (resultNum: number): number => {
+    const rule = themeRules.find((r: any) => resultNum >= r.startResult && resultNum <= r.endResult);
+    if (rule && rule.themeIndex !== undefined && rule.themeIndex < customThemes.length) {
+      return rule.themeIndex;
+    }
+    if (rule && rule.themeUrl) {
+      const idx = customThemes.indexOf(rule.themeUrl);
+      if (idx >= 0) return idx;
+    }
+    return 0;
+  };
+
+  const themeIdx = getThemeIndexForResult(compIdx);
+  const c = { ...getDefaultThemeConfig(), ...(themeConfigs[themeIdx] || {}) };
+  const backgroundSource = customThemes[themeIdx] || customThemes[0];
+  
+  const festivalName = eventSettings?.festivalName || 'Sahityotsav';
+  const campusName = eventSettings?.campusName || eventSettings?.sectorName || 'Campus';
+  
+  const W = 1080;
+  const H = 1350;
+  canvas.width = W;
+  canvas.height = H;
+
+  const drawOverlay = (W: number, H: number) => {
+    const activeCategory = { name: categoryName };
+    const activeComp = { name: compName };
+    // Removed dummy addRegion
+    let hoveredElement = null;
+    let dragging = null;
+    
+    
+    if (!activeComp) return;
+
+    const regions: { id: string, x: number, y: number, w: number, h: number }[] = [];
+    const addRegion = (id: string, x: number, y: number, w: number, h: number) => {
+      regions.push({ id, x, y, w, h });
+      if (hoveredElement === id || dragging === id) {
+        ctx.save();
+        ctx.strokeStyle = dragging === id ? '#22d3ee' : 'rgba(34, 211, 238, 0.5)';
+        ctx.lineWidth = dragging === id ? 4 : 2;
+        ctx.setLineDash(dragging === id ? [] : [8, 4]);
+        ctx.strokeRect(x, y, w, h);
+        ctx.restore();
+      }
+    };
+
+    // Campus Name
+    if (c.showCampusName !== false) {
+      ctx.textAlign = 'left';
+      ctx.font = `900 ${c.campusNameSize ?? 28}px ${c.campusNameFont || c.fontFamily || 'sans-serif'}`;
+      ctx.fillStyle = c.campusNameColor || c.titleColor || '#ffffff';
+      const campusText = c.campusNameUppercase !== false ? campusName.toUpperCase() : campusName;
+      const campusMetrics = ctx.measureText(campusText);
+      const cx = c.campusNameX ?? c.titleX ?? 540;
+      const cy = c.campusNameY ?? (c.titleY ? Math.max(c.titleY - 30, 30) : 70);
+      ctx.fillText(campusText, cx, cy);
+      addRegion('campusName', cx - 10, cy - (c.campusNameSize ?? 28) - 5, campusMetrics.width + 20, (c.campusNameSize ?? 28) + 20);
+    }
+
+    // Fest Name
+    if (c.showFestName !== false) {
+      ctx.textAlign = 'left';
+      ctx.font = `900 ${c.festNameSize ?? 36}px ${c.festNameFont || c.fontFamily || 'sans-serif'}`;
+      ctx.fillStyle = c.festNameColor || c.titleColor || '#fbbf24';
+      const festText = c.festNameUppercase !== false ? festivalName.toUpperCase() : festivalName;
+      const festMetrics = ctx.measureText(festText);
+      const fx = c.festNameX ?? c.titleX ?? 540;
+      const fy = c.festNameY ?? (c.titleY ? c.titleY + 20 : 120);
+      ctx.fillText(festText, fx, fy);
+      addRegion('festName', fx - 10, fy - (c.festNameSize ?? 36) - 5, festMetrics.width + 20, (c.festNameSize ?? 36) + 20);
+    }
+
+    // Formatted result number: 1 -> 01, 9 -> 09, 10 -> 10, 105 -> 105 (without #)
+    const formattedNum = compIdx < 10 ? compIdx.toString().padStart(2, '0') : compIdx.toString();
+
+    // Result Label Word (e.g. "RESULT")
+    ctx.textAlign = 'left';
+    ctx.font = `800 ${c.resultLabelSize || 28}px ${c.resultLabelFont || c.fontFamily || 'sans-serif'}`;
+    ctx.fillStyle = c.resultLabelColor || '#ffffff';
+    const rawLbl = c.resultLabelText || 'RESULT';
+    const rLblText = c.resultLabelUppercase !== false ? rawLbl.toUpperCase() : rawLbl;
+    const rLblMetrics = ctx.measureText(rLblText);
+    const rx = c.resultLabelX ?? 470;
+    const ry = c.resultLabelY ?? 180;
+    ctx.fillText(rLblText, rx, ry);
+    addRegion('resultLabel', rx - 10, ry - (c.resultLabelSize || 28) - 5, rLblMetrics.width + 20, (c.resultLabelSize || 28) + 20);
+
+    // Result Number (e.g. "01", "10", "105")
+    ctx.textAlign = 'left';
+    ctx.font = `800 ${c.resultNumSize || 28}px ${c.resultNumFont || c.fontFamily || 'sans-serif'}`;
+    ctx.fillStyle = c.resultNumColor || '#ffffff';
+    const rNumX = c.resultNumX ?? 600;
+    const rNumY = c.resultNumY ?? 180;
+    ctx.fillText(formattedNum, rNumX, rNumY);
+    const rNumMetrics = ctx.measureText(formattedNum);
+    addRegion('resultNum', rNumX - 10, rNumY - (c.resultNumSize || 28) - 5, rNumMetrics.width + 20, (c.resultNumSize || 28) + 20);
+
+    // Category
+    ctx.textAlign = 'left';
+    ctx.font = `800 ${c.categorySize ?? 32}px ${c.categoryFont || c.fontFamily || 'sans-serif'}`;
+    ctx.fillStyle = c.categoryColor || 'rgba(255, 255, 255, 0.7)';
+    const rawCat = activeCategory?.name || 'GENERAL';
+    const catText = c.categoryUppercase !== false ? rawCat.toUpperCase() : rawCat;
+    const catMetrics = ctx.measureText(catText);
+    const catX = c.categoryX ?? 540;
+    const catY = c.categoryY ?? 260;
+    ctx.fillText(catText, catX, catY);
+    addRegion('category', catX - 10, catY - (c.categorySize ?? 32) - 5, catMetrics.width + 20, (c.categorySize ?? 32) + 20);
+
+    // Competition Name
+    ctx.textAlign = 'left';
+    ctx.font = `900 ${c.compNameSize ?? 52}px ${c.compNameFont || c.fontFamily || 'sans-serif'}`;
+    ctx.fillStyle = c.compNameColor || '#ffffff';
+    const rawComp = activeComp.name;
+    const compText = c.compNameUppercase ? rawComp.toUpperCase() : rawComp;
+    const compMetrics = ctx.measureText(compText);
+    const compX = c.compNameX ?? 540;
+    const compY = c.compNameY ?? 330;
+    ctx.fillText(compText, compX, compY);
+    addRegion('compName', compX - 10, compY - (c.compNameSize ?? 52) - 5, compMetrics.width + 20, (c.compNameSize ?? 52) + 20);
+
+
+
+    // Draw each rank with per-rank positions
+    compResults.forEach((res) => {
+      const rank = res.rank || 1;
+      if (rank > 3) return;
+
+      let winnerName = 'Participant Name';
+      let winnerUnit = 'Unit Name';
+
+      winnerName = c.winnerUppercase === false && !c.uppercaseNames ? res.participantName : res.participantName.toUpperCase();
+      winnerUnit = res.department;
+      const bx = c[`rank${rank}BadgeX`] ?? 140;
+      const by = c[`rank${rank}BadgeY`] ?? (460 + (rank - 1) * 180);
+      const nx = c[`rank${rank}NameX`] ?? 260;
+      const ny = c[`rank${rank}NameY`] ?? (448 + (rank - 1) * 180);
+      const ux = c[`rank${rank}UnitX`] ?? 260;
+      const uy = c[`rank${rank}UnitY`] ?? (483 + (rank - 1) * 180);
+
+      const rColor = rank === 1 ? c.rank1Color : rank === 2 ? c.rank2Color : c.rank3Color;
+      const rankText = rank === 1 ? c.rank1Text : rank === 2 ? c.rank2Text : c.rank3Text;
+
+      // Rank badge
+      ctx.font = `900 ${c.rankSize}px ${c.rankFont || c.fontFamily || 'sans-serif'}`;
+      const textWidth = ctx.measureText(rankText).width;
+
+      if (c.rankBadgeShape !== 'none') {
+        ctx.fillStyle = rColor;
+        ctx.beginPath();
+        if (c.rankBadgeShape === 'pill') {
+          ctx.roundRect(bx - (textWidth / 2) - 20, by - 37, textWidth + 40, 50, 25);
+        } else if (c.rankBadgeShape === 'circle') {
+          ctx.arc(bx, by - 12, 40, 0, 2 * Math.PI);
+        } else {
+          ctx.rect(bx - (textWidth / 2) - 20, by - 37, textWidth + 40, 50);
+        }
+        ctx.fill();
+      }
+
+      ctx.fillStyle = c.rankTextColor || '#000000';
+      ctx.textAlign = 'center';
+      ctx.fillText(rankText, bx, by);
+      addRegion(`rank${rank}Badge`, bx - textWidth / 2 - 25, by - 42, textWidth + 50, 60);
+
+      // Winner name
+      ctx.textAlign = 'left';
+      ctx.font = `800 ${c.winnerSize}px ${c.winnerFont || c.fontFamily || 'sans-serif'}`;
+      ctx.fillStyle = c.winnerColor;
+      ctx.fillText(winnerName, nx, ny);
+      const nameMetrics = ctx.measureText(winnerName);
+      addRegion(`rank${rank}Name`, nx - 5, ny - (c.winnerSize ?? 44) - 5, nameMetrics.width + 10, (c.winnerSize ?? 44) + 15);
+
+      // Unit name
+      ctx.font = `700 ${c.unitSize}px ${c.unitFont || 'monospace'}`;
+      ctx.fillStyle = c.unitColor;
+      const unitText = c.unitUppercase !== false ? winnerUnit.toUpperCase() : winnerUnit;
+      ctx.fillText(unitText, ux, uy);
+      const unitMetrics = ctx.measureText(unitText);
+      addRegion(`rank${rank}Unit`, ux - 5, uy - (c.unitSize ?? 30) - 5, unitMetrics.width + 10, (c.unitSize ?? 30) + 15);
+    });
+
+    // Footer
+    if (c.showFooter !== false) {
+      if (c.showFooterBg) {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+        ctx.fillRect(0, H - 180, W, 180);
+      }
+      const line1 = c.footerLine1 || `OFFICIAL WINNERS ANNOUNCEMENT \u2022 ${festivalName.toUpperCase()}`;
+      const line2 = c.footerLine2 || `Generated live by ${campusName} ${festivalName} Management Portal`;
+
+      ctx.textAlign = 'center';
+      ctx.font = `800 28px ${c.fontFamily || 'sans-serif'}`;
+      ctx.fillStyle = c.titleColor || '#fbbf24';
+      ctx.fillText(line1, W / 2, H - 100);
+
+      ctx.font = '600 20px monospace';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+      ctx.fillText(line2, W / 2, H - 55);
+    }
+  };
+
+  return new Promise((resolve) => {
+    const drawBackgroundAndOverlay = (bgImg?: HTMLImageElement) => {
+      try {
+        const W = bgImg ? (bgImg.naturalWidth || bgImg.width || 1080) : 1080;
+        const H = bgImg ? (bgImg.naturalHeight || bgImg.height || 1350) : 1350;
+        canvas.width = W;
+        canvas.height = H;
+
+        if (bgImg) {
+          ctx.drawImage(bgImg, 0, 0, W, H);
+        } else {
+          const grad = ctx.createLinearGradient(0, 0, 0, H);
+          grad.addColorStop(0, '#020617');
+          grad.addColorStop(0.5, '#0f172a');
+          grad.addColorStop(1, '#1e1b4b');
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, W, H);
+        }
+        drawOverlay(W, H);
+        resolve(true);
+      } catch (e) {
+        console.error("Error drawing poster overlay:", e);
+        resolve(false);
+      }
+    };
+
+    if (backgroundSource) {
+      const img = new Image();
+      if (backgroundSource.startsWith('http://') || backgroundSource.startsWith('https://')) {
+        img.crossOrigin = 'anonymous';
+      }
+      img.onload = () => drawBackgroundAndOverlay(img);
+      img.onerror = () => drawBackgroundAndOverlay();
+      img.src = backgroundSource;
+    } else {
+      drawBackgroundAndOverlay();
+    }
+  });
+};

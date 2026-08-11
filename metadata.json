@@ -1,0 +1,6 @@
+{
+  "name": "Rendezvous Silver Edition - Imam Rabbani LIFE Festival",
+  "description": "Official festival portal for Rendezvous Silver Edition – Imam Rabbani LIFE Festival organized by Kulliyathu Imam Rabbani, Markaz Garden Poonoor.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
