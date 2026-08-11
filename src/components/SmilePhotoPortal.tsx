@@ -35,14 +35,14 @@ export const SmilePhotoPortal: React.FC<SmilePhotoPortalProps> = ({ cmsSettings 
 
         {/* Centered Interactive QR Scanner Frame & Drive Action Button */}
         <div className="max-w-sm mx-auto bg-[#141416] border border-white/15 rounded-2xl p-6 sm:p-8 text-center relative overflow-hidden shadow-xl group">
-          <div className="absolute inset-0 bg-gradient-to-b from-[#FF2B2B]/5 via-transparent to-transparent opacity-50" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#FF2B2B]/5 via-transparent to-transparent opacity-50 pointer-events-none" />
 
           {/* QR Frame Container - Clickable to Drive */}
           <a
             href={driveLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="relative w-48 h-48 sm:w-52 sm:h-52 mx-auto bg-black p-3 rounded-xl border-2 border-[#FF2B2B]/50 hover:border-[#FF2B2B] shadow-xl flex flex-col items-center justify-center mb-6 block transition-all group/qr cursor-pointer"
+            className="relative z-10 w-48 h-48 sm:w-52 sm:h-52 mx-auto bg-black p-3 rounded-xl border-2 border-[#FF2B2B]/50 hover:border-[#FF2B2B] shadow-xl flex flex-col items-center justify-center mb-6 block transition-all group/qr cursor-pointer"
             title="Click to open Photo Drive"
           >
             {/* Corner markers */}
@@ -66,7 +66,7 @@ export const SmilePhotoPortal: React.FC<SmilePhotoPortalProps> = ({ cmsSettings 
             href={driveLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full py-3.5 bg-gradient-to-r from-[#FF2B2B] to-[#B30000] hover:from-[#FF4444] hover:to-[#E60000] text-white text-xs font-extrabold uppercase tracking-wider rounded-xl shadow-lg shadow-[#FF2B2B]/30 hover:shadow-[#FF2B2B]/50 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer group border border-[#FF2B2B]/50 active:scale-[0.98]"
+            className="relative z-10 w-full py-3.5 bg-gradient-to-r from-[#FF2B2B] to-[#B30000] hover:from-[#FF4444] hover:to-[#E60000] text-white text-xs font-extrabold uppercase tracking-wider rounded-xl shadow-lg shadow-[#FF2B2B]/30 hover:shadow-[#FF2B2B]/50 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer group border border-[#FF2B2B]/50 active:scale-[0.98] block"
           >
             <QrCode className="w-4 h-4" />
             <span>SCAN QR / OPEN PHOTO DRIVE</span>
