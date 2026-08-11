@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { GalleryItem } from '../types';
+import { ZoomIn, ArrowRight, X, ChevronLeft, ChevronRight, Download, Share2, Check, Send, Copy, Image as ImageIcon } from 'lucide-react';
 import { getMediaUrl } from '../utils/mediaUrl';
 
 interface GallerySectionProps {
