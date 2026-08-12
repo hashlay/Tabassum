@@ -100,7 +100,7 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-3 border-b border-white/10 pb-5">
           <div>
-            <span className="text-[#FF2B2B] font-mono text-[10px] font-bold tracking-[0.25em] uppercase mb-0.5 block">
+            <span style={{ color: 'var(--color-primary-accent)' }} className="font-mono text-[10px] font-bold tracking-[0.25em] uppercase mb-0.5 block">
               FROM THE GROUND
             </span>
             <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight font-sans">
@@ -120,7 +120,8 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
                 window.location.pathname = '/gallery';
               }
             }}
-            className="text-[#FF2B2B] hover:text-red-400 font-extrabold text-xs font-mono tracking-wider hover:underline flex items-center gap-1.5 shrink-0 self-start sm:self-end uppercase cursor-pointer transition-colors"
+            style={{ color: 'var(--color-primary-accent)' }}
+            className="hover:opacity-80 font-extrabold text-xs font-mono tracking-wider hover:underline flex items-center gap-1.5 shrink-0 self-start sm:self-end uppercase cursor-pointer transition-colors"
           >
             <span>VIEW ALL</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -130,7 +131,7 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
         {/* Photo Grid */}
         {loading ? (
           <div className="flex justify-center items-center py-20">
-            <div className="w-8 h-8 border-2 border-[#FF2B2B]/30 border-t-[#FF2B2B] rounded-full animate-spin" />
+            <div style={{ borderColor: 'var(--color-primary-accent)', borderTopColor: 'transparent' }} className="w-8 h-8 border-2 rounded-full animate-spin" />
           </div>
         ) : displayItems.length === 0 ? (
           <div className="text-center py-20 bg-[#18181B]/50 rounded-2xl border border-white/5">

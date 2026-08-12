@@ -285,15 +285,15 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-[#0D0D0F] animate-in fade-in duration-200 overflow-y-auto">
       {/* Top Header Full Width */}
-      <div className="w-full bg-gradient-to-r from-red-950/40 via-[#121214] to-black border-b border-white/10 shrink-0">
+      <div className="w-full bg-[#121214] border-b border-white/10 shrink-0">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between p-6 gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-[#FF2B2B] flex items-center justify-center text-white shadow-lg shadow-[#FF2B2B]/30 font-bold shrink-0">
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg font-bold shrink-0" style={{ backgroundColor: 'var(--color-primary-accent)' }}>
               <User className="w-6 h-6" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-mono font-bold text-[#FF2B2B] bg-[#FF2B2B]/10 px-2 py-0.5 rounded-md border border-[#FF2B2B]/30">
+                <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-md border bg-white/5" style={{ color: 'var(--color-primary-accent)', borderColor: 'var(--color-primary-accent)' }}>
                   {p.codeNumber}
                 </span>
                 <span className="text-xs text-amber-400 font-mono font-bold flex items-center gap-1">
@@ -309,13 +309,14 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
           <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={logout}
-              className="px-5 py-2.5 text-sm font-mono font-bold text-red-300 hover:text-white bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 rounded-xl transition-colors shrink-0"
+              style={{ backgroundColor: 'var(--color-primary-accent)', color: '#ffffff' }}
+              className="px-5 py-2.5 text-sm font-mono font-bold rounded-xl hover:opacity-90 transition-colors shrink-0 shadow-lg cursor-pointer"
             >
               Sign Out
             </button>
             <button
               onClick={onClose}
-              className="p-2.5 text-zinc-400 hover:text-white bg-white/5 border border-white/10 rounded-xl transition-colors shrink-0"
+              className="p-2.5 text-zinc-400 hover:text-white bg-white/5 border border-white/10 rounded-xl transition-colors shrink-0 cursor-pointer"
               title="Close Portal"
             >
               <X className="w-5 h-5" />
@@ -336,10 +337,11 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
               <img
                 src={p.avatarUrl}
                 alt={cleanName}
-                className="w-36 h-36 rounded-full object-cover shadow-2xl bg-zinc-900 border-2 border-transparent group-hover:border-[#FF2B2B] transition-all"
+                className="w-36 h-36 rounded-full object-cover shadow-2xl bg-zinc-900 border-2 border-transparent transition-all"
+                style={{ borderColor: 'var(--color-primary-accent)' }}
               />
             </div>
-            <label className="cursor-pointer text-[#FF2B2B] hover:text-red-400 text-xs font-bold font-mono uppercase tracking-wider transition-colors hover:underline">
+            <label className="cursor-pointer text-xs font-bold font-mono uppercase tracking-wider transition-colors hover:underline" style={{ color: 'var(--color-primary-accent)' }}>
               Upload
               <input type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
             </label>
@@ -352,8 +354,8 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
               <span className="bg-white/10 text-zinc-200 px-3 py-1.5 rounded-xl border border-white/10">
                 Team: <strong className="text-sky-400">{deptName}</strong>
               </span>
-              <span className="bg-[#FF2B2B]/10 text-red-400 px-3 py-1.5 rounded-xl border border-[#FF2B2B]/20">
-                Category: <strong className="text-red-300">{catName}</strong>
+              <span className="bg-white/5 px-3 py-1.5 rounded-xl border" style={{ borderColor: 'var(--color-primary-accent)', color: 'var(--color-primary-accent)' }}>
+                Category: <strong className="font-extrabold" style={{ color: 'var(--color-primary-accent)' }}>{catName}</strong>
               </span>
             </div>
 
@@ -376,7 +378,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
         {/* Section A: Competition Schedule / Your Programs */}
         <div className="space-y-4">
           <h4 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-[#FF2B2B]" />
+            <Calendar className="w-5 h-5" style={{ color: 'var(--color-primary-accent)' }} />
             <span>Your Registered Programs</span>
           </h4>
 
@@ -394,7 +396,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                   </div>
                   <div>
                     {sc.status === 'live' && (
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#FF2B2B] text-white text-[10px] font-bold uppercase tracking-widest rounded-full animate-pulse shadow-md shadow-[#FF2B2B]/40">
+                      <span style={{ backgroundColor: 'var(--color-primary-accent)' }} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-white text-[10px] font-bold uppercase tracking-widest rounded-full animate-pulse shadow-md">
                         <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
                         LIVE NOW
                       </span>

@@ -142,19 +142,19 @@ export const PublicGalleryPage: React.FC = () => {
           </div>
 
           <div className="bg-[#161619] border border-[#2D2D35] px-3.5 py-2 rounded-xl shrink-0 font-mono text-xs text-zinc-300">
-            <span className="text-[#FF2B2B] font-bold">{filteredItems.length}</span> / {allGalleryItems.length} Photos
+            <span style={{ color: 'var(--color-primary-accent)' }} className="font-bold">{filteredItems.length}</span> / {allGalleryItems.length} Photos
           </div>
         </div>
 
         {/* Filter Controls: Search & Category Filter Pills */}
-          <div className="relative mb-6 sm:mb-8 max-w-2xl group z-10">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-[#FF2B2B] transition-colors" />
+        <div className="relative mb-6 sm:mb-8 max-w-2xl group z-10">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 transition-colors" />
           <input
             type="text"
             placeholder="Search photos by title, category or photographer..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#18181B] border border-white/10 rounded-xl py-3.5 pl-10 pr-4 text-white placeholder:text-zinc-600 focus:outline-none focus:border-[#FF2B2B]/50 focus:ring-1 focus:ring-[#FF2B2B]/50 transition-all font-sans text-sm"
+            className="w-full bg-[#18181B] border border-white/10 rounded-xl py-3.5 pl-10 pr-4 text-white placeholder:text-zinc-600 focus:outline-none focus:border-white transition-all font-sans text-sm"
           />
         </div>
 
@@ -166,9 +166,10 @@ export const PublicGalleryPage: React.FC = () => {
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
+                style={selectedCategory === category ? { backgroundColor: 'var(--color-primary-accent)' } : {}}
                 className={`px-4 py-1.5 rounded-lg text-xs font-bold font-mono uppercase tracking-wider whitespace-nowrap transition-all duration-300 ${
                   selectedCategory === category
-                    ? 'bg-[#FF2B2B] text-white shadow-lg shadow-red-900/20'
+                    ? 'text-white shadow-lg'
                     : 'text-zinc-400 hover:text-white hover:bg-white/5'
                 }`}
               >
@@ -180,7 +181,7 @@ export const PublicGalleryPage: React.FC = () => {
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-32">
-            <RefreshCw className="w-8 h-8 text-[#FF2B2B] animate-spin mb-4" />
+            <RefreshCw className="w-8 h-8 animate-spin mb-4" style={{ color: 'var(--color-primary-accent)' }} />
             <p className="text-zinc-500 font-mono text-sm uppercase tracking-wider">Loading Gallery...</p>
           </div>
         ) : filteredItems.length === 0 ? (
@@ -191,7 +192,8 @@ export const PublicGalleryPage: React.FC = () => {
                 setSearchQuery('');
                 setSelectedCategory('All');
               }}
-              className="px-6 py-2 bg-[#FF2B2B] hover:bg-red-600 text-white font-bold font-mono text-xs uppercase tracking-wider rounded-lg transition-colors shadow-lg shadow-red-900/20"
+              style={{ backgroundColor: 'var(--color-primary-accent)' }}
+              className="px-6 py-2 hover:opacity-90 text-white font-bold font-mono text-xs uppercase tracking-wider rounded-lg transition-colors shadow-lg"
             >
               Reset Filters
             </button>
