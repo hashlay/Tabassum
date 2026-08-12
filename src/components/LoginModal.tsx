@@ -53,7 +53,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
       {/* Main Card matching Reference Design */}
       <div 
-        className="relative w-full max-w-[450px] bg-[#1E1E20] border border-[#333338] rounded-2xl shadow-2xl overflow-hidden p-6 sm:p-8 space-y-5 my-auto"
+        className="relative w-full max-w-sm bg-[#1E1E20] border border-[#333338] rounded-2xl shadow-2xl overflow-hidden p-5 sm:p-6 space-y-4 my-auto shrink-0"
+        style={{ maxWidth: '380px' }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Card Header Bar */}
@@ -61,7 +62,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
           <Logo size="sm" showSubBadge={false} />
           <button
             onClick={onClose}
-            className="p-1.5 text-zinc-400 hover:text-white bg-white/5 border border-white/10 rounded-lg transition-colors"
+            className="p-1.5 text-zinc-400 hover:text-white bg-white/5 border border-white/10 rounded-lg transition-colors cursor-pointer"
             title="Close"
           >
             <X className="w-4 h-4" />
@@ -73,7 +74,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
           <span className="text-[#D4AF37] text-[10px] font-bold tracking-[0.2em] uppercase font-mono block">
             PARTICIPANT PORTAL
           </span>
-          <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight mt-0.5 mb-1 font-sans">
+          <h2 className="text-lg sm:text-xl font-extrabold text-white tracking-tight mt-0.5 mb-1 font-sans">
             Sign in
           </h2>
           <p className="text-zinc-400 text-xs leading-relaxed font-sans">
@@ -82,9 +83,9 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Login Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3.5">
           <div>
-            <label className="block text-xs font-bold text-zinc-300 uppercase tracking-widest mb-1.5 font-mono">
+            <label className="block text-[11px] font-bold text-zinc-300 uppercase tracking-widest mb-1 font-mono">
               CHEST NUMBER
             </label>
             <input
@@ -92,12 +93,12 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
               placeholder="e.g. 1042"
               value={chestNumber}
               onChange={(e) => setChestNumber(e.target.value)}
-              className="w-full bg-[#141416] border border-[#38383C] focus:border-[#DC2626] rounded-xl px-4 py-3 text-sm text-white font-mono placeholder:text-zinc-500 focus:outline-none transition-colors"
+              className="w-full bg-[#141416] border border-[#38383C] focus:border-[#DC2626] rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white font-mono placeholder:text-zinc-500 focus:outline-none transition-colors"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-zinc-300 uppercase tracking-widest mb-1.5 font-mono">
+            <label className="block text-[11px] font-bold text-zinc-300 uppercase tracking-widest mb-1 font-mono">
               DATE OF BIRTH
             </label>
             <div className="relative flex items-center">
@@ -106,11 +107,11 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                 type="date"
                 value={dob}
                 onChange={(e) => setDob(e.target.value)}
-                className="w-full bg-[#141416] border border-[#38383C] focus:border-[#DC2626] rounded-xl pl-4 pr-11 py-3 text-sm text-white font-mono placeholder:text-zinc-500 focus:outline-none transition-colors [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:hidden"
+                className="w-full bg-[#141416] border border-[#38383C] focus:border-[#DC2626] rounded-xl pl-3.5 pr-10 py-2.5 text-xs sm:text-sm text-white font-mono placeholder:text-zinc-500 focus:outline-none transition-colors [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:hidden"
                 placeholder="DD/MM/YYYY"
               />
               <Calendar 
-                className="absolute right-4 w-5 h-5 text-zinc-500 cursor-pointer hover:text-white transition-colors"
+                className="absolute right-3.5 w-4 h-4 text-zinc-500 cursor-pointer hover:text-white transition-colors"
                 onClick={() => {
                   try {
                     dateInputRef.current?.showPicker();
@@ -123,21 +124,21 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
           </div>
 
           {errorMsg && (
-            <p className="text-[#DC2626] text-[13px] font-sans pt-1">
+            <p className="text-[#DC2626] text-xs font-sans pt-1">
               {errorMsg}
             </p>
           )}
 
           <button
             type="submit"
-            className="w-full py-3.5 bg-[#DC2626] hover:bg-red-700 active:scale-[0.99] text-white font-extrabold text-xs sm:text-sm uppercase tracking-wider rounded-xl shadow-lg shadow-red-950/40 transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
+            className="w-full py-2.5 bg-[#DC2626] hover:bg-red-700 active:scale-[0.99] text-white font-extrabold text-xs sm:text-sm uppercase tracking-wider rounded-xl shadow-lg shadow-red-950/40 transition-all flex items-center justify-center gap-2 cursor-pointer mt-1"
           >
             <span>SIGN IN</span>
           </button>
         </form>
 
         {/* Footer Note */}
-        <p className="text-zinc-400 text-[11px] font-medium text-left font-sans pt-1">
+        <p className="text-zinc-500 text-[10px] sm:text-[11px] font-medium text-left font-sans pt-1">
           Your details stay on your device and the official results service.
         </p>
 
