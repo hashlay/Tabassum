@@ -134,15 +134,15 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings }) => {
 
             <div className="space-y-2.5 text-xs text-zinc-300 font-mono">
               <div className="flex items-center gap-2.5">
-                <MapPin className="w-4 h-4 text-[#FF2B2B] shrink-0" />
+                <MapPin className="w-4 h-4 shrink-0" style={{ color: 'var(--color-primary-accent)' }} />
                 <span>{cmsSettings?.footerLocation || INSTITUTION.location}</span>
               </div>
               <div className="flex items-center gap-2.5">
-                <Mail className="w-4 h-4 text-[#FF2B2B] shrink-0" />
+                <Mail className="w-4 h-4 shrink-0" style={{ color: 'var(--color-primary-accent)' }} />
                 <span>{cmsSettings?.footerEmail || INSTITUTION.email}</span>
               </div>
               <div className="flex items-center gap-2.5">
-                <Phone className="w-4 h-4 text-[#FF2B2B] shrink-0" />
+                <Phone className="w-4 h-4 shrink-0" style={{ color: 'var(--color-primary-accent)' }} />
                 <span>{cmsSettings?.footerPhone || INSTITUTION.phone}</span>
               </div>
             </div>

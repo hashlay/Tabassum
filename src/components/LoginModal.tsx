@@ -130,7 +130,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
           <button
             type="submit"
-            className="w-full py-3.5 bg-[#DC2626] hover:bg-red-700 active:scale-[0.99] text-white font-extrabold text-xs sm:text-sm uppercase tracking-wider rounded-xl shadow-lg shadow-red-950/40 transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
+            style={{ backgroundColor: 'var(--color-primary-accent)' }}
+            className="w-full py-3.5 hover:opacity-90 active:scale-[0.99] text-white font-extrabold text-xs sm:text-sm uppercase tracking-wider rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
           >
             <span>SIGN IN</span>
           </button>

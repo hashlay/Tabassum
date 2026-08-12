@@ -40,7 +40,7 @@ export const ResultsSection: React.FC<ResultsSectionProps> = ({ onNavigate }) =>
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-3 border-b border-white/10 pb-5">
           <div>
-            <span className="text-[#FF2B2B] font-mono text-[10px] font-bold tracking-[0.25em] uppercase mb-1 block">
+            <span style={{ color: 'var(--color-primary-accent)' }} className="font-mono text-[10px] font-bold tracking-[0.25em] uppercase mb-1 block">
               STANDINGS & RESULTS
             </span>
             <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight font-sans">
@@ -53,7 +53,8 @@ export const ResultsSection: React.FC<ResultsSectionProps> = ({ onNavigate }) =>
 
           <button
             onClick={() => onNavigate('team-points')}
-            className="text-[#FF2B2B] font-bold text-xs font-mono tracking-wider hover:underline flex items-center gap-1.5 shrink-0 self-start sm:self-end uppercase cursor-pointer"
+            style={{ color: 'var(--color-primary-accent)' }}
+            className="font-bold text-xs font-mono tracking-wider hover:underline flex items-center gap-1.5 shrink-0 self-start sm:self-end uppercase cursor-pointer"
           >
             <span>FULL STANDINGS</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -72,7 +73,7 @@ export const ResultsSection: React.FC<ResultsSectionProps> = ({ onNavigate }) =>
                     <div key={house.id} className="space-y-1.5">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <span className="text-lg font-black font-mono text-[#FF2B2B] w-4">
+                          <span style={{ color: 'var(--color-primary-accent)' }} className="text-lg font-black font-mono w-4">
                             {index + 1}
                           </span>
                           <span className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider font-mono">
@@ -87,8 +88,8 @@ export const ResultsSection: React.FC<ResultsSectionProps> = ({ onNavigate }) =>
                       {/* Red progress bar */}
                       <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
                         <div
-                          className="bg-[#FF2B2B] h-full rounded-full transition-all duration-1000"
-                          style={{ width: `${percentage}%` }}
+                          className="h-full rounded-full transition-all duration-1000"
+                          style={{ width: `${percentage}%`, backgroundColor: 'var(--color-primary-accent)' }}
                         />
                       </div>
                     </div>
@@ -104,7 +105,8 @@ export const ResultsSection: React.FC<ResultsSectionProps> = ({ onNavigate }) =>
             <div className="pt-1">
               <button
                 onClick={() => onNavigate('team-points')}
-                className="text-[#FF2B2B] font-bold text-xs font-mono tracking-wider hover:underline flex items-center gap-1.5 uppercase cursor-pointer"
+                style={{ color: 'var(--color-primary-accent)' }}
+                className="font-bold text-xs font-mono tracking-wider hover:underline flex items-center gap-1.5 uppercase cursor-pointer"
               >
                 <span>SEE ALL HOUSES</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -117,7 +119,7 @@ export const ResultsSection: React.FC<ResultsSectionProps> = ({ onNavigate }) =>
             {results && results.length > 0 ? (
               <>
                 <div>
-                  <span className="text-[#FF2B2B] text-[10px] font-bold font-mono uppercase tracking-widest block mb-0.5">
+                  <span style={{ color: 'var(--color-primary-accent)' }} className="text-[10px] font-bold font-mono uppercase tracking-widest block mb-0.5">
                     FIND A RESULT
                   </span>
                   <p className="text-zinc-300 text-xs leading-relaxed font-sans">
@@ -162,7 +164,8 @@ export const ResultsSection: React.FC<ResultsSectionProps> = ({ onNavigate }) =>
                   <button
                     type="button"
                     onClick={handleGetResult}
-                    className="w-full py-3 bg-[#DC2626] hover:bg-red-700 active:scale-[0.99] text-white font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-red-950/40 transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
+                    style={{ backgroundColor: 'var(--color-primary-accent)' }}
+                    className="w-full py-3 hover:opacity-90 active:scale-[0.99] text-white font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
                   >
                     <span>GET RESULT</span>
                     <ArrowRight className="w-3.5 h-3.5" />

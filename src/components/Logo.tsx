@@ -76,7 +76,7 @@ export const Logo: React.FC<LogoProps> = ({
                 <path
                   key={i}
                   d={generateWaveLine(i)}
-                  stroke="#FF2B2B"
+                  stroke="var(--color-primary-accent, #FF2B2B)"
                   strokeWidth="3.2"
                   strokeLinecap="round"
                 />

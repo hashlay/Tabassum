@@ -29,11 +29,11 @@ export const TeamPointsPage: React.FC = () => {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Page Hero Header */}
         <div className="mb-8 sm:mb-10 text-center sm:text-left">
-          <span className="text-[#FF2B2B] font-mono text-[10px] font-bold tracking-[0.25em] uppercase mb-1 block">
+          <span style={{ color: 'var(--color-primary-accent)' }} className="font-mono text-[10px] font-bold tracking-[0.25em] uppercase mb-1 block">
             CHAMPIONSHIP LEADERBOARD
           </span>
           <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight font-sans">
-            Team Points <span className="text-[#FF2B2B]">Standings</span>
+            Team Points <span style={{ color: 'var(--color-primary-accent)' }}>Standings</span>
           </h1>
         </div>
 
@@ -67,16 +67,16 @@ export const TeamPointsPage: React.FC = () => {
 
               {/* Rank 01 Card (Center Champion) */}
               {top1 && (
-                <div className="bg-gradient-to-b from-[#1C0E0E] via-[#161619] to-[#141416] border-2 border-[#FF2B2B] rounded-2xl p-6 text-center shadow-[0_0_40px_rgba(255,43,43,0.2)] relative order-1 md:order-2">
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#FF2B2B] text-white font-mono font-black text-[9px] uppercase px-3 py-0.5 rounded-full tracking-widest shadow-md">
+                <div style={{ borderColor: 'var(--color-primary-accent)' }} className="bg-[#161619] border-2 rounded-2xl p-6 text-center shadow-2xl relative order-1 md:order-2">
+                  <div style={{ backgroundColor: 'var(--color-primary-accent)' }} className="absolute -top-3 left-1/2 -translate-x-1/2 text-white font-mono font-black text-[9px] uppercase px-3 py-0.5 rounded-full tracking-widest shadow-md">
                     LEADING
                   </div>
-                  <span className="text-[#FF2B2B] text-[10px] font-bold font-mono tracking-widest uppercase mb-1 block pt-1">
+                  <span style={{ color: 'var(--color-primary-accent)' }} className="text-[10px] font-bold font-mono tracking-widest uppercase mb-1 block pt-1">
                     FIRST PLACE
                   </span>
-                  <div className="text-4xl sm:text-5xl font-black font-mono text-[#FF2B2B] mb-2">01</div>
+                  <div style={{ color: 'var(--color-primary-accent)' }} className="text-4xl sm:text-5xl font-black font-mono mb-2">01</div>
                   <h3 className="text-lg sm:text-xl font-black text-white mb-1 font-sans">{top1.name}</h3>
-                  <div className="text-base font-black font-mono text-[#FF2B2B]">
+                  <div style={{ color: 'var(--color-primary-accent)' }} className="text-base font-black font-mono">
                     {top1.totalPoints} <span className="text-[10px] text-zinc-400 font-mono">POINTS</span>
                   </div>
                 </div>
@@ -102,7 +102,7 @@ export const TeamPointsPage: React.FC = () => {
               {/* Table Header Controls */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#2A2A30] pb-4">
                 <div>
-                  <span className="text-[#FF2B2B] text-[10px] font-bold font-mono tracking-widest uppercase block mb-0.5">
+                  <span style={{ color: 'var(--color-primary-accent)' }} className="text-[10px] font-bold font-mono tracking-widest uppercase block mb-0.5">
                     FULL HOUSE STANDINGS
                   </span>
                   <h2 className="text-lg font-bold text-white tracking-tight font-sans">

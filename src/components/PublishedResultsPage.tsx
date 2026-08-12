@@ -160,7 +160,7 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
         {/* Page Header */}
         <div className="mb-6 border-b border-[#2A2A30] pb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
-            <span className="text-[#FF2B2B] font-mono text-[10px] font-bold tracking-[0.25em] uppercase mb-1 block">
+            <span style={{ color: 'var(--color-primary-accent)' }} className="font-mono text-[10px] font-bold tracking-[0.25em] uppercase mb-1 block">
               PUBLISHED RESULTS
             </span>
             <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight mb-2 font-sans">
@@ -170,7 +170,7 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
               Every published result from Festival. Results stream in live as the juries sign them off.
             </p>
 
-            <div className="inline-block bg-[#1B1B1F] border border-[#FF2B2B]/30 px-3 py-1 rounded-full text-[11px] font-mono font-bold text-[#FF2B2B] tracking-wider uppercase mt-3">
+            <div style={{ color: 'var(--color-primary-accent)', borderColor: 'var(--color-primary-accent)' }} className="inline-block bg-[#1B1B1F] border px-3 py-1 rounded-full text-[11px] font-mono font-bold tracking-wider uppercase mt-3">
               {groupedEvents.length} COMPETITIONS PUBLISHED
             </div>
           </div>
@@ -182,7 +182,8 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
                 setSelectedCategory('All');
                 if (onClearFilter) onClearFilter();
               }}
-              className="px-3.5 py-2 bg-white/5 hover:bg-[#FF2B2B] text-zinc-300 hover:text-white border border-white/10 hover:border-[#FF2B2B] text-xs font-mono font-bold uppercase rounded-xl transition-all flex items-center gap-2 self-start sm:self-end cursor-pointer"
+              style={{ backgroundColor: 'var(--color-primary-accent)' }}
+              className="px-3.5 py-2 hover:opacity-90 text-white text-xs font-mono font-bold uppercase rounded-xl transition-all flex items-center gap-2 self-start sm:self-end cursor-pointer"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Show All Competitions</span>
@@ -192,7 +193,6 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
 
         {/* Search & Filter Bar */}
         <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 mb-6">
-          {/* Search Input */}
           <div className="sm:col-span-8 relative">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
             <input
@@ -200,16 +200,15 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
               placeholder="Search competition or category..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#161619] border border-[#2D2D35] focus:border-[#DC2626] rounded-xl pl-10 pr-4 py-2.5 text-xs text-white font-mono placeholder:text-zinc-500 focus:outline-none transition-colors"
+              className="w-full bg-[#161619] border border-[#2D2D35] focus:border-white rounded-xl pl-10 pr-4 py-2.5 text-xs text-white font-mono placeholder:text-zinc-500 focus:outline-none transition-colors"
             />
           </div>
 
-          {/* Category Dropdown */}
           <div className="sm:col-span-4 relative">
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value as Category)}
-              className="w-full bg-[#161619] border border-[#2D2D35] focus:border-[#DC2626] rounded-xl px-3.5 py-2.5 text-xs text-white font-mono appearance-none focus:outline-none transition-colors pr-10 cursor-pointer"
+              className="w-full bg-[#161619] border border-[#2D2D35] focus:border-white rounded-xl px-3.5 py-2.5 text-xs text-white font-mono appearance-none focus:outline-none transition-colors pr-10 cursor-pointer"
             >
               <option value="All">All categories</option>
               {categories.map(c => (
@@ -220,10 +219,9 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
           </div>
         </div>
 
-        {/* Notice for Selected Competition with NO Results Published Yet */}
         {hasSpecificEventSelected && !isSelectedEventPublished && (
-          <div className="bg-[#181214] border border-[#FF2B2B]/40 rounded-xl p-6 text-center max-w-xl mx-auto shadow-xl space-y-3 my-6">
-            <div className="w-10 h-10 rounded-full bg-[#FF2B2B]/15 border border-[#FF2B2B]/40 text-[#FF2B2B] flex items-center justify-center mx-auto">
+          <div style={{ borderColor: 'var(--color-primary-accent)' }} className="bg-[#181214] border rounded-xl p-6 text-center max-w-xl mx-auto shadow-xl space-y-3 my-6">
+            <div style={{ backgroundColor: 'var(--color-primary-accent)', color: '#ffffff' }} className="w-10 h-10 rounded-full flex items-center justify-center mx-auto">
               <AlertCircle className="w-5 h-5" />
             </div>
             <div>
@@ -231,7 +229,7 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
                 Result Not Published Yet
               </h3>
               <p className="text-zinc-300 text-xs font-mono mt-1 leading-relaxed">
-                Official results for <span className="text-[#FF2B2B] font-bold">"{selectedEvent}"</span> have not been published by the jury yet.
+                Official results for <span style={{ color: 'var(--color-primary-accent)' }} className="font-bold">"{selectedEvent}"</span> have not been published by the jury yet.
               </p>
             </div>
             <button
@@ -239,7 +237,8 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
                 setSelectedEvent('All');
                 if (onClearFilter) onClearFilter();
               }}
-              className="px-4 py-2 bg-[#FF2B2B] hover:bg-red-700 text-white text-xs font-mono font-bold uppercase rounded-xl shadow transition-all cursor-pointer inline-block mt-2"
+              style={{ backgroundColor: 'var(--color-primary-accent)' }}
+              className="px-4 py-2 hover:opacity-90 text-white text-xs font-mono font-bold uppercase rounded-xl shadow transition-all cursor-pointer inline-block mt-2"
             >
               View All Published Results
             </button>
@@ -257,14 +256,13 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
                 key={group.key}
                 className="bg-[#161619] border border-[#2A2A32] rounded-xl overflow-hidden shadow-md transition-all"
               >
-                {/* Event Summary Bar */}
                 <button
                   type="button"
                   onClick={() => toggleEvent(group.key)}
                   className="w-full p-3.5 sm:p-4 flex items-center justify-between hover:bg-[#1C1C21] transition-colors text-left cursor-pointer"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#222228] border border-[#FF2B2B]/30 flex items-center justify-center font-mono font-bold text-xs text-[#FF2B2B]">
+                    <div style={{ color: 'var(--color-primary-accent)', borderColor: 'var(--color-primary-accent)' }} className="w-8 h-8 rounded-lg bg-[#222228] border flex items-center justify-center font-mono font-bold text-xs">
                       {itemNumber}
                     </div>
                     <div>
@@ -279,14 +277,13 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
 
                   <div className="flex items-center gap-3">
                     {isExpanded ? (
-                      <ChevronUp className="w-5 h-5 text-[#FF2B2B]" />
+                      <ChevronUp className="w-5 h-5" style={{ color: 'var(--color-primary-accent)' }} />
                     ) : (
                       <ChevronDown className="w-5 h-5 text-zinc-400" />
                     )}
                   </div>
                 </button>
 
-                {/* Collapsible Clean Winners Table */}
                 {isExpanded && (
                   <div className="p-2 sm:p-4 bg-[#111114] border-t border-[#25252D] overflow-x-auto">
                     <table className="w-full text-left text-xs font-mono">
@@ -307,8 +304,8 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
                               <tr key={res.id} className="hover:bg-white/5 transition-colors">
                                 <td className="py-3 px-4 text-center font-extrabold text-sm">
                                   {isFirst ? (
-                                    <span className="text-[#FF2B2B] inline-flex items-center justify-center gap-1 font-black">
-                                      <Trophy className="w-4 h-4 text-[#FF2B2B]" /> 1
+                                    <span style={{ color: 'var(--color-primary-accent)' }} className="inline-flex items-center justify-center gap-1 font-black">
+                                      <Trophy className="w-4 h-4" style={{ color: 'var(--color-primary-accent)' }} /> 1
                                     </span>
                                   ) : (
                                     <span className="text-zinc-300 font-bold">{res.rank}</span>
@@ -316,7 +313,8 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
                                 </td>
                                 <td className="py-3 px-4">
                                   <div
-                                    className={`font-sans text-xs sm:text-sm font-extrabold uppercase tracking-wide ${isFirst ? 'text-[#FF2B2B]' : 'text-white'
+                                    style={isFirst ? { color: 'var(--color-primary-accent)' } : {}}
+                                    className={`font-sans text-xs sm:text-sm font-extrabold uppercase tracking-wide ${isFirst ? '' : 'text-white'
                                       }`}
                                   >
                                     {res.participantName}
@@ -358,7 +356,8 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
                     <div className="px-4 pb-2 pt-4 bg-[#111114] flex items-center gap-3 border-t border-[#202028] mt-2 relative">
                       <button 
                         onClick={(e) => { e.stopPropagation(); handleDownloadPoster(group); }}
-                        className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#FF2B2B]/10 hover:bg-[#FF2B2B]/20 text-[#FF2B2B] border border-[#FF2B2B]/30 rounded-md text-xs font-bold font-mono uppercase transition-colors cursor-pointer shadow-sm"
+                        style={{ color: 'var(--color-primary-accent)', borderColor: 'var(--color-primary-accent)' }}
+                        className="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/5 hover:bg-white/10 border rounded-md text-xs font-bold font-mono uppercase transition-colors cursor-pointer shadow-sm"
                       >
                         <Download className="w-3.5 h-3.5" />
                         <span>Download HD Poster</span>

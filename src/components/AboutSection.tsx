@@ -17,12 +17,11 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
         <div className="flex flex-col items-start mb-8 sm:mb-10">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#FF2B2B]/10 border border-[#FF2B2B]/30 text-[#FF2B2B] text-[11px] font-mono font-bold uppercase tracking-wider mb-2">
-
+          <div style={{ color: 'var(--color-primary-accent)', borderColor: 'var(--color-primary-accent)' }} className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/5 border text-[11px] font-mono font-bold uppercase tracking-wider mb-2">
             <span>{cmsSettings?.aboutBadge || 'Festival Vision'}</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-white uppercase tracking-tight" dangerouslySetInnerHTML={{ __html: cmsSettings?.aboutMainHeading || 'ABOUT THE <span class="text-[#FF2B2B]">FESTIVAL</span>' }}></h2>
-          <div className="w-16 h-1 bg-[#FF2B2B] mt-2 rounded-full" />
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-white uppercase tracking-tight" dangerouslySetInnerHTML={{ __html: cmsSettings?.aboutMainHeading || 'ABOUT THE FESTIVAL' }}></h2>
+          <div style={{ backgroundColor: 'var(--color-primary-accent)' }} className="w-16 h-1 mt-2 rounded-full" />
         </div>
 
         {/* 2-Column Split */}
@@ -30,14 +29,14 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
           {/* Left Column: Narrative Content */}
           <div className="lg:col-span-7 space-y-5">
             <div className="bg-[#1A1A1A]/80 border border-white/10 rounded-2xl p-5 sm:p-7 backdrop-blur-xl relative">
-              <div className="absolute -top-3 -left-2 bg-[#FF2B2B] p-1.5 rounded-lg text-white shadow-md">
+              <div style={{ backgroundColor: 'var(--color-primary-accent)' }} className="absolute -top-3 -left-2 p-1.5 rounded-lg text-white shadow-md">
                 <Quote className="w-4 h-4" />
               </div>
 
               <h3 className="text-lg sm:text-xl font-bold text-white mb-1.5 pt-1">
                 {cmsSettings?.aboutTitle || 'Kulliyathu Imam Rabbani'}
               </h3>
-              <p className="text-xs font-semibold text-[#FF2B2B] uppercase tracking-wider mb-3 font-mono">
+              <p style={{ color: 'var(--color-primary-accent)' }} className="text-xs font-semibold uppercase tracking-wider mb-3 font-mono">
                 {cmsSettings?.aboutSubtitle || 'Off-Campus of Markaz Garden, Poonoor'}
               </p>
 
@@ -64,7 +63,8 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
               {/* CTA Modal Button */}
               <button
                 onClick={onOpenConceptModal}
-                className="group inline-flex items-center gap-2.5 px-5 py-2.5 bg-[#FF2B2B] hover:bg-red-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all duration-300 shadow-md shadow-[#FF2B2B]/20 cursor-pointer"
+                style={{ backgroundColor: 'var(--color-primary-accent)' }}
+                className="group inline-flex items-center gap-2.5 px-5 py-2.5 hover:opacity-90 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all duration-300 shadow-md cursor-pointer"
               >
                 <BookOpen className="w-3.5 h-3.5" />
                 <span>{cmsSettings?.themeButtonText || 'Read Philosophical Concept'}</span>

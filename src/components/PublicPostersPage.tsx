@@ -167,7 +167,7 @@ export const PublicPostersPage: React.FC = () => {
           </div>
 
           <div className="bg-[#161619] border border-[#2D2D35] px-3.5 py-2 rounded-xl shrink-0 font-mono text-xs text-zinc-300">
-            <span className="text-[#FF2B2B] font-bold">{filteredPosters.length}</span> Posters Generated
+            <span style={{ color: 'var(--color-primary-accent)' }} className="font-bold">{filteredPosters.length}</span> Posters Generated
           </div>
         </div>
 
@@ -319,7 +319,8 @@ export const PublicPostersPage: React.FC = () => {
 
                 <button
                   onClick={() => handleDownload(activePoster)}
-                  className="px-4 py-2.5 bg-[#FF2B2B] hover:bg-red-600 text-white rounded-xl text-xs font-bold font-mono transition-colors flex items-center gap-2 shadow-lg shadow-[#FF2B2B]/20 cursor-pointer"
+                  style={{ backgroundColor: 'var(--color-primary-accent)' }}
+                  className="px-4 py-2.5 hover:opacity-90 text-white rounded-xl text-xs font-bold font-mono transition-colors flex items-center gap-2 shadow-lg cursor-pointer"
                 >
                   <Download className="w-4 h-4" />
                   <span className="hidden sm:inline">Download HD</span>

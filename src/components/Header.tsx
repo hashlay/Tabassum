@@ -118,17 +118,17 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, onNavigate, cmsSe
               <button
                 key={link.id}
                 onClick={() => handleLinkClick(link.id)}
-                style={isActive ? { backgroundColor: 'var(--color-primary-accent, #FF2B2B)' } : undefined}
+                style={isActive ? { backgroundColor: 'var(--color-primary-accent)' } : {}}
                 className={`relative px-3.5 py-1.5 text-xs font-medium rounded-full transition-all duration-200 flex items-center gap-1.5 ${
                   isActive
-                    ? 'text-white shadow-lg shadow-emerald-950/30'
+                    ? 'text-white shadow-lg'
                     : 'text-zinc-400 hover:text-zinc-100 hover:bg-white/5'
                 }`}
               >
                 {link.isLive && (
                   <span className="relative flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: 'var(--color-primary-accent, #FF2B2B)' }}></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: 'var(--color-primary-accent)' }}></span>
                   </span>
                 )}
                 {link.label}
@@ -142,8 +142,8 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, onNavigate, cmsSe
           {/* Participant Login Pill Button */}
           <button
             onClick={handleUserPillClick}
-            style={{ backgroundColor: 'var(--color-primary-accent, #FF2B2B)' }}
-            className="px-4.5 py-2 text-xs font-extrabold text-white hover:brightness-110 rounded-full flex items-center gap-2 transition-all shadow-lg hover:scale-105 cursor-pointer"
+            style={{ backgroundColor: 'var(--color-primary-accent)' }}
+            className="px-4.5 py-2 text-xs font-extrabold text-white hover:opacity-90 rounded-full flex items-center gap-2 transition-all shadow-lg hover:scale-105 cursor-pointer"
           >
             {authUser && authUser.role === 'participant' ? (
               <>
@@ -185,7 +185,10 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, onNavigate, cmsSe
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#0D0D0D]/95 border-b border-white/10 backdrop-blur-xl px-4 py-6 mt-2 space-y-2 animate-in slide-in-from-top duration-200">
+        <div 
+          className="md:hidden border-b border-white/10 backdrop-blur-xl px-4 py-6 mt-2 space-y-2 animate-in slide-in-from-top duration-200"
+          style={{ backgroundColor: 'var(--color-body-bg, #0D0D0D)' }}
+        >
           <div className="text-xs uppercase tracking-widest text-zinc-500 font-mono px-3 mb-2">
             Navigation Menu
           </div>
@@ -193,18 +196,19 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, onNavigate, cmsSe
             <button
               key={link.id}
               onClick={() => handleLinkClick(link.id)}
+              style={activeSection === link.id ? { color: 'var(--color-primary-accent)', borderColor: 'var(--color-primary-accent)' } : {}}
               className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center justify-between ${
                 activeSection === link.id
-                  ? 'bg-[#FF2B2B]/15 text-[#FF2B2B] border border-[#FF2B2B]/30 font-semibold'
+                  ? 'bg-white/10 border font-semibold'
                   : 'text-zinc-300 hover:bg-white/5'
               }`}
             >
               <div className="flex items-center gap-2">
-                {link.isLive && <Radio className="w-4 h-4 text-[#FF2B2B] animate-pulse" />}
+                {link.isLive && <Radio className="w-4 h-4 animate-pulse" style={{ color: 'var(--color-primary-accent)' }} />}
                 <span>{link.label}</span>
               </div>
               {link.badge && (
-                <span className="bg-[#FF2B2B] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                <span className="text-white text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: 'var(--color-primary-accent)' }}>
                   {link.badge}
                 </span>
               )}
@@ -215,7 +219,7 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, onNavigate, cmsSe
               onClick={() => { handleUserPillClick(); setMobileMenuOpen(false); }}
               className="w-full py-2.5 bg-white/10 border border-white/20 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-2"
             >
-              <User className="w-4 h-4 text-[#FF2B2B]" />
+              <User className="w-4 h-4" style={{ color: 'var(--color-primary-accent)' }} />
               <span>{authUser ? 'My Dashboard & Profile' : 'Participant / Management Login'}</span>
             </button>
           </div>

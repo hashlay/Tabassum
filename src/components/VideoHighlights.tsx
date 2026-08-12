@@ -78,7 +78,7 @@ const VideoCard: React.FC<{
 
         {/* Red Circular Play Button in Center */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-10 h-10 rounded-full bg-[#DC2626] text-white flex items-center justify-center shadow-lg shadow-red-950/50 sm:group-hover:scale-110 transition-transform duration-300">
+          <div style={{ backgroundColor: 'var(--color-primary-accent)' }} className="w-10 h-10 rounded-full text-white flex items-center justify-center shadow-lg sm:group-hover:scale-110 transition-transform duration-300">
             <Play className="w-3.5 h-3.5 fill-white translate-x-0.5" />
           </div>
         </div>
@@ -86,7 +86,7 @@ const VideoCard: React.FC<{
 
       {/* Title Text Underneath */}
       <div className="text-left">
-        <h3 className="text-[11px] font-mono font-bold text-zinc-200 uppercase tracking-wide line-clamp-2 sm:group-hover:text-[#FF2B2B] transition-colors leading-snug">
+        <h3 className="text-[11px] font-mono font-bold text-zinc-200 uppercase tracking-wide line-clamp-2 sm:group-hover:text-amber-400 transition-colors leading-snug">
           {video.title}
         </h3>
         <p className="text-xs text-zinc-500 line-clamp-1 mt-0.5">{video.performer}</p>
@@ -154,7 +154,7 @@ export const VideoHighlights: React.FC = React.memo(() => {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
         <div className="mb-6 border-b border-white/10 pb-5">
-          <span className="text-[#FF2B2B] font-mono text-[10px] font-bold tracking-[0.25em] uppercase mb-0.5 block">
+          <span style={{ color: 'var(--color-primary-accent)' }} className="font-mono text-[10px] font-bold tracking-[0.25em] uppercase mb-0.5 block">
             REPLAY
           </span>
           <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight font-sans">
@@ -167,7 +167,7 @@ export const VideoHighlights: React.FC = React.memo(() => {
 
         {loading ? (
           <div className="flex justify-center items-center py-20">
-            <div className="w-8 h-8 border-2 border-[#FF2B2B]/30 border-t-[#FF2B2B] rounded-full animate-spin" />
+            <div style={{ borderColor: 'var(--color-primary-accent)', borderTopColor: 'transparent' }} className="w-8 h-8 border-2 rounded-full animate-spin" />
           </div>
         ) : highlights.length === 0 ? (
           <div className="text-center py-20 bg-[#18181B]/50 rounded-2xl border border-white/5">
@@ -223,7 +223,7 @@ export const VideoHighlights: React.FC = React.memo(() => {
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
                 <div>
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <span className="px-2 py-0.5 bg-[#FF2B2B]/10 text-[#FF2B2B] border border-[#FF2B2B]/20 rounded text-[10px] font-mono font-bold uppercase tracking-wider">
+                    <span style={{ color: 'var(--color-primary-accent)', borderColor: 'var(--color-primary-accent)' }} className="px-2 py-0.5 bg-white/5 border rounded text-[10px] font-mono font-bold uppercase tracking-wider">
                       {activeVideo.event}
                     </span>
                     <span className="text-xs text-zinc-500 font-mono uppercase">{activeVideo.stageName}</span>
@@ -242,7 +242,8 @@ export const VideoHighlights: React.FC = React.memo(() => {
                   </button>
                   <button
                     onClick={() => handleDownload(activeVideo)}
-                    className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-[#FF2B2B] hover:bg-[#FF2B2B]/90 text-white rounded-lg text-sm font-medium transition-colors cursor-pointer shadow-lg shadow-red-900/20 min-h-[44px]"
+                    style={{ backgroundColor: 'var(--color-primary-accent)' }}
+                    className="flex items-center gap-2 px-3 sm:px-4 py-2 hover:opacity-90 text-white rounded-lg text-sm font-medium transition-colors cursor-pointer shadow-lg min-h-[44px]"
                   >
                     <Download className="w-4 h-4" />
                     <span className="hidden sm:inline">Download HD</span>

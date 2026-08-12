@@ -129,7 +129,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
           ) : (
             <>
               <h1 className="text-2xl sm:text-4xl md:text-6xl font-black text-white uppercase tracking-tight max-w-4xl mx-auto leading-tight mb-2 sm:mb-4 drop-shadow-md text-center">
-                REN<span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF2B2B] via-red-500 to-rose-400">DEZVOUS</span>{' '}
+                REN<span style={{ color: 'var(--color-primary-accent)' }}>DEZVOUS</span>{' '}
                 <span className="text-zinc-200 font-extralight block sm:inline">SILVER EDITION</span>
               </h1>
             </>
@@ -141,7 +141,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
 
           {/* Institutional Credit Tag */}
           <p className="text-[11px] sm:text-xs font-medium text-zinc-300 max-w-xl mx-auto mb-6 flex items-center justify-center gap-1.5 sm:gap-2 flex-wrap drop-shadow-sm text-center">
-            <span className="text-[#FF2B2B] font-bold">{cmsSettings?.heroInstitutionLeft || INSTITUTION.name}</span>
+            <span style={{ color: 'var(--color-primary-accent)' }} className="font-bold">{cmsSettings?.heroInstitutionLeft || INSTITUTION.name}</span>
             <span className="text-zinc-500">•</span>
             <span>{cmsSettings?.heroInstitutionRight || INSTITUTION.tagline}</span>
           </p>
@@ -157,12 +157,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 mb-10 sm:mb-12">
           <div className="flex items-center gap-2 text-zinc-400 font-mono text-[10px] sm:text-xs">
-            <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#FF2B2B]" />
+            <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: 'var(--color-primary-accent)' }} />
             <span>{cmsSettings?.heroDate || INSTITUTION.dates}</span>
           </div>
-          <div className="hidden sm:block w-1.5 h-1.5 rounded-full bg-[#FF2B2B]/40" />
+          <div className="hidden sm:block w-1.5 h-1.5 rounded-full opacity-40" style={{ backgroundColor: 'var(--color-primary-accent)' }} />
           <div className="flex items-center gap-2 text-zinc-400 font-mono text-[10px] sm:text-xs">
-            <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#FF2B2B]" />
+            <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: 'var(--color-primary-accent)' }} />
             <span>{cmsSettings?.heroLocation || INSTITUTION.location}</span>
           </div>
         </div>
@@ -171,7 +171,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6 sm:mb-10 max-w-md mx-auto sm:max-w-none">
           <button
             onClick={() => onNavigate('results')}
-            className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-[#FF2B2B] to-[#C00000] hover:from-[#FF4444] hover:to-[#E60000] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-lg shadow-[#FF2B2B]/30 hover:shadow-[#FF2B2B]/60 transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+            style={{ backgroundColor: 'var(--color-primary-accent)' }}
+            className="w-full sm:w-auto px-6 py-3 hover:opacity-90 text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
           >
             <Trophy className="w-4 h-4 text-white" />
             <span>Check Live Results</span>
@@ -182,7 +183,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
             onClick={() => onNavigate('live')}
             className="w-full sm:w-auto px-6 py-3 bg-black/60 hover:bg-black/80 border border-white/30 hover:border-white/60 text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl backdrop-blur-lg transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 cursor-pointer"
           >
-            <Radio className="w-4 h-4 text-[#FF2B2B] animate-pulse" />
+            <Radio className="w-4 h-4 animate-pulse" style={{ color: 'var(--color-primary-accent)' }} />
             <span>Watch Live Stream</span>
           </button>
         </div>

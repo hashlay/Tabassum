@@ -21,12 +21,12 @@ export const SmilePhotoPortal: React.FC<SmilePhotoPortalProps> = ({ cmsSettings 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
         {/* Header Title */}
         <div className="max-w-2xl mx-auto mb-6 sm:mb-8">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FF2B2B]/15 border border-[#FF2B2B]/40 text-[#FF2B2B] text-[10px] font-mono font-bold uppercase tracking-wider mb-2">
-            <Camera className="w-3.5 h-3.5 text-[#FF2B2B]" />
+          <div style={{ color: 'var(--color-primary-accent)', borderColor: 'var(--color-primary-accent)' }} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border text-[10px] font-mono font-bold uppercase tracking-wider mb-2">
+            <Camera className="w-3.5 h-3.5" style={{ color: 'var(--color-primary-accent)' }} />
             <span>Official Photo Download Hub</span>
           </div>
           <h2 className="text-2xl sm:text-4xl font-extrabold text-white uppercase tracking-tight">
-            PHOTO HUB — <span className="text-[#FF2B2B]">FESTIVAL MEMORIES</span>
+            PHOTO HUB — <span style={{ color: 'var(--color-primary-accent)' }}>FESTIVAL MEMORIES</span>
           </h2>
           <p className="text-zinc-400 text-xs sm:text-sm mt-2 leading-relaxed font-sans">
             Scan the QR code or click the button below to directly access and download official festival photos in high resolution.
@@ -42,14 +42,15 @@ export const SmilePhotoPortal: React.FC<SmilePhotoPortalProps> = ({ cmsSettings 
             href={driveLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="relative z-10 w-48 h-48 sm:w-52 sm:h-52 mx-auto bg-black p-3 rounded-xl border-2 border-[#FF2B2B]/50 hover:border-[#FF2B2B] shadow-xl flex flex-col items-center justify-center mb-6 block transition-all group/qr cursor-pointer"
+            style={{ borderColor: 'var(--color-primary-accent)' }}
+            className="relative z-10 w-48 h-48 sm:w-52 sm:h-52 mx-auto bg-black p-3 rounded-xl border-2 shadow-xl flex flex-col items-center justify-center mb-6 block transition-all group/qr cursor-pointer"
             title="Click to open Photo Drive"
           >
             {/* Corner markers */}
-            <div className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-[#FF2B2B]" />
-            <div className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-[#FF2B2B]" />
-            <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-[#FF2B2B]" />
-            <div className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-[#FF2B2B]" />
+            <div style={{ borderColor: 'var(--color-primary-accent)' }} className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2" />
+            <div style={{ borderColor: 'var(--color-primary-accent)' }} className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2" />
+            <div style={{ borderColor: 'var(--color-primary-accent)' }} className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2" />
+            <div style={{ borderColor: 'var(--color-primary-accent)' }} className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2" />
 
             {/* Rendered QR Code */}
             <div className="p-2.5 bg-white rounded-lg shadow-inner w-36 h-36 sm:w-40 sm:h-40 flex items-center justify-center group-hover/qr:scale-105 transition-transform">
@@ -66,7 +67,8 @@ export const SmilePhotoPortal: React.FC<SmilePhotoPortalProps> = ({ cmsSettings 
             href={driveLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="relative z-10 w-full py-3.5 bg-gradient-to-r from-[#FF2B2B] to-[#B30000] hover:from-[#FF4444] hover:to-[#E60000] text-white text-xs font-extrabold uppercase tracking-wider rounded-xl shadow-lg shadow-[#FF2B2B]/30 hover:shadow-[#FF2B2B]/50 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer group border border-[#FF2B2B]/50 active:scale-[0.98] block"
+            style={{ backgroundColor: 'var(--color-primary-accent)', borderColor: 'var(--color-primary-accent)' }}
+            className="relative z-10 w-full py-3.5 hover:opacity-90 text-white text-xs font-extrabold uppercase tracking-wider rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer group border active:scale-[0.98] block"
           >
             <QrCode className="w-4 h-4" />
             <span>SCAN QR / OPEN PHOTO DRIVE</span>
