@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { GalleryItem } from '../types';
-import { Search, ZoomIn, Download, Share2, Check, Send, Copy, X, ChevronLeft, ChevronRight, Filter, Sparkles, RefreshCw } from 'lucide-react';
+import { Search, ZoomIn, Download, Share2, Check, Send, Copy, X, ChevronLeft, ChevronRight, Filter, Sparkles, RefreshCw, Camera } from 'lucide-react';
 import { getMediaUrl } from '../utils/mediaUrl';
 import { useFestival } from '../context/FestivalContext';
 

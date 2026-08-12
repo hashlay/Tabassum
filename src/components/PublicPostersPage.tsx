@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useFestival } from '../context/FestivalContext';
 import { Category, ResultItem } from '../types';
-import { Search, ChevronDown, Download, X, Share2, ZoomIn, Copy, Check, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, ChevronDown, Download, X, Share2, ZoomIn, Copy, Check, ChevronLeft, ChevronRight, Trophy, Filter } from 'lucide-react';
 import { PosterImage } from './PosterImage';
 
 interface CompetitionPoster {
