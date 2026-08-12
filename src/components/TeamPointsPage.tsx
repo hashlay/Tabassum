@@ -118,7 +118,7 @@ export const TeamPointsPage: React.FC = () => {
                     placeholder="Find a team..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-[#1C1C20] border border-[#33333C] focus:border-[#FF2B2B] rounded-xl pl-9 pr-3 py-2 text-xs text-white font-mono placeholder:text-zinc-500 focus:outline-none transition-colors"
+                    className="w-full bg-[#1C1C20] border border-[#33333C] focus:border-white rounded-xl pl-9 pr-3 py-2 text-xs text-white font-mono placeholder:text-zinc-500 focus:outline-none transition-colors"
                   />
                 </div>
               </div>
@@ -134,7 +134,7 @@ export const TeamPointsPage: React.FC = () => {
                   return (
                     <div
                       key={house.id}
-                      className="p-3.5 bg-[#18181C] border border-[#282830] rounded-xl flex flex-col space-y-2 hover:border-[#DC2626]/50 transition-all"
+                      className="p-3.5 bg-[#18181C] border border-[#282830] rounded-xl flex flex-col space-y-2 hover:border-white/30 transition-all"
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
@@ -152,8 +152,8 @@ export const TeamPointsPage: React.FC = () => {
                       {/* Score Bar */}
                       <div className="w-full bg-black/50 h-1.5 rounded-full overflow-hidden">
                         <div
-                          className="bg-[#DC2626] h-full rounded-full transition-all duration-1000"
-                          style={{ width: `${percentage}%` }}
+                          className="h-full rounded-full transition-all duration-1000"
+                          style={{ width: `${percentage}%`, backgroundColor: 'var(--color-primary-accent)' }}
                         />
                       </div>
                     </div>

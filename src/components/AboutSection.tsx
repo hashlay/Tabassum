@@ -90,7 +90,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
 
                 {/* Badge Overlay */}
                 <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-md border border-white/20 px-2.5 py-1 rounded-full flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#FF2B2B] animate-ping" />
+                  <span className="w-1.5 h-1.5 rounded-full animate-ping" style={{ backgroundColor: 'var(--color-primary-accent)' }} />
                   <span className="text-[9px] font-mono font-bold text-white uppercase tracking-wider">
                     {cmsSettings?.aboutImageBadge || 'Inauguration Session'}
                   </span>
@@ -98,7 +98,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
 
                 {/* Bottom Overlay Label */}
                 <div className="absolute bottom-3 left-3 right-3 text-left">
-                  <span className="text-[10px] font-bold text-[#FF2B2B] uppercase tracking-widest block font-mono">
+                  <span className="text-[10px] font-bold uppercase tracking-widest block font-mono" style={{ color: 'var(--color-primary-accent)' }}>
                     {cmsSettings?.aboutImageTitle || 'Kulliyathu Imam Rabbani'}
                   </span>
                   <h4 className="text-base font-extrabold text-white leading-tight">
@@ -113,7 +113,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
               {/* Card Footer details */}
               <div className="p-3 bg-[#141414] border-t border-white/10 flex items-center justify-between text-[11px] text-zinc-400">
                 <div className="flex items-center gap-1.5">
-                  <Award className="w-3.5 h-3.5 text-[#FF2B2B]" />
+                  <Award className="w-3.5 h-3.5" style={{ color: 'var(--color-primary-accent)' }} />
                   <span>{cmsSettings?.aboutImageFooter || 'Markaz Garden Off-Campus'}</span>
                 </div>
               </div>

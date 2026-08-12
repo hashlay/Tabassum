@@ -181,7 +181,7 @@ export const PublicPostersPage: React.FC = () => {
               placeholder="Search event..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#161619] border border-[#2D2D35] focus:border-[#FF2B2B] rounded-xl pl-10 pr-4 py-2.5 text-xs text-white font-mono placeholder:text-zinc-500 focus:outline-none transition-colors"
+              className="w-full bg-[#161619] border border-[#2D2D35] focus:border-white rounded-xl pl-10 pr-4 py-2.5 text-xs text-white font-mono placeholder:text-zinc-500 focus:outline-none transition-colors"
             />
           </div>
 
@@ -190,7 +190,7 @@ export const PublicPostersPage: React.FC = () => {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value as Category)}
-              className="w-full bg-[#161619] border border-[#2D2D35] focus:border-[#FF2B2B] rounded-xl px-3.5 py-2.5 text-xs text-white font-mono appearance-none focus:outline-none transition-colors pr-10 cursor-pointer"
+              className="w-full bg-[#161619] border border-[#2D2D35] focus:border-white rounded-xl px-3.5 py-2.5 text-xs text-white font-mono appearance-none focus:outline-none transition-colors pr-10 cursor-pointer"
             >
               <option value="All">All categories</option>
               {categories.map(c => (
@@ -208,7 +208,7 @@ export const PublicPostersPage: React.FC = () => {
               <div key={poster.id} className="group flex flex-col gap-2">
                 <div 
                   onClick={() => setActivePoster(poster)}
-                  className="relative aspect-[4/5] bg-[#161619] border border-[#2A2A32] rounded-xl overflow-hidden cursor-pointer group-hover:border-[#FF2B2B] transition-colors shadow-lg"
+                  className="relative aspect-[4/5] bg-[#161619] border border-white/10 rounded-xl overflow-hidden cursor-pointer group-hover:border-white/40 transition-colors shadow-lg"
                 >
                   <PosterImage
                     competitionId={poster.id}

@@ -130,7 +130,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
             <>
               <h1 className="text-2xl sm:text-4xl md:text-6xl font-black text-white uppercase tracking-tight max-w-4xl mx-auto leading-tight mb-2 sm:mb-4 drop-shadow-md text-center">
                 REN<span style={{ color: 'var(--color-primary-accent)' }}>DEZVOUS</span>{' '}
-                <span className="text-zinc-200 font-extralight block sm:inline">SILVER EDITION</span>
+                <span className="font-extrabold block sm:inline" style={{ color: 'var(--color-primary-accent)' }}>SILVER EDITION</span>
               </h1>
             </>
           )}

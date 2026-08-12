@@ -52,7 +52,8 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
 
   const handleDownload = async (imageUrl: string, title: string) => {
     try {
-      const response = await fetch(imageUrl);
+      const mediaUrl = getMediaUrl(imageUrl);
+      const response = await fetch(mediaUrl);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -63,7 +64,7 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
     } catch (_) {
-      window.open(imageUrl, '_blank');
+      window.open(getMediaUrl(imageUrl), '_blank');
     }
   };
 
@@ -248,7 +249,8 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
               <button
                 type="button"
                 onClick={() => handleDownload(activeItem.imageUrl, activeItem.title)}
-                className="px-4 py-2 bg-black/60 hover:bg-[#FF2B2B] border border-white/20 hover:border-[#FF2B2B] text-white text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-colors duration-200 flex items-center gap-1.5 shadow-md cursor-pointer min-h-[44px]"
+                style={{ backgroundColor: 'var(--color-primary-accent)' }}
+                className="px-4 py-2 hover:opacity-90 border border-white/20 text-white text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-all duration-200 flex items-center gap-1.5 shadow-md cursor-pointer min-h-[44px]"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>DOWNLOAD</span>
@@ -257,7 +259,7 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
               <button
                 type="button"
                 onClick={() => handleShare(activeItem)}
-                className="px-4 py-2 bg-black/60 hover:bg-[#FF2B2B] border border-white/20 hover:border-[#FF2B2B] text-white text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-colors duration-200 flex items-center gap-1.5 shadow-md cursor-pointer min-h-[44px]"
+                className="px-4 py-2 bg-black/60 hover:bg-white/20 border border-white/20 text-white text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-colors duration-200 flex items-center gap-1.5 shadow-md cursor-pointer min-h-[44px]"
               >
                 {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Share2 className="w-3.5 h-3.5" />}
                 <span>{copied ? 'COPIED!' : 'SHARE'}</span>
@@ -280,7 +282,8 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
                 <button
                   type="button"
                   onClick={() => handleCopyLink(activeItem.imageUrl)}
-                  className="px-3 py-1.5 bg-white/10 border border-white/20 hover:bg-[#FF2B2B] text-white text-xs font-mono font-bold uppercase rounded-lg transition-all flex items-center gap-1.5 cursor-pointer"
+                  style={{ backgroundColor: 'var(--color-primary-accent)' }}
+                  className="px-3 py-1.5 border border-white/20 hover:opacity-90 text-white text-xs font-mono font-bold uppercase rounded-lg transition-all flex items-center gap-1.5 cursor-pointer"
                 >
                   <Copy className="w-3.5 h-3.5" />
                   <span>{copied ? 'Copied!' : 'Copy Link'}</span>
