@@ -245,119 +245,125 @@ export const PublicPostersPage: React.FC = () => {
 
       {/* Lightbox Modal */}
       {activePoster && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-black/95 backdrop-blur-sm">
-          {/* Close button */}
-          <button
-            onClick={() => {
-              setActivePoster(null);
-              setShowShareMenu(false);
-            }}
-            className="absolute top-4 sm:top-6 right-4 sm:right-6 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors z-50 cursor-pointer"
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-in fade-in duration-200"
+          onClick={() => {
+            setActivePoster(null);
+            setShowShareMenu(false);
+          }}
+        >
+          <div
+            className="relative max-w-4xl w-full bg-[#18181B] border border-white/15 rounded-2xl overflow-hidden shadow-2xl flex flex-col my-auto max-h-[90vh]"
+            onClick={(e) => e.stopPropagation()}
           >
-            <X className="w-6 h-6" />
-          </button>
+            {/* Header Bar */}
+            <div className="flex items-center justify-between p-3.5 sm:p-4 bg-[#141416] border-b border-white/10 shrink-0">
+              <div className="flex items-center gap-2">
+                <span style={{ color: 'var(--color-primary-accent)', borderColor: 'var(--color-primary-accent)' }} className="px-2.5 py-0.5 bg-white/5 border rounded text-[10px] font-mono font-bold uppercase tracking-wider">
+                  {activePoster.category} Category
+                </span>
+                <h3 className="text-sm sm:text-base font-bold text-white tracking-tight line-clamp-1">{activePoster.eventName}</h3>
+              </div>
 
-          {/* Previous Button */}
-          {filteredPosters.length > 1 && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handlePrev();
-              }}
-              className="absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 p-3 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors z-50 backdrop-blur-md hidden sm:block cursor-pointer"
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
-          )}
+              <button
+                onClick={() => {
+                  setActivePoster(null);
+                  setShowShareMenu(false);
+                }}
+                className="p-1.5 text-zinc-400 hover:text-white bg-white/5 border border-white/10 rounded-lg transition-colors cursor-pointer"
+                title="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-          {/* Next Button */}
-          {filteredPosters.length > 1 && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleNext();
-              }}
-              className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 p-3 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors z-50 backdrop-blur-md hidden sm:block cursor-pointer"
-            >
-              <ChevronRight className="w-6 h-6" />
-            </button>
-          )}
+            {/* Poster Canvas Image Box */}
+            <div className="relative w-full max-h-[60vh] bg-black flex items-center justify-center overflow-hidden flex-shrink-0 p-2">
+              {filteredPosters.length > 1 && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handlePrev();
+                  }}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 p-2.5 text-zinc-200 hover:text-white bg-black/70 border border-white/15 rounded-full transition-colors z-20 cursor-pointer"
+                >
+                  <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+                </button>
+              )}
 
-          <div className="relative max-w-5xl w-full flex flex-col items-center">
-            {/* Image */}
-            <div className="relative w-full max-h-[75vh] flex justify-center mb-6">
               <PosterImage
                 competitionId={activePoster.id}
                 eventName={activePoster.eventName}
                 category={activePoster.category}
                 compIndex={activePoster.compIndex}
                 results={activePoster.results}
-                className="max-w-full max-h-[75vh] object-contain rounded-lg shadow-2xl"
+                className="max-w-full max-h-[60vh] object-contain rounded-lg shadow-2xl"
                 onLoadUrl={(url) => { activePoster.imageUrl = url; }}
               />
+
+              {filteredPosters.length > 1 && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleNext();
+                  }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 text-zinc-200 hover:text-white bg-black/70 border border-white/15 rounded-full transition-colors z-20 cursor-pointer"
+                >
+                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                </button>
+              )}
             </div>
 
-            {/* Content & Actions */}
-            <div className="w-full max-w-2xl bg-[#161619] border border-[#2D2D35] rounded-2xl p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="text-center sm:text-left">
-                <h2 className="text-lg sm:text-xl font-bold font-competition-title text-white tracking-tight">
-                  {activePoster.eventName}
-                </h2>
-                <p className="text-xs text-zinc-400 font-mono mt-1">
-                  {activePoster.category} Category
-                </p>
-              </div>
+            {/* Modal Footer Controls */}
+            <div className="p-4 bg-[#121214] border-t border-white/10 overflow-y-auto">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h4 className="text-base font-bold text-white">{activePoster.eventName}</h4>
+                  <p className="text-xs text-zinc-400 font-mono">Official Verified Result Poster</p>
+                </div>
 
-              <div className="flex items-center gap-3 relative">
-                <button
-                  onClick={() => handleShare(activePoster)}
-                  className="px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl text-xs font-bold font-mono transition-colors flex items-center gap-2 cursor-pointer"
-                >
-                  <Share2 className="w-4 h-4" />
-                  <span className="hidden sm:inline">Share</span>
-                </button>
+                <div className="flex items-center gap-2.5 shrink-0 relative">
+                  <button
+                    onClick={() => handleShare(activePoster)}
+                    className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl text-xs font-mono font-bold transition-colors flex items-center gap-2 cursor-pointer min-h-[38px]"
+                  >
+                    <Share2 className="w-4 h-4" />
+                    <span>Share</span>
+                  </button>
 
-                <button
-                  onClick={() => handleDownload(activePoster)}
-                  style={{ backgroundColor: 'var(--color-primary-accent)' }}
-                  className="px-4 py-2.5 hover:opacity-90 text-white rounded-xl text-xs font-bold font-mono transition-colors flex items-center gap-2 shadow-lg cursor-pointer"
-                >
-                  <Download className="w-4 h-4" />
-                  <span className="hidden sm:inline">Download HD</span>
-                </button>
+                  <button
+                    onClick={() => handleDownload(activePoster)}
+                    style={{ backgroundColor: 'var(--color-primary-accent)' }}
+                    className="px-4 py-2 hover:opacity-90 text-white rounded-xl text-xs font-mono font-bold transition-colors flex items-center gap-2 shadow-lg cursor-pointer min-h-[38px]"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>Download HD</span>
+                  </button>
 
-                {/* Share Menu Popup */}
-                {showShareMenu && (
-                  <div className="absolute bottom-full right-0 mb-2 w-52 bg-[#1C1C21] border border-[#33333D] rounded-xl p-2 shadow-2xl z-50">
-                    <button
-                      onClick={() => handleCopyLink(activePoster)}
-                      className="w-full text-left px-3 py-2 text-xs font-mono text-zinc-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors flex items-center gap-2"
-                    >
-                      {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                      {copied ? 'Link Copied!' : 'Copy Result Link'}
-                    </button>
-                    <a
-                      href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`🏆 Official Result Poster: ${activePoster.eventName} (${activePoster.category}) - ${window.location.origin}/results?category=${encodeURIComponent(activePoster.category)}&event=${encodeURIComponent(activePoster.eventName)}`)}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="w-full text-left px-3 py-2 text-xs font-mono text-zinc-300 hover:text-white hover:bg-[#25D366]/20 rounded-lg transition-colors flex items-center gap-2 mt-1"
-                    >
-                      <Share2 className="w-3.5 h-3.5 text-[#25D366]" />
-                      Share on WhatsApp
-                    </a>
-                  </div>
-                )}
+                  {/* Share Menu Popup */}
+                  {showShareMenu && (
+                    <div className="absolute bottom-full right-0 mb-2 w-52 bg-[#1C1C21] border border-[#33333D] rounded-xl p-2 shadow-2xl z-50">
+                      <button
+                        onClick={() => handleCopyLink(activePoster)}
+                        className="w-full text-left px-3 py-2 text-xs font-mono text-zinc-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors flex items-center gap-2"
+                      >
+                        {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                        {copied ? 'Link Copied!' : 'Copy Result Link'}
+                      </button>
+                      <a
+                        href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`🏆 Official Result Poster: ${activePoster.eventName} (${activePoster.category}) - ${window.location.origin}/results?category=${encodeURIComponent(activePoster.category)}&event=${encodeURIComponent(activePoster.eventName)}`)}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="w-full text-left px-3 py-2 text-xs font-mono text-zinc-300 hover:text-white hover:bg-[#25D366]/20 rounded-lg transition-colors flex items-center gap-2 mt-1"
+                      >
+                        <Share2 className="w-3.5 h-3.5 text-[#25D366]" />
+                        Share on WhatsApp
+                      </a>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-            
-            {/* Mobile swipe hint */}
-            {filteredPosters.length > 1 && (
-              <div className="mt-4 flex sm:hidden items-center justify-center gap-4 text-zinc-500">
-                <button onClick={() => handlePrev()} className="p-2 bg-white/5 rounded-full"><ChevronLeft className="w-4 h-4" /></button>
-                <span className="text-[10px] font-mono uppercase tracking-widest">Navigate</span>
-                <button onClick={() => handleNext()} className="p-2 bg-white/5 rounded-full"><ChevronRight className="w-4 h-4" /></button>
-              </div>
-            )}
           </div>
         </div>
       )}

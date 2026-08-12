@@ -183,18 +183,34 @@ export const VideoHighlights: React.FC = React.memo(() => {
         )}
       </div>
 
-      {/* Video Modal Player — no backdrop-blur on mobile for performance */}
+      {/* Video Modal Player */}
       {activeVideo && (
-        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4" style={{ WebkitOverflowScrolling: 'touch' }}>
-          <button
-            onClick={handleClose}
-            className="absolute top-4 right-4 sm:top-6 sm:right-6 p-2.5 text-zinc-400 hover:text-white bg-white/10 rounded-full transition-colors z-50 cursor-pointer hover:bg-white/20"
-            aria-label="Close video"
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-in fade-in duration-200"
+          onClick={handleClose}
+        >
+          <div
+            className="relative max-w-4xl w-full bg-[#18181B] border border-white/15 rounded-2xl overflow-hidden shadow-2xl flex flex-col my-auto max-h-[90vh]"
+            onClick={(e) => e.stopPropagation()}
           >
-            <X className="w-5 h-5" />
-          </button>
+            {/* Header bar with close button */}
+            <div className="flex items-center justify-between p-3.5 sm:p-4 bg-[#141416] border-b border-white/10 shrink-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span style={{ color: 'var(--color-primary-accent)', borderColor: 'var(--color-primary-accent)' }} className="px-2 py-0.5 bg-white/5 border rounded text-[10px] font-mono font-bold uppercase tracking-wider">
+                  {activeVideo.event}
+                </span>
+                <span className="text-xs text-zinc-400 font-mono uppercase">{activeVideo.stageName}</span>
+              </div>
+              <button
+                onClick={handleClose}
+                className="p-1.5 text-zinc-400 hover:text-white bg-white/5 border border-white/10 rounded-lg transition-colors cursor-pointer"
+                aria-label="Close video"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-          <div className="max-w-5xl w-full bg-[#18181B] border border-white/15 rounded-xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+            {/* Video Player Container */}
             <div className="relative aspect-video bg-black flex-shrink-0">
               <video
                 src={getMediaUrl(activeVideo.videoUrl)}
@@ -219,34 +235,29 @@ export const VideoHighlights: React.FC = React.memo(() => {
               />
             </div>
             
-            <div className="p-4 sm:p-6 bg-[#121214] overflow-y-auto">
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+            {/* Modal Footer Controls */}
+            <div className="p-4 sm:p-5 bg-[#121214] overflow-y-auto">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                 <div>
-                  <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <span style={{ color: 'var(--color-primary-accent)', borderColor: 'var(--color-primary-accent)' }} className="px-2 py-0.5 bg-white/5 border rounded text-[10px] font-mono font-bold uppercase tracking-wider">
-                      {activeVideo.event}
-                    </span>
-                    <span className="text-xs text-zinc-500 font-mono uppercase">{activeVideo.stageName}</span>
-                  </div>
-                  <h3 className="text-lg sm:text-2xl font-bold text-white leading-tight">{activeVideo.title}</h3>
-                  <p className="text-sm text-zinc-400 mt-1">Performer: <span className="text-zinc-200">{activeVideo.performer}</span></p>
+                  <h3 className="text-lg sm:text-xl font-bold text-white leading-tight">{activeVideo.title}</h3>
+                  <p className="text-xs text-zinc-400 mt-1">Performer: <span className="text-zinc-200 font-mono">{activeVideo.performer}</span></p>
                 </div>
                 
                 <div className="flex gap-2 flex-shrink-0">
                   <button
                     onClick={() => handleShare(activeVideo)}
-                    className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg text-sm font-medium transition-colors cursor-pointer min-h-[44px]"
+                    className="flex items-center gap-2 px-3.5 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-mono font-bold transition-colors cursor-pointer min-h-[40px]"
                   >
                     <Share2 className="w-4 h-4" />
-                    <span className="hidden sm:inline">Share</span>
+                    <span>Share</span>
                   </button>
                   <button
                     onClick={() => handleDownload(activeVideo)}
                     style={{ backgroundColor: 'var(--color-primary-accent)' }}
-                    className="flex items-center gap-2 px-3 sm:px-4 py-2 hover:opacity-90 text-white rounded-lg text-sm font-medium transition-colors cursor-pointer shadow-lg min-h-[44px]"
+                    className="flex items-center gap-2 px-3.5 py-2 hover:opacity-90 text-white rounded-xl text-xs font-mono font-bold transition-colors cursor-pointer shadow-lg min-h-[40px]"
                   >
                     <Download className="w-4 h-4" />
-                    <span className="hidden sm:inline">Download HD</span>
+                    <span>Download HD</span>
                   </button>
                 </div>
               </div>

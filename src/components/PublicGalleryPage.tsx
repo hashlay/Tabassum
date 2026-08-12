@@ -268,103 +268,118 @@ export const PublicGalleryPage: React.FC = () => {
 
       {/* Lightbox Preview Modal */}
       {activeItem && (
-        <div className="fixed inset-0 z-50 bg-black/95 flex flex-col items-center justify-center p-4">
-          <button
-            onClick={() => {
-              setActiveItem(null);
-              setShowShareMenu(false);
-            }}
-            className="absolute top-4 right-4 sm:top-6 sm:right-6 p-2 text-zinc-400 hover:text-white bg-white/10 rounded-full transition-colors z-50 cursor-pointer"
-            title="Close"
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-in fade-in duration-200"
+          onClick={() => {
+            setActiveItem(null);
+            setShowShareMenu(false);
+          }}
+        >
+          <div
+            className="relative max-w-4xl w-full bg-[#18181B] border border-white/15 rounded-2xl overflow-hidden shadow-2xl flex flex-col my-auto max-h-[90vh]"
+            onClick={(e) => e.stopPropagation()}
           >
-            <X className="w-5 h-5" />
-          </button>
+            {/* Header bar with title & close button */}
+            <div className="flex items-center justify-between p-3.5 sm:p-4 bg-[#141416] border-b border-white/10 shrink-0">
+              <div className="flex items-center gap-2">
+                <span style={{ color: 'var(--color-primary-accent)', borderColor: 'var(--color-primary-accent)' }} className="px-2 py-0.5 bg-white/5 border rounded text-[10px] font-mono font-bold uppercase tracking-wider">
+                  {activeItem.category || 'Gallery'}
+                </span>
+                <h3 className="text-sm font-bold text-white line-clamp-1">{activeItem.title}</h3>
+              </div>
+              <button
+                onClick={() => {
+                  setActiveItem(null);
+                  setShowShareMenu(false);
+                }}
+                className="p-1.5 text-zinc-400 hover:text-white bg-white/5 border border-white/10 rounded-lg transition-colors cursor-pointer"
+                title="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-          <button
-            onClick={handlePrev}
-            className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 p-2.5 text-zinc-300 hover:text-white bg-black/60 border border-white/10 hover:border-[#FF2B2B] rounded-full transition-colors z-50 cursor-pointer"
-          >
-            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
-          </button>
+            {/* Image Container with Prev/Next Navigation overlay */}
+            <div className="relative w-full max-h-[60vh] bg-black flex items-center justify-center overflow-hidden flex-shrink-0">
+              <button
+                onClick={handlePrev}
+                className="absolute left-3 top-1/2 -translate-y-1/2 p-2.5 text-zinc-200 hover:text-white bg-black/70 border border-white/15 rounded-full transition-colors z-20 cursor-pointer"
+              >
+                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
 
-          <button
-            onClick={handleNext}
-            className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 p-2.5 text-zinc-300 hover:text-white bg-black/60 border border-white/10 hover:border-[#FF2B2B] rounded-full transition-colors z-50 cursor-pointer"
-          >
-            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
-          </button>
-
-          <div className="max-w-4xl w-full flex flex-col items-center space-y-3">
-            {/* Image Box */}
-            <div className="relative w-full max-h-[65vh] aspect-video bg-black rounded-xl overflow-hidden border border-white/15 shadow-2xl flex items-center justify-center">
               <img
                 src={getMediaUrl(activeItem.imageUrl)}
                 alt={activeItem.title}
-                className="w-full h-full object-contain"
+                className="w-full h-full max-h-[60vh] object-contain"
                 referrerPolicy="no-referrer"
                 decoding="async"
               />
+
+              <button
+                onClick={handleNext}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 text-zinc-200 hover:text-white bg-black/70 border border-white/15 rounded-full transition-colors z-20 cursor-pointer"
+              >
+                <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
             </div>
 
-            {/* Caption Info */}
-            <div className="text-center space-y-1 max-w-xl">
-              <h3 className="text-base font-bold text-white">{activeItem.title}</h3>
-              {activeItem.caption && (
-                <p className="text-xs text-zinc-300 leading-relaxed font-sans">{activeItem.caption}</p>
+            {/* Modal Footer Controls */}
+            <div className="p-4 bg-[#121214] border-t border-white/10 overflow-y-auto">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="text-xs text-zinc-400 font-mono">
+                  {activeItem.caption && <p className="text-zinc-300 font-sans mb-1">{activeItem.caption}</p>}
+                  {activeItem.photographer && <span>Photo by {activeItem.photographer}</span>}
+                </div>
+
+                {/* Action Buttons Bar */}
+                <div className="flex items-center gap-2.5 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => handleDownload(activeItem.imageUrl, activeItem.title)}
+                    style={{ backgroundColor: 'var(--color-primary-accent)' }}
+                    className="px-4 py-2 hover:opacity-90 text-white text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-all duration-200 flex items-center gap-1.5 shadow-md cursor-pointer min-h-[38px]"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>DOWNLOAD HD</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleShare(activeItem)}
+                    className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-colors duration-200 flex items-center gap-1.5 shadow-md cursor-pointer min-h-[38px]"
+                  >
+                    {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Share2 className="w-3.5 h-3.5" />}
+                    <span>{copied ? 'COPIED!' : 'SHARE'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Share Options Drawer */}
+              {showShareMenu && (
+                <div className="mt-3 p-3 bg-[#18181C] border border-[#2D2D35] rounded-xl flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2">
+                  <a
+                    href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out this photo from Rendezvous Silver Edition: ${activeItem.title}\n${activeItem.imageUrl}`)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-3 py-1.5 bg-[#25D366]/20 border border-[#25D366]/40 hover:bg-[#25D366] text-white text-xs font-mono font-bold uppercase rounded-lg transition-all flex items-center gap-1.5"
+                  >
+                    <Send className="w-3.5 h-3.5 text-[#25D366]" />
+                    <span>WhatsApp</span>
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={() => handleCopyLink(activeItem.imageUrl)}
+                    style={{ backgroundColor: 'var(--color-primary-accent)' }}
+                    className="px-3 py-1.5 border border-white/20 hover:opacity-90 text-white text-xs font-mono font-bold uppercase rounded-lg transition-all flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                    <span>{copied ? 'Copied!' : 'Copy Link'}</span>
+                  </button>
+                </div>
               )}
-              <div className="flex items-center justify-center gap-3 text-[10px] font-mono text-zinc-400 pt-0.5">
-                {activeItem.category && <span className="text-[#FF2B2B] uppercase font-bold">{activeItem.category}</span>}
-                {activeItem.photographer && <span>Photo: {activeItem.photographer}</span>}
-                {activeItem.date && <span>{activeItem.date}</span>}
-              </div>
             </div>
-
-            {/* Action Buttons Bar */}
-            <div className="flex items-center justify-center gap-3 pt-1">
-              <button
-                type="button"
-                onClick={() => handleDownload(activeItem.imageUrl, activeItem.title)}
-                style={{ backgroundColor: 'var(--color-primary-accent)' }}
-                className="px-4 py-2 hover:opacity-90 border border-white/20 text-white text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-all duration-200 flex items-center gap-1.5 shadow-md cursor-pointer min-h-[44px]"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>DOWNLOAD HD</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleShare(activeItem)}
-                className="px-4 py-2 bg-black/60 hover:bg-white/20 border border-white/20 text-white text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-colors duration-200 flex items-center gap-1.5 shadow-md cursor-pointer min-h-[44px]"
-              >
-                {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Share2 className="w-3.5 h-3.5" />}
-                <span>{copied ? 'COPIED!' : 'SHARE'}</span>
-              </button>
-            </div>
-
-            {/* Share Options Drawer */}
-            {showShareMenu && (
-              <div className="p-3 bg-[#18181C] border border-[#2D2D35] rounded-xl flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2">
-                <a
-                  href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out this photo from Rendezvous Silver Edition: ${activeItem.title}\n${activeItem.imageUrl}`)}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-3 py-1.5 bg-[#25D366]/20 border border-[#25D366]/40 hover:bg-[#25D366] text-white text-xs font-mono font-bold uppercase rounded-lg transition-all flex items-center gap-1.5"
-                >
-                  <Send className="w-3.5 h-3.5 text-[#25D366]" />
-                  <span>WhatsApp</span>
-                </a>
-
-                <button
-                  type="button"
-                  onClick={() => handleCopyLink(activeItem.imageUrl)}
-                  style={{ backgroundColor: 'var(--color-primary-accent)' }}
-                  className="px-3 py-1.5 border border-white/20 hover:opacity-90 text-white text-xs font-mono font-bold uppercase rounded-lg transition-all flex items-center gap-1.5 cursor-pointer"
-                >
-                  <Copy className="w-3.5 h-3.5" />
-                  <span>{copied ? 'Copied!' : 'Copy Link'}</span>
-                </button>
-              </div>
-            )}
           </div>
         </div>
       )}
