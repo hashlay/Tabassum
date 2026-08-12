@@ -8,7 +8,44 @@ interface FooterProps {
   cmsSettings?: any;
 }
 
+const QuickLink = ({ id, label, onNavigate }: { id: string; label: string; onNavigate: (id: string) => void }) => {
+  const [hovered, setHovered] = React.useState(false);
+  return (
+    <li>
+      <button
+        onClick={() => onNavigate(id)}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        style={hovered ? { color: 'var(--color-primary-accent)' } : {}}
+        className="text-zinc-400 transition-colors cursor-pointer"
+      >
+        {label}
+      </button>
+    </li>
+  );
+};
+
+const SocialLink = ({ href, label, children }: { href: string; label: string; children: React.ReactNode }) => {
+  const [hovered, setHovered] = React.useState(false);
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={hovered ? { backgroundColor: 'var(--color-primary-accent)', color: '#ffffff' } : {}}
+      className="p-2.5 bg-white/5 text-zinc-300 rounded-xl transition-all"
+      aria-label={label}
+    >
+      {children}
+    </a>
+  );
+};
+
 export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings }) => {
+  const [topHovered, setTopHovered] = React.useState(false);
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -51,78 +88,15 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings }) => {
               Quick Navigation
             </h4>
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-xs font-medium text-zinc-400">
-              <li>
-                <button
-                  onClick={() => onNavigate('hero')}
-                  className="hover:text-[#FF2B2B] transition-colors cursor-pointer"
-                >
-                  Festival Home
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate('about')}
-                  className="hover:text-[#FF2B2B] transition-colors cursor-pointer"
-                >
-                  About & Concept
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate('results')}
-                  className="hover:text-[#FF2B2B] transition-colors cursor-pointer"
-                >
-                  Results Standings
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate('team-points')}
-                  className="hover:text-[#FF2B2B] transition-colors cursor-pointer"
-                >
-                  Team Points
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate('posters')}
-                  className="hover:text-[#FF2B2B] transition-colors cursor-pointer"
-                >
-                  Winner Posters
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate('smile')}
-                  className="hover:text-[#FF2B2B] transition-colors cursor-pointer"
-                >
-                  SMILE Photo Hub
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate('live')}
-                  className="hover:text-[#FF2B2B] transition-colors cursor-pointer"
-                >
-                  Live Stream
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate('gallery')}
-                  className="hover:text-[#FF2B2B] transition-colors cursor-pointer"
-                >
-                  Festival Gallery
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate('highlights')}
-                  className="hover:text-[#FF2B2B] transition-colors cursor-pointer"
-                >
-                  Video Highlights
-                </button>
-              </li>
+              <QuickLink id="hero" label="Festival Home" onNavigate={onNavigate} />
+              <QuickLink id="about" label="About & Concept" onNavigate={onNavigate} />
+              <QuickLink id="results" label="Results Standings" onNavigate={onNavigate} />
+              <QuickLink id="team-points" label="Team Points" onNavigate={onNavigate} />
+              <QuickLink id="posters" label="Winner Posters" onNavigate={onNavigate} />
+              <QuickLink id="smile" label="SMILE Photo Hub" onNavigate={onNavigate} />
+              <QuickLink id="live" label="Live Stream" onNavigate={onNavigate} />
+              <QuickLink id="gallery" label="Festival Gallery" onNavigate={onNavigate} />
+              <QuickLink id="highlights" label="Video Highlights" onNavigate={onNavigate} />
             </ul>
           </div>
 
@@ -152,33 +126,15 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings }) => {
                 Connect With Us
               </span>
               <div className="flex items-center gap-3">
-                <a
-                  href={cmsSettings?.footerInstagram || INSTITUTION.socials.instagram}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="p-2.5 bg-white/5 hover:bg-[#FF2B2B] hover:text-white text-zinc-300 rounded-xl transition-all"
-                  aria-label="Instagram"
-                >
+                <SocialLink href={cmsSettings?.footerInstagram || INSTITUTION.socials.instagram} label="Instagram">
                   <Instagram className="w-4 h-4" />
-                </a>
-                <a
-                  href={cmsSettings?.footerYoutube || INSTITUTION.socials.youtube}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="p-2.5 bg-white/5 hover:bg-[#FF2B2B] hover:text-white text-zinc-300 rounded-xl transition-all"
-                  aria-label="YouTube"
-                >
+                </SocialLink>
+                <SocialLink href={cmsSettings?.footerYoutube || INSTITUTION.socials.youtube} label="YouTube">
                   <Youtube className="w-4 h-4" />
-                </a>
-                <a
-                  href={cmsSettings?.footerFacebook || INSTITUTION.socials.facebook}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="p-2.5 bg-white/5 hover:bg-[#FF2B2B] hover:text-white text-zinc-300 rounded-xl transition-all"
-                  aria-label="Facebook"
-                >
+                </SocialLink>
+                <SocialLink href={cmsSettings?.footerFacebook || INSTITUTION.socials.facebook} label="Facebook">
                   <Facebook className="w-4 h-4" />
-                </a>
+                </SocialLink>
               </div>
             </div>
           </div>
@@ -190,7 +146,10 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings }) => {
 
           <button
             onClick={scrollToTop}
-            className="p-3 bg-white/5 hover:bg-[#FF2B2B] hover:text-white text-zinc-400 rounded-full transition-all flex items-center gap-2"
+            onMouseEnter={() => setTopHovered(true)}
+            onMouseLeave={() => setTopHovered(false)}
+            style={topHovered ? { backgroundColor: 'var(--color-primary-accent)', color: '#ffffff' } : {}}
+            className="p-3 bg-white/5 text-zinc-400 rounded-full transition-all flex items-center gap-2 cursor-pointer"
           >
             <span className="text-[10px] uppercase font-bold">Back to top</span>
             <ArrowUp className="w-4 h-4" />
