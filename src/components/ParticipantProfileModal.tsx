@@ -201,10 +201,16 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
         r.raw?.participationType === 'group'
       );
 
+      // Category compatibility check
+      const isCategoryMatch = !participantCategory || !rCategory || 
+        participantCategory === rCategory || 
+        rCategory.includes(participantCategory) || 
+        participantCategory.includes(rCategory);
+
       const isGroupMatch = isGroupEvent && Boolean(
         (participantId && rTeamMemberIds.includes(participantId)) ||
         (rTeamId && registeredTeamIds.has(rTeamId)) ||
-        (participantUnit && rDepartment && participantUnit === rDepartment && isCompMatch)
+        (participantUnit && rDepartment && participantUnit === rDepartment && isCompMatch && isCategoryMatch)
       );
 
       // A result ONLY belongs to this participant if it's their individual result or their group team result
@@ -223,7 +229,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
     return resultsList;
   }, [allResults, p]);
 
-  // Filter posters where this participant or their group team won Rank 1, 2, or 3
+  // Filter posters where this participant or their group team won Rank 1, 2, or 3 in THEIR exact category & competition
   const participantPosters = useMemo(() => {
     if (!p) return [];
 
@@ -233,16 +239,35 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
 
     if (wonRanks.length === 0) return [];
 
-    const wonCompIds = new Set(wonRanks.map(r => r.competitionId || r.raw?.competitionId).filter(Boolean));
-    const wonCompNames = new Set(wonRanks.map(r => (r.eventName || '').toLowerCase()));
+    const wonCompIds = new Set<string>();
+    const wonCompKeys = new Set<string>();
+
+    wonRanks.forEach(r => {
+      const cId = r.competitionId || r.raw?.competitionId;
+      if (cId) wonCompIds.add(cId);
+
+      const cat = (r.category || r.categoryName || r.raw?.categoryName || '').trim().toLowerCase();
+      const ev = (r.eventName || r.program || r.raw?.program || '').trim().toLowerCase();
+      if (ev && cat) {
+        wonCompKeys.add(`${ev}__${cat}`);
+      }
+    });
 
     return competitionPosters.filter(poster => {
       const firstRes = poster.results?.[0];
       if (!firstRes) return false;
-      const compId = firstRes.competitionId || firstRes.raw?.competitionId;
-      const eventName = (firstRes.eventName || '').toLowerCase();
 
-      return (compId && wonCompIds.has(compId)) || (eventName && wonCompNames.has(eventName));
+      const posterCompId = firstRes.competitionId || firstRes.raw?.competitionId;
+      if (posterCompId && wonCompIds.has(posterCompId)) return true;
+
+      const posterCat = (poster.category || firstRes.category || '').trim().toLowerCase();
+      const posterEv = (poster.eventName || firstRes.eventName || '').trim().toLowerCase();
+
+      if (posterEv && posterCat && wonCompKeys.has(`${posterEv}__${posterCat}`)) {
+        return true;
+      }
+
+      return false;
     });
   }, [competitionPosters, participantDeclaredResults, p]);
 
