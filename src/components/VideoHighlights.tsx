@@ -39,15 +39,37 @@ const VideoCard: React.FC<{
               referrerPolicy="no-referrer"
               loading="lazy"
               decoding="async"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                if (!target.dataset.triedFallback && video.videoUrl) {
+                  target.dataset.triedFallback = 'true';
+                  if (video.videoUrl.startsWith('/data/uploads/')) {
+                    target.src = `https://rendevouz-8sfp.onrender.com/api${video.videoUrl}`;
+                  }
+                }
+              }}
             />
           ) : (
-            /* Static placeholder instead of <video> — prevents mobile lag */
-            <div className="w-full h-full bg-gradient-to-br from-[#1a1a1f] to-[#111114] flex items-center justify-center">
-              <Video className="w-8 h-8 text-zinc-700" />
-            </div>
+            <video
+              src={getMediaUrl(video.videoUrl)}
+              preload="metadata"
+              muted
+              playsInline
+              className="w-full h-full object-cover opacity-90 sm:group-hover:scale-105 transition-transform duration-500 pointer-events-none"
+              onError={(e) => {
+                const target = e.target as HTMLVideoElement;
+                if (!target.dataset.triedFallback && video.videoUrl) {
+                  target.dataset.triedFallback = 'true';
+                  if (video.videoUrl.startsWith('/data/uploads/')) {
+                    target.src = `https://rendevouz-8sfp.onrender.com/api${video.videoUrl}`;
+                  } else if (!video.videoUrl.startsWith('http')) {
+                    target.src = `https://rendevouz-8sfp.onrender.com/api/data/uploads/${video.videoUrl.split('/').pop()}`;
+                  }
+                }
+              }}
+            />
           )
         ) : (
-          /* Skeleton placeholder before IntersectionObserver fires */
           <div className="w-full h-full bg-[#18181B] animate-pulse" />
         )}
 
@@ -183,6 +205,17 @@ export const VideoHighlights: React.FC = React.memo(() => {
                 controlsList="nodownload"
                 playsInline
                 preload="auto"
+                onError={(e) => {
+                  const target = e.target as HTMLVideoElement;
+                  if (!target.dataset.triedFallback && activeVideo.videoUrl) {
+                    target.dataset.triedFallback = 'true';
+                    if (activeVideo.videoUrl.startsWith('/data/uploads/')) {
+                      target.src = `https://rendevouz-8sfp.onrender.com/api${activeVideo.videoUrl}`;
+                    } else if (!activeVideo.videoUrl.startsWith('http')) {
+                      target.src = `https://rendevouz-8sfp.onrender.com/api/data/uploads/${activeVideo.videoUrl.split('/').pop()}`;
+                    }
+                  }
+                }}
               />
             </div>
             
