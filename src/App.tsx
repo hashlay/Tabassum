@@ -107,7 +107,23 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
   React.useEffect(() => {
     fetch(`/api/public/cms?t=${Date.now()}`)
       .then(res => res.json())
-      .then(data => setCmsData(data))
+      .then(data => {
+        setCmsData(data);
+        const theme = data?.cmsSettings?.colorTheme;
+        if (theme) {
+          const root = document.documentElement;
+          if (theme.primaryAccent) root.style.setProperty('--color-primary-accent', theme.primaryAccent);
+          if (theme.bodyBg) root.style.setProperty('--color-body-bg', theme.bodyBg);
+          if (theme.cardBg) root.style.setProperty('--color-card-bg', theme.cardBg);
+          if (theme.cardElevatedBg) root.style.setProperty('--color-card-elevated-bg', theme.cardElevatedBg);
+          if (theme.borderSubtle) root.style.setProperty('--color-border-subtle', theme.borderSubtle);
+          if (theme.textPrimary) root.style.setProperty('--color-text-primary', theme.textPrimary);
+          if (theme.textSecondary) root.style.setProperty('--color-text-secondary', theme.textSecondary);
+          if (theme.textMuted) root.style.setProperty('--color-text-muted', theme.textMuted);
+          if (theme.goldAccent) root.style.setProperty('--color-gold-accent', theme.goldAccent);
+          if (theme.successAccent) root.style.setProperty('--color-success-accent', theme.successAccent);
+        }
+      })
       .catch(err => console.error('Failed to load CMS data:', err));
   }, []);
 
