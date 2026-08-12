@@ -77,6 +77,17 @@ export const PublicPostersPage: React.FC = () => {
     });
   }, [competitionPosters, selectedCategory, searchQuery]);
 
+  useEffect(() => {
+    if (activePoster) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [activePoster]);
+
   const handleDownload = async (poster: CompetitionPoster) => {
     try {
       const fileName = `Result_Poster_${poster.category}_${poster.eventName.replace(/[^a-zA-Z0-9]/g, '_')}.jpg`;
@@ -99,132 +110,147 @@ export const PublicPostersPage: React.FC = () => {
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
       }
-    } catch (_) {
-      if (poster.imageUrl) window.open(poster.imageUrl, '_blank');
+    } catch (err) {
+      console.error('Download poster failed', err);
     }
   };
 
   const handleShare = async (poster: CompetitionPoster) => {
-    const text = `🏆 Official Result Poster: ${poster.eventName} (${poster.category}) - Sahityotsav Festival Results!`;
-    const shareUrl = window.location.origin + '/results?category=' + encodeURIComponent(poster.category) + '&event=' + encodeURIComponent(poster.eventName);
-
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `${poster.eventName} - Result Poster`,
-          text: text,
-          url: shareUrl
+          title: `Result Poster - ${poster.eventName}`,
+          text: `Check out the result poster for ${poster.eventName} (${poster.category} Category) at SSF Sahityotsav!`,
+          url: `${window.location.origin}/results?category=${encodeURIComponent(poster.category)}&event=${encodeURIComponent(poster.eventName)}`,
         });
-        return;
-      } catch (_) {}
+      } catch (err) {
+        setShowShareMenu(!showShareMenu);
+      }
+    } else {
+      setShowShareMenu(!showShareMenu);
     }
-
-    setShowShareMenu(true);
   };
 
   const handleCopyLink = (poster: CompetitionPoster) => {
-    const shareUrl = window.location.origin + '/results?category=' + encodeURIComponent(poster.category) + '&event=' + encodeURIComponent(poster.eventName);
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(shareUrl);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
-
-  const handleNext = () => {
-    if (!activePoster) return;
-    const currentIndex = filteredPosters.findIndex(p => p.id === activePoster.id);
-    if (currentIndex === -1) return;
-    const nextIndex = (currentIndex + 1) % filteredPosters.length;
-    setActivePoster(filteredPosters[nextIndex]);
-    setCopied(false);
-    setShowShareMenu(false);
+    const link = `${window.location.origin}/results?category=${encodeURIComponent(poster.category)}&event=${encodeURIComponent(poster.eventName)}`;
+    navigator.clipboard.writeText(link);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const handlePrev = () => {
     if (!activePoster) return;
-    const currentIndex = filteredPosters.findIndex(p => p.id === activePoster.id);
-    if (currentIndex === -1) return;
+    const currentIndex = filteredPosters.findIndex((p) => p.id === activePoster.id);
     const prevIndex = (currentIndex - 1 + filteredPosters.length) % filteredPosters.length;
     setActivePoster(filteredPosters[prevIndex]);
-    setCopied(false);
+    setShowShareMenu(false);
+  };
+
+  const handleNext = () => {
+    if (!activePoster) return;
+    const currentIndex = filteredPosters.findIndex((p) => p.id === activePoster.id);
+    const nextIndex = (currentIndex + 1) % filteredPosters.length;
+    setActivePoster(filteredPosters[nextIndex]);
     setShowShareMenu(false);
   };
 
   return (
-    <div className="min-h-screen bg-[#0D0D0F] text-white pt-20 sm:pt-24 pb-16 font-sans selection:bg-[#FF2B2B]">
+    <div className="min-h-screen bg-[#080808] text-white pt-24 pb-16 font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        {/* Page Header */}
-        <div className="mb-6 border-b border-[#2A2A30] pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div className="space-y-1.5">
-            <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight font-sans">
+        
+        {/* Header section */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-white/10 pb-6 mb-8 gap-4">
+          <div>
+            <div style={{ color: 'var(--color-primary-accent)', borderColor: 'var(--color-primary-accent)' }} className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/5 border text-[11px] font-mono font-bold uppercase tracking-wider mb-2">
+              <Trophy className="w-3.5 h-3.5" />
+              <span>Official Media Hub</span>
+            </div>
+            <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight uppercase font-sans">
               Competition Posters
             </h1>
-            <p className="text-zinc-400 text-xs sm:text-sm max-w-2xl leading-relaxed font-sans">
-              Verified official result posters generated per competition event.
+            <p className="text-zinc-400 text-xs sm:text-sm font-sans mt-1">
+              Explore and download official result posters for all completed items.
             </p>
           </div>
 
-          <div className="bg-[#161619] border border-[#2D2D35] px-3.5 py-2 rounded-xl shrink-0 font-mono text-xs text-zinc-300">
-            <span style={{ color: 'var(--color-primary-accent)' }} className="font-bold">{filteredPosters.length}</span> Posters Generated
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-mono text-zinc-400 uppercase">Total Items:</span>
+            <span style={{ backgroundColor: 'var(--color-primary-accent)' }} className="px-2.5 py-0.5 rounded-md text-xs font-mono font-bold text-white shadow-sm">
+              {filteredPosters.length}
+            </span>
           </div>
         </div>
 
-        {/* Search & Filter Controls */}
-        <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 mb-6">
-          {/* Search Bar */}
-          <div className="sm:col-span-8 relative">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+        {/* Filter bar */}
+        <div className="flex flex-col sm:flex-row gap-3 mb-8">
+          <div className="relative flex-1">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
             <input
               type="text"
-              placeholder="Search event..."
+              placeholder="Search event or category..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#161619] border border-[#2D2D35] focus:border-white rounded-xl pl-10 pr-4 py-2.5 text-xs text-white font-mono placeholder:text-zinc-500 focus:outline-none transition-colors"
+              className="w-full bg-[#161619] border border-[#2A2A32] focus:border-white rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none transition-colors"
             />
           </div>
 
-          {/* Category Select */}
-          <div className="sm:col-span-4 relative">
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value as Category)}
-              className="w-full bg-[#161619] border border-[#2D2D35] focus:border-white rounded-xl px-3.5 py-2.5 text-xs text-white font-mono appearance-none focus:outline-none transition-colors pr-10 cursor-pointer"
-            >
-              <option value="All">All categories</option>
-              {categories.map(c => (
-                <option key={c.name} value={c.name}>{c.name}</option>
-              ))}
-            </select>
-            <ChevronDown className="w-4 h-4 text-zinc-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+            <Filter className="w-4 h-4 text-zinc-400 shrink-0 ml-1" />
+            {[{name: 'All'}, ...categories].map((cat) => (
+              <button
+                key={cat.name}
+                onClick={() => setSelectedCategory(cat.name as Category)}
+                style={selectedCategory === cat.name ? { backgroundColor: 'var(--color-primary-accent)', color: '#ffffff' } : {}}
+                className={`px-3 py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider transition-all whitespace-nowrap border ${
+                  selectedCategory === cat.name
+                    ? 'border-transparent shadow-md'
+                    : 'bg-[#161619] border-[#2A2A32] text-zinc-400 hover:text-white hover:border-white/20'
+                }`}
+              >
+                {cat.name}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Clean Image Grid or Empty State */}
-        {filteredPosters.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {/* Posters Grid */}
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="aspect-[4/5] bg-[#161619] border border-[#2A2A32] rounded-2xl animate-pulse" />
+            ))}
+          </div>
+        ) : filteredPosters.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {filteredPosters.map((poster) => (
-              <div key={poster.id} className="group flex flex-col gap-2">
-                <div 
-                  onClick={() => setActivePoster(poster)}
-                  className="relative aspect-[4/5] bg-[#161619] border border-white/10 rounded-xl overflow-hidden cursor-pointer group-hover:border-white/40 transition-colors shadow-lg"
-                >
+              <div
+                key={poster.id}
+                onClick={() => {
+                  setActivePoster(poster);
+                  setShowShareMenu(false);
+                }}
+                className="group relative bg-[#161619] border border-[#2A2A32] rounded-2xl overflow-hidden cursor-pointer shadow-lg sm:hover:border-white/40 transition-all duration-300 flex flex-col"
+              >
+                <div className="relative aspect-[4/5] overflow-hidden bg-black flex items-center justify-center p-2">
                   <PosterImage
                     competitionId={poster.id}
                     eventName={poster.eventName}
                     category={poster.category}
                     compIndex={poster.compIndex}
                     results={poster.results}
-                    className="w-full h-full object-contain object-center group-hover:scale-[1.02] transition-transform duration-500"
+                    className="w-full h-full object-contain will-change-transform sm:group-hover:scale-105 transition-transform duration-500 rounded-lg"
                     onLoadUrl={(url) => { poster.imageUrl = url; }}
                   />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
-                    <ZoomIn className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity transform scale-50 group-hover:scale-100 duration-300" />
+
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-40 sm:group-hover:opacity-80 transition-opacity" />
+
+                  <div className="absolute top-3 right-3 p-1.5 rounded-full text-white opacity-0 sm:group-hover:opacity-100 transition-opacity shadow-md" style={{ backgroundColor: 'var(--color-primary-accent)' }}>
+                    <ZoomIn className="w-4 h-4 text-white" />
                   </div>
                 </div>
-                <div className="px-1 text-center">
-                  <h3 className="font-competition-title font-bold text-sm sm:text-base text-white tracking-snug line-clamp-1">
+
+                <div className="p-4 bg-[#141417] border-t border-[#25252D] flex flex-col justify-between flex-1">
+                  <h3 className="text-sm font-bold text-white line-clamp-1 group-hover:text-white transition-colors">
                     {poster.eventName}
                   </h3>
                   <p className="text-xs text-zinc-400 font-mono mt-0.5 uppercase tracking-wider">
@@ -235,9 +261,8 @@ export const PublicPostersPage: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-12 bg-[#161619] border border-[#2A2A32] rounded-2xl text-zinc-400 font-mono text-xs space-y-1">
-            <div className="text-sm uppercase tracking-widest text-zinc-500">Result is not published</div>
-            <div className="text-[11px] text-zinc-500">Results will appear here once competitions are completed.</div>
+          <div className="text-center py-20 border-2 border-dashed border-[#2A2A32] rounded-2xl">
+            <p className="text-zinc-500 font-mono text-sm">No posters found matching your criteria.</p>
           </div>
         )}
 
@@ -246,7 +271,7 @@ export const PublicPostersPage: React.FC = () => {
       {/* Lightbox Modal */}
       {activePoster && (
         <div
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200"
           onClick={() => {
             setActivePoster(null);
             setShowShareMenu(false);
@@ -257,7 +282,7 @@ export const PublicPostersPage: React.FC = () => {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header Bar */}
-            <div className="flex items-center justify-between p-3.5 sm:p-4 bg-[#141416] border-b border-white/10 shrink-0">
+            <div className="flex items-center justify-between p-4 bg-[#141416] border-b border-white/10 shrink-0">
               <div className="flex items-center gap-2">
                 <span style={{ color: 'var(--color-primary-accent)', borderColor: 'var(--color-primary-accent)' }} className="px-2.5 py-0.5 bg-white/5 border rounded text-[10px] font-mono font-bold uppercase tracking-wider">
                   {activePoster.category} Category

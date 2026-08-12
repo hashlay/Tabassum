@@ -62,6 +62,17 @@ export const PublicGalleryPage: React.FC = () => {
     });
   }, [allGalleryItems, selectedCategory, searchQuery]);
 
+  useEffect(() => {
+    if (activeItem) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [activeItem]);
+
   const handleNext = () => {
     if (!activeItem) return;
     const currentIndex = filteredItems.findIndex((i) => i.id === activeItem.id);
@@ -96,7 +107,12 @@ export const PublicGalleryPage: React.FC = () => {
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
     } catch (_) {
-      window.open(getMediaUrl(imageUrl), '_blank');
+      const a = document.createElement('a');
+      a.href = getMediaUrl(imageUrl);
+      a.download = `${title.replace(/\s+/g, '_')}.jpg`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     }
   };
 
@@ -115,7 +131,7 @@ export const PublicGalleryPage: React.FC = () => {
       } catch (_) { }
     }
 
-    setShowShareMenu(!showShareMenu);
+    setShowShareMenu(true);
   };
 
   const handleCopyLink = (url: string) => {
@@ -134,74 +150,66 @@ export const PublicGalleryPage: React.FC = () => {
         {/* Page Header */}
         <div className="mb-6 border-b border-[#2A2A30] pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div className="space-y-1.5">
+            <div style={{ color: 'var(--color-primary-accent)', borderColor: 'var(--color-primary-accent)' }} className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/5 border text-[11px] font-mono font-bold uppercase tracking-wider mb-2">
+              <Camera className="w-3.5 h-3.5" />
+              <span>Official Media Hub</span>
+            </div>
             <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight font-sans">
               Festival Gallery
             </h1>
             <p className="text-zinc-400 text-xs sm:text-sm max-w-2xl leading-relaxed font-sans">
-              Complete photographic archive of Festival. Browse, download in HD, and share memories.
+              Official snapshots and captured moments from across all stages and events.
             </p>
           </div>
 
           <div className="bg-[#161619] border border-[#2D2D35] px-3.5 py-2 rounded-xl shrink-0 font-mono text-xs text-zinc-300">
-            <span style={{ color: 'var(--color-primary-accent)' }} className="font-bold">{filteredItems.length}</span> / {allGalleryItems.length} Photos
+            <span style={{ color: 'var(--color-primary-accent)' }} className="font-bold">{filteredItems.length}</span> Photos Available
           </div>
         </div>
 
-        {/* Filter Controls: Search & Category Filter Pills */}
-        <div className="relative mb-6 sm:mb-8 max-w-2xl group z-10">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 transition-colors" />
-          <input
-            type="text"
-            placeholder="Search photos by title, category or photographer..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#18181B] border border-white/10 rounded-xl py-3.5 pl-10 pr-4 text-white placeholder:text-zinc-600 focus:outline-none focus:border-white transition-all font-sans text-sm"
-          />
+        {/* Filter bar */}
+        <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 mb-6">
+          <div className="sm:col-span-8 relative">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+            <input
+              type="text"
+              placeholder="Search title, category, photographer..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-[#161619] border border-[#2D2D35] focus:border-white rounded-xl pl-10 pr-4 py-2.5 text-xs text-white font-mono placeholder:text-zinc-500 focus:outline-none transition-colors"
+            />
+          </div>
+
+          <div className="sm:col-span-4 relative">
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="w-full bg-[#161619] border border-[#2D2D35] focus:border-white rounded-xl px-3.5 py-2.5 text-xs text-white font-mono appearance-none focus:outline-none transition-colors pr-10 cursor-pointer"
+            >
+              <option value="All">All Categories ({allGalleryItems.length})</option>
+              {categories.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="w-4 h-4 text-zinc-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
         </div>
 
-        {/* Category Filters */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 sm:mb-8 scrollbar-hide shrink-0 z-10 relative mask-fade-edges">
-          <div className="flex items-center gap-2 bg-[#18181B] border border-white/5 p-1 rounded-xl shrink-0">
-            <Filter className="w-3.5 h-3.5 text-zinc-500 ml-2" />
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                style={selectedCategory === category ? { backgroundColor: 'var(--color-primary-accent)' } : {}}
-                className={`px-4 py-1.5 rounded-lg text-xs font-bold font-mono uppercase tracking-wider whitespace-nowrap transition-all duration-300 ${
-                  selectedCategory === category
-                    ? 'text-white shadow-lg'
-                    : 'text-zinc-400 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                {category}
-              </button>
+        {/* Gallery Grid */}
+        {loading ? (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-10">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+              <div key={n} className="aspect-[4/3] bg-[#161619] border border-[#2A2A32] rounded-xl animate-pulse" />
             ))}
           </div>
-        </div>
-
-        {loading ? (
-          <div className="flex flex-col items-center justify-center py-32">
-            <RefreshCw className="w-8 h-8 animate-spin mb-4" style={{ color: 'var(--color-primary-accent)' }} />
-            <p className="text-zinc-500 font-mono text-sm uppercase tracking-wider">Loading Gallery...</p>
-          </div>
         ) : filteredItems.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 px-4 bg-[#18181B] rounded-2xl border border-white/5">
-            <p className="text-zinc-400 font-mono text-sm mb-4">No photos match your filter criteria.</p>
-            <button
-              onClick={() => {
-                setSearchQuery('');
-                setSelectedCategory('All');
-              }}
-              style={{ backgroundColor: 'var(--color-primary-accent)' }}
-              className="px-6 py-2 hover:opacity-90 text-white font-bold font-mono text-xs uppercase tracking-wider rounded-lg transition-colors shadow-lg"
-            >
-              Reset Filters
-            </button>
+          <div className="text-center py-20 bg-[#161619]/50 rounded-2xl border border-white/5">
+            <p className="text-zinc-400 font-medium text-sm font-mono">No photos match your filter criteria.</p>
           </div>
         ) : (
-        /* Gallery Image Grid */
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 sm:gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-10">
           {filteredItems.map((item) => (
             <div
               key={item.id}
@@ -212,7 +220,6 @@ export const PublicGalleryPage: React.FC = () => {
               }}
               className="group relative bg-[#161619] border border-[#2A2A32] rounded-xl overflow-hidden cursor-pointer shadow-md sm:hover:border-white/40 transition-colors duration-300 flex flex-col"
             >
-              {/* Image Frame */}
               <div className="relative aspect-[4/3] overflow-hidden bg-black">
                 <img
                   src={getMediaUrl(item.imageUrl)}
@@ -221,34 +228,15 @@ export const PublicGalleryPage: React.FC = () => {
                   referrerPolicy="no-referrer"
                   loading="lazy"
                   decoding="async"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    if (!target.dataset.triedFallback && item.imageUrl) {
-                      target.dataset.triedFallback = 'true';
-                      if (item.imageUrl.startsWith('/data/uploads/')) {
-                        target.src = `https://rendevouz-8sfp.onrender.com/api${item.imageUrl}`;
-                      } else if (!item.imageUrl.startsWith('http')) {
-                        target.src = `https://rendevouz-8sfp.onrender.com${item.imageUrl.startsWith('/') ? item.imageUrl : '/' + item.imageUrl}`;
-                      }
-                    }
-                  }}
                 />
-
-                {/* Hover Gradient */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 sm:group-hover:opacity-90 transition-opacity" />
-
-                {/* Category Badge */}
                 <div className="absolute top-2 left-2 bg-black/70 px-2 py-0.5 rounded text-[9px] font-mono font-bold text-zinc-300 uppercase border border-white/10">
                   {item.category}
                 </div>
-
-                {/* Zoom Icon Button */}
                 <div className="absolute top-2 right-2 p-1 rounded-full text-white opacity-0 sm:group-hover:opacity-100 transition-opacity shadow-md" style={{ backgroundColor: 'var(--color-primary-accent)' }}>
                   <ZoomIn className="w-3 h-3 text-white" />
                 </div>
               </div>
-
-              {/* Title & Info */}
               <div className="p-2.5 bg-[#141417] border-t border-[#25252D] flex flex-col justify-between flex-1">
                 <h3 className="text-xs font-bold text-white line-clamp-1 group-hover:text-white transition-colors">
                   {item.title}
@@ -269,7 +257,7 @@ export const PublicGalleryPage: React.FC = () => {
       {/* Lightbox Preview Modal */}
       {activeItem && (
         <div
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200"
           onClick={() => {
             setActiveItem(null);
             setShowShareMenu(false);

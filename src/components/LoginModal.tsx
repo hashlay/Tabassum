@@ -18,12 +18,18 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
   React.useEffect(() => {
     if (isOpen) {
+      document.body.style.overflow = 'hidden';
       const params = new URLSearchParams(window.location.search);
       const userParam = params.get('user') || params.get('chest') || params.get('code');
       if (userParam) {
         setChestNumber(userParam);
       }
+    } else {
+      document.body.style.overflow = 'unset';
     }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -45,7 +51,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-xl animate-in fade-in duration-200 overflow-y-auto py-8"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 animate-in fade-in duration-200"
       onClick={onClose}
     >
       {/* Background Subtle Ambient Glow */}

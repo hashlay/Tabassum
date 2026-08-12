@@ -127,6 +127,17 @@ export const VideoHighlights: React.FC = React.memo(() => {
     setActiveVideo(null);
   }, []);
 
+  useEffect(() => {
+    if (activeVideo) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [activeVideo]);
+
   const handleShare = useCallback(async (video: VideoHighlight) => {
     const text = `Check out this amazing performance: ${video.title} by ${video.performer} at SSF Sahityotsav!`;
     const url = window.location.origin + video.videoUrl;
@@ -186,7 +197,7 @@ export const VideoHighlights: React.FC = React.memo(() => {
       {/* Video Modal Player */}
       {activeVideo && (
         <div
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200"
           onClick={handleClose}
         >
           <div

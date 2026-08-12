@@ -32,6 +32,17 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
 
   const displayItems = galleryItems;
 
+  useEffect(() => {
+    if (activeItem) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [activeItem]);
+
   const handleNext = () => {
     if (!activeItem) return;
     const currentIndex = displayItems.findIndex(i => i.id === activeItem.id);
@@ -58,85 +69,76 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}-hd.jpg`;
+      a.download = `${title.replace(/\s+/g, '_')}.jpg`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
     } catch (_) {
-      window.open(getMediaUrl(imageUrl), '_blank');
+      const a = document.createElement('a');
+      a.href = getMediaUrl(imageUrl);
+      a.download = `${title.replace(/\s+/g, '_')}.jpg`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     }
   };
 
-  const handleShare = async (item: GalleryItem) => {
-    const fullUrl = item.imageUrl.startsWith('http') ? item.imageUrl : window.location.origin + item.imageUrl;
-    const text = `Check out this photo from Rendezvous Silver Edition: ${item.title}`;
-
+  const handleShare = (item: GalleryItem) => {
     if (navigator.share) {
-      try {
-        await navigator.share({
-          title: item.title,
-          text: text,
-          url: fullUrl
-        });
-        return;
-      } catch (_) { }
+      navigator.share({
+        title: item.title,
+        text: `Check out this photo from Rendezvous Silver Edition: ${item.title}`,
+        url: window.location.origin + item.imageUrl,
+      }).catch(() => setShowShareMenu(!showShareMenu));
+    } else {
+      setShowShareMenu(!showShareMenu);
     }
-
-    setShowShareMenu(true);
   };
 
-  const handleCopyLink = (url: string) => {
-    const fullUrl = url.startsWith('http') ? url : window.location.origin + url;
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(fullUrl);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
+  const handleCopyLink = (imageUrl: string) => {
+    const fullUrl = window.location.origin + imageUrl;
+    navigator.clipboard.writeText(fullUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
-    <section id="gallery" className="py-10 sm:py-14 bg-[#121214] relative overflow-hidden border-b border-white/10 font-sans">
+    <section id="gallery" className="py-10 sm:py-14 bg-[#0A0A0C] relative overflow-hidden border-b border-white/10 font-sans">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* Section Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-3 border-b border-white/10 pb-5">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 border-b border-white/10 pb-5 gap-4">
           <div>
             <span style={{ color: 'var(--color-primary-accent)' }} className="font-mono text-[10px] font-bold tracking-[0.25em] uppercase mb-0.5 block">
-              FROM THE GROUND
+              MOMENTS
             </span>
             <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight font-sans">
-              Gallery
+              Festival Gallery
             </h2>
             <p className="text-zinc-400 text-xs font-sans mt-0.5">
-              Scenes from Campus as the festival unfolds.
+              High-resolution snapshots from various events.
             </p>
           </div>
 
           <button
-            type="button"
-            onClick={() => {
-              if (onNavigate) {
-                onNavigate('gallery');
-              } else {
-                window.location.pathname = '/gallery';
-              }
-            }}
+            onClick={() => onNavigate && onNavigate('gallery')}
             style={{ color: 'var(--color-primary-accent)' }}
-            className="hover:opacity-80 font-extrabold text-xs font-mono tracking-wider hover:underline flex items-center gap-1.5 shrink-0 self-start sm:self-end uppercase cursor-pointer transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-wider hover:opacity-80 transition-opacity cursor-pointer self-start sm:self-auto"
           >
-            <span>VIEW ALL</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <span>View All Photos ({galleryItems.length})</span>
+            <ArrowRight className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Photo Grid */}
+        {/* Gallery Grid */}
         {loading ? (
-          <div className="flex justify-center items-center py-20">
-            <div style={{ borderColor: 'var(--color-primary-accent)', borderTopColor: 'transparent' }} className="w-8 h-8 border-2 rounded-full animate-spin" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-10">
+            {[1, 2, 3, 4].map((n) => (
+              <div key={n} className="aspect-[4/3] bg-[#161619] border border-[#2A2A32] rounded-xl animate-pulse" />
+            ))}
           </div>
         ) : displayItems.length === 0 ? (
-          <div className="text-center py-20 bg-[#18181B]/50 rounded-2xl border border-white/5">
-            <ImageIcon className="w-12 h-12 text-zinc-600 mx-auto mb-3" />
+          <div className="text-center py-16 bg-[#161619]/50 rounded-2xl border border-white/5">
             <p className="text-zinc-400 font-medium">No featured photos available yet.</p>
           </div>
         ) : (
@@ -160,17 +162,6 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
                     referrerPolicy="no-referrer"
                     loading={index < 4 ? "eager" : "lazy"}
                     decoding="async"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      if (!target.dataset.triedFallback && item.imageUrl) {
-                        target.dataset.triedFallback = 'true';
-                        if (item.imageUrl.startsWith('/data/uploads/')) {
-                          target.src = `https://rendevouz-8sfp.onrender.com/api${item.imageUrl}`;
-                        } else if (!item.imageUrl.startsWith('http')) {
-                          target.src = `https://rendevouz-8sfp.onrender.com${item.imageUrl.startsWith('/') ? item.imageUrl : '/' + item.imageUrl}`;
-                        }
-                      }
-                    }}
                   />
 
                   {/* Hover Gradient */}
@@ -207,7 +198,7 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
       {/* Lightbox Preview Modal */}
       {activeItem && (
         <div
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200"
           onClick={() => {
             setActiveItem(null);
             setShowShareMenu(false);
