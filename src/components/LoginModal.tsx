@@ -44,7 +44,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   };
 
   return (
-    <div 
+    <div
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-xl animate-in fade-in duration-200 overflow-y-auto py-8"
       onClick={onClose}
     >
@@ -52,8 +52,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
       <div className="absolute top-1/3 right-1/3 w-96 h-96 bg-[#FF2B2B]/10 rounded-full blur-3xl pointer-events-none" />
 
       {/* Main Card matching Reference Design */}
-      <div 
-        className="relative w-full max-w-[450px] bg-[#1E1E20] border border-[#333338] rounded-2xl shadow-2xl overflow-hidden p-6 sm:p-8 space-y-5 my-auto"
+      <div
+        className="relative w-full max-w-[560px] min-h-[620px] bg-[#1E1E20] border border-[#333338] rounded-2xl shadow-2xl overflow-hidden p-6 sm:p-8 space-y-5 my-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Card Header Bar */}
@@ -109,7 +109,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                 className="w-full bg-[#141416] border border-[#38383C] focus:border-[#DC2626] rounded-xl pl-4 pr-11 py-3 text-sm text-white font-mono placeholder:text-zinc-500 focus:outline-none transition-colors [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:hidden"
                 placeholder="DD/MM/YYYY"
               />
-              <Calendar 
+              <Calendar
                 className="absolute right-4 w-5 h-5 text-zinc-500 cursor-pointer hover:text-white transition-colors"
                 onClick={() => {
                   try {
