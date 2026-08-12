@@ -111,75 +111,107 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
     });
   }, [allResults]);
 
-  // Dynamically compute ALL declared results for ONLY this participant's registered programs
+  // Dynamically compute ALL declared results for ONLY this participant's registered programs & wins
   const participantDeclaredResults = useMemo(() => {
     if (!p) return [];
 
-    // Collect all competition IDs and clean Program names this participant is registered for
+    const participantId = p.id || (p as any).raw?.id;
+    const participantCode = (p.codeNumber || p.chestNumber || '').toString().trim().toLowerCase();
+    const participantName = (p.name || p.fullName || '').trim().toLowerCase();
+    const participantUnit = (p.department || p.unitName || '').trim().toLowerCase();
+    const participantCategory = (p.category || p.categoryName || '').trim().toLowerCase();
+
+    // Collect registered competition IDs, clean names, and team IDs for this participant
     const registeredCompIds = new Set<string>();
     const registeredCompNames = new Set<string>();
+    const registeredTeamIds = new Set<string>();
 
-    if (Array.isArray(p.schedule)) {
-      p.schedule.forEach((sc: any) => {
-        if (sc.competitionId) registeredCompIds.add(sc.competitionId);
-        if (sc.id) registeredCompIds.add(sc.id);
-        if (sc.program) {
-          const cleanProgName = sc.program.replace(/\s*\([^)]*Group[^)]*\)/gi, '').trim();
-          registeredCompNames.add(cleanProgName.toLowerCase());
-          registeredCompNames.add(sc.program.toLowerCase());
-        }
-      });
-    }
+    if (p.teamId) registeredTeamIds.add(p.teamId);
 
-    if (Array.isArray(p.registeredPrograms)) {
-      p.registeredPrograms.forEach((prog: any) => {
-        if (prog.competitionId) registeredCompIds.add(prog.competitionId);
-        if (prog.id) registeredCompIds.add(prog.id);
-        if (prog.program) {
-          const cleanProgName = prog.program.replace(/\s*\([^)]*Group[^)]*\)/gi, '').trim();
-          registeredCompNames.add(cleanProgName.toLowerCase());
-          registeredCompNames.add(prog.program.toLowerCase());
-        }
-        if (prog.name) {
-          registeredCompNames.add(prog.name.toLowerCase());
-        }
+    const checkAndAddProgram = (prog: any) => {
+      if (!prog) return;
+      if (prog.competitionId) registeredCompIds.add(prog.competitionId);
+      if (prog.id) registeredCompIds.add(prog.id);
+      if (prog.teamId) registeredTeamIds.add(prog.teamId);
+      
+      const rawProgName = prog.program || prog.name || prog.eventName || '';
+      if (rawProgName) {
+        const cleanProgName = rawProgName.replace(/\s*\([^)]*Group[^)]*\)/gi, '').trim().toLowerCase();
+        registeredCompNames.add(cleanProgName);
+        registeredCompNames.add(rawProgName.trim().toLowerCase());
+      }
+    };
+
+    if (Array.isArray(p.schedule)) p.schedule.forEach(checkAndAddProgram);
+    if (Array.isArray(p.registeredPrograms)) p.registeredPrograms.forEach(checkAndAddProgram);
+    if (Array.isArray(p.results)) {
+      p.results.forEach((r: any) => {
+        if (r.competitionId) registeredCompIds.add(r.competitionId);
+        if (r.eventName) registeredCompNames.add(r.eventName.trim().toLowerCase());
       });
     }
 
     const resultsList: any[] = [];
-    const seenCompKeys = new Set<string>();
+    const seenResultKeys = new Set<string>();
 
     (allResults || []).forEach((r: any) => {
-      // 1. MUST be registered for this competition
       const rCompId = r.competitionId || r.raw?.competitionId;
-      const rEventName = (r.eventName || r.program || '').toLowerCase();
+      const rCategory = (r.category || r.categoryName || r.raw?.categoryName || '').trim().toLowerCase();
+      const rEventName = (r.eventName || r.program || r.raw?.program || '').trim().toLowerCase();
+      const cleanEventName = rEventName.replace(/\s*\([^)]*Group[^)]*\)/gi, '').trim();
 
-      const isRegisteredComp = (
+      // Check category compatibility to prevent cross-category matches
+      if (participantCategory && rCategory && !participantCategory.includes('general') && !rCategory.includes('general')) {
+        const sub1 = participantCategory.substring(0, 5);
+        const sub2 = rCategory.substring(0, 5);
+        if (sub1 !== sub2 && !rCategory.includes(participantCategory) && !participantCategory.includes(rCategory)) {
+          return;
+        }
+      }
+
+      // Must be a registered competition for this participant
+      const isCompMatch = (
         (rCompId && registeredCompIds.has(rCompId)) ||
-        (rEventName && registeredCompNames.has(rEventName))
+        (rEventName && registeredCompNames.has(rEventName)) ||
+        (cleanEventName && registeredCompNames.has(cleanEventName))
       );
 
-      if (!isRegisteredComp) return;
+      if (!isCompMatch) return;
 
-      // 2. STRICT PARTICIPATION MATCHING (ID based)
-      const isIndividualMatch = (
-        r.participantId === p.id ||
-        (r.raw && r.raw.participantId === p.id)
+      // Extract result participant and team info
+      const rPartId = r.participantId || r.raw?.participantId;
+      const rCodeNumber = (r.codeNumber || r.chestNumber || r.raw?.codeNumber || r.raw?.chestNumber || '').toString().trim().toLowerCase();
+      const rParticipantName = (r.participantName || r.raw?.participantName || '').trim().toLowerCase();
+      const rTeamId = r.teamId || r.raw?.teamId;
+      const rTeamMemberIds: string[] = r.teamMemberIds || r.raw?.teamMemberIds || [];
+      const rDepartment = (r.department || r.unitName || r.raw?.unitName || '').trim().toLowerCase();
+
+      // INDIVIDUAL PARTICIPANT MATCHING
+      const isIndividualMatch = Boolean(
+        (participantId && rPartId && participantId === rPartId) ||
+        (participantCode && rCodeNumber && participantCode === rCodeNumber) ||
+        (participantName && rParticipantName && (participantName === rParticipantName || rParticipantName.includes(participantName)))
       );
 
-      const isGroupMatch = (
+      // GROUP / TEAM MATCHING
+      const isGroupEvent = Boolean(
         r.participationType === 'group' ||
-        r.participationType === 'Group Event' ||
         r.participationType === 'Group' ||
+        r.participationType === 'Group Event' ||
         r.raw?.participationType === 'group'
-      ) && (
-        r.raw && Array.isArray(r.raw.teamMemberIds) && r.raw.teamMemberIds.includes(p.id)
       );
 
+      const isGroupMatch = isGroupEvent && Boolean(
+        (participantId && rTeamMemberIds.includes(participantId)) ||
+        (rTeamId && registeredTeamIds.has(rTeamId)) ||
+        (participantUnit && rDepartment && participantUnit === rDepartment && isCompMatch)
+      );
+
+      // A result ONLY belongs to this participant if it's their individual result or their group team result
       if (isIndividualMatch || isGroupMatch) {
-        const uniqueKey = r.id || `${r.competitionId}_${r.rank}_${r.participantName}`;
-        if (!seenCompKeys.has(uniqueKey)) {
-          seenCompKeys.add(uniqueKey);
+        const uniqueKey = r.id || `${rCompId}_${r.rank}_${rParticipantName}`;
+        if (!seenResultKeys.has(uniqueKey)) {
+          seenResultKeys.add(uniqueKey);
           resultsList.push({
             ...r,
             isGroupEvent: isGroupMatch && !isIndividualMatch
