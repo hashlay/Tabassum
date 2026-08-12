@@ -35,6 +35,65 @@
   --color-success-accent: #10B981;
 }
 
+/* === CMS THEME COLOR OVERRIDES (ATTRIBUTE SELECTORS) === */
+/* Primary Brand Accent (#FF2B2B, #DC2626) */
+[class*="bg-[#FF2B2B]"], [class*="bg-[#ff2b2b]"], [class*="bg-[#DC2626]"] {
+  background-color: var(--color-primary-accent, #FF2B2B) !important;
+}
+
+[class*="text-[#FF2B2B]"], [class*="text-[#ff2b2b]"], [class*="text-[#DC2626]"] {
+  color: var(--color-primary-accent, #FF2B2B) !important;
+}
+
+[class*="border-[#FF2B2B]"], [class*="border-[#ff2b2b]"], [class*="border-[#DC2626]"] {
+  border-color: var(--color-primary-accent, #FF2B2B) !important;
+}
+
+[class*="from-[#FF2B2B]"], [class*="from-[#ff2b2b]"] {
+  --tw-gradient-from: var(--color-primary-accent, #FF2B2B) !important;
+  --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-from) 0%, var(--tw-gradient-to, rgb(255 255 255 / 0)) 100%) !important;
+}
+
+[class*="to-[#FF2B2B]"], [class*="to-[#ff2b2b]"] {
+  --tw-gradient-to: var(--color-primary-accent, #FF2B2B) !important;
+}
+
+[class*="bg-[#FF2B2B]/10"], [class*="bg-[#ff2b2b]/10"] {
+  background-color: color-mix(in srgb, var(--color-primary-accent, #FF2B2B) 10%, transparent) !important;
+}
+[class*="bg-[#FF2B2B]/15"], [class*="bg-[#ff2b2b]/15"] {
+  background-color: color-mix(in srgb, var(--color-primary-accent, #FF2B2B) 15%, transparent) !important;
+}
+[class*="bg-[#FF2B2B]/20"], [class*="bg-[#ff2b2b]/20"] {
+  background-color: color-mix(in srgb, var(--color-primary-accent, #FF2B2B) 20%, transparent) !important;
+}
+[class*="bg-[#FF2B2B]/30"], [class*="bg-[#ff2b2b]/30"] {
+  background-color: color-mix(in srgb, var(--color-primary-accent, #FF2B2B) 30%, transparent) !important;
+}
+[class*="bg-[#FF2B2B]/50"], [class*="bg-[#ff2b2b]/50"] {
+  background-color: color-mix(in srgb, var(--color-primary-accent, #FF2B2B) 50%, transparent) !important;
+}
+
+/* Page Body & Backgrounds (#0D0D0D, #0D0D0F) */
+[class*="bg-[#0D0D0D]"], [class*="bg-[#0d0d0d]"], [class*="bg-[#0D0D0F]"] {
+  background-color: var(--color-body-bg, #0D0D0D) !important;
+}
+
+/* Card Containers (#161619, #1B1B1F) */
+[class*="bg-[#161619]"], [class*="bg-[#161619]"], [class*="bg-[#1B1B1F]"] {
+  background-color: var(--color-card-bg, #161619) !important;
+}
+
+/* Elevated Containers (#1A1A1E, #222228) */
+[class*="bg-[#1A1A1E]"], [class*="bg-[#1a1a1e]"], [class*="bg-[#222228]"] {
+  background-color: var(--color-card-elevated-bg, #1A1A1E) !important;
+}
+
+/* Subtle Borders (#2A2A32, #2D2D35) */
+[class*="border-[#2A2A32]"], [class*="border-[#2a2a32]"], [class*="border-[#2D2D35]"] {
+  border-color: var(--color-border-subtle, #2A2A32) !important;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;

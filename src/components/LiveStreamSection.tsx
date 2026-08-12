@@ -26,7 +26,7 @@ export const LiveStreamSection: React.FC = () => {
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-3 border-b border-white/10 pb-5">
           <div>
-            <span className="text-[#FF2B2B] font-mono text-[10px] font-bold tracking-[0.25em] uppercase mb-0.5 block">
+            <span className="font-mono text-[10px] font-bold tracking-[0.25em] uppercase mb-0.5 block" style={{ color: 'var(--color-primary-accent, #FF2B2B)' }}>
               ON AIR
             </span>
             <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight font-sans">
@@ -44,7 +44,8 @@ export const LiveStreamSection: React.FC = () => {
               const el = document.getElementById('live');
               if (el) el.scrollIntoView({ behavior: 'smooth' });
             }}
-            className="text-[#FF2B2B] font-bold text-xs font-mono tracking-wider hover:underline flex items-center gap-1.5 shrink-0 self-start sm:self-end uppercase cursor-pointer"
+            style={{ color: 'var(--color-primary-accent, #FF2B2B)' }}
+            className="font-bold text-xs font-mono tracking-wider hover:underline flex items-center gap-1.5 shrink-0 self-start sm:self-end uppercase cursor-pointer"
           >
             <span>PROGRAMME</span>
             <ArrowRight className="w-3.5 h-3.5" />

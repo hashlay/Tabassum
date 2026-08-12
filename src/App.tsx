@@ -123,80 +123,31 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
           if (theme.goldAccent) root.style.setProperty('--color-gold-accent', theme.goldAccent);
           if (theme.successAccent) root.style.setProperty('--color-success-accent', theme.successAccent);
 
-          // Inject dynamic CSS overrides for all Tailwind arbitrary hex classes
-          // This makes bg-[#FF2B2B], text-[#FF2B2B], border-[#2A2A32] etc. respond to CMS color changes
-          const existingStyle = document.getElementById('cms-theme-overrides');
-          if (existingStyle) existingStyle.remove();
-
-          const style = document.createElement('style');
-          style.id = 'cms-theme-overrides';
-
-          // Map: CSS variable name → array of hex values it replaces
-          const colorMap: Record<string, string[]> = {
-            'var(--color-primary-accent)': ['#FF2B2B', '#ff2b2b', '#DC2626', '#dc2626'],
-            'var(--color-body-bg)': ['#0D0D0D', '#0d0d0d', '#0D0D0F', '#0d0d0f'],
-            'var(--color-card-bg)': ['#161619', '#1B1B1F', '#1b1b1f'],
-            'var(--color-card-elevated-bg)': ['#1A1A1E', '#1a1a1e', '#222228'],
-            'var(--color-border-subtle)': ['#2A2A32', '#2a2a32', '#2D2D35', '#2d2d35'],
-            'var(--color-text-secondary)': ['#E4E4E7', '#e4e4e7'],
-            'var(--color-text-muted)': ['#A1A1AA', '#a1a1aa'],
-            'var(--color-gold-accent)': ['#F59E0B', '#f59e0b'],
-            'var(--color-success-accent)': ['#10B981', '#10b981'],
-          };
-
-          let css = '';
-          for (const [cssVar, hexes] of Object.entries(colorMap)) {
-            for (const hex of hexes) {
-              // Escape the hex for CSS selector (# becomes \\#)
-              const escaped = hex.replace('#', '\\#');
-              // Background color overrides
-              css += `.bg-\\[${escaped}\\]{background-color:${cssVar}!important}\n`;
-              // Text color overrides
-              css += `.text-\\[${escaped}\\]{color:${cssVar}!important}\n`;
-              // Border color overrides
-              css += `.border-\\[${escaped}\\]{border-color:${cssVar}!important}\n`;
-              // Focus border overrides
-              css += `.focus\\:border-\\[${escaped}\\]:focus{border-color:${cssVar}!important}\n`;
-              // Hover background overrides
-              css += `.hover\\:bg-\\[${escaped}\\]:hover{background-color:${cssVar}!important}\n`;
-              // Hover border overrides
-              css += `.hover\\:border-\\[${escaped}\\]:hover{border-color:${cssVar}!important}\n`;
-              // Hover text overrides
-              css += `.hover\\:text-\\[${escaped}\\]:hover{color:${cssVar}!important}\n`;
-              // Group-hover text overrides
-              css += `.group:hover .sm\\:group-hover\\:text-\\[${escaped}\\]{color:${cssVar}!important}\n`;
-              css += `.group-hover\\:text-\\[${escaped}\\]{color:${cssVar}!important}\n`;
-              // Selection color
-              css += `.selection\\:bg-\\[${escaped}\\] ::selection{background-color:${cssVar}!important}\n`;
-              // Gradient stops
-              css += `.from-\\[${escaped}\\]{--tw-gradient-from:${cssVar}!important}\n`;
-              css += `.via-\\[${escaped}\\]{--tw-gradient-via:${cssVar}!important}\n`;
-              css += `.to-\\[${escaped}\\]{--tw-gradient-to:${cssVar}!important}\n`;
-              // Hover gradient stops
-              css += `.hover\\:from-\\[${escaped}\\]:hover{--tw-gradient-from:${cssVar}!important}\n`;
-              css += `.hover\\:to-\\[${escaped}\\]:hover{--tw-gradient-to:${cssVar}!important}\n`;
-              // Ring color
-              css += `.ring-\\[${escaped}\\]{--tw-ring-color:${cssVar}!important}\n`;
-              // Placeholder
-              css += `.placeholder\\:text-\\[${escaped}\\]::placeholder{color:${cssVar}!important}\n`;
-
-              // Handle opacity modifiers: /5, /10, /15, /20, /30, /40, /50, /60, /70, /80, /90
-              for (const opacity of [5, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90]) {
-                css += `.bg-\\[${escaped}\\]\\/${opacity}{background-color:color-mix(in srgb,${cssVar} ${opacity}%,transparent)!important}\n`;
-                css += `.text-\\[${escaped}\\]\\/${opacity}{color:color-mix(in srgb,${cssVar} ${opacity}%,transparent)!important}\n`;
-                css += `.border-\\[${escaped}\\]\\/${opacity}{border-color:color-mix(in srgb,${cssVar} ${opacity}%,transparent)!important}\n`;
-                css += `.hover\\:bg-\\[${escaped}\\]\\/${opacity}:hover{background-color:color-mix(in srgb,${cssVar} ${opacity}%,transparent)!important}\n`;
-                css += `.from-\\[${escaped}\\]\\/${opacity}{--tw-gradient-from:color-mix(in srgb,${cssVar} ${opacity}%,transparent)!important}\n`;
-                css += `.via-\\[${escaped}\\]\\/${opacity}{--tw-gradient-via:color-mix(in srgb,${cssVar} ${opacity}%,transparent)!important}\n`;
-                css += `.to-\\[${escaped}\\]\\/${opacity}{--tw-gradient-to:color-mix(in srgb,${cssVar} ${opacity}%,transparent)!important}\n`;
-                css += `.shadow-\\[${escaped}\\]\\/${opacity}{--tw-shadow-color:color-mix(in srgb,${cssVar} ${opacity}%,transparent)}\n`;
-                css += `.hover\\:shadow-\\[${escaped}\\]\\/${opacity}:hover{--tw-shadow-color:color-mix(in srgb,${cssVar} ${opacity}%,transparent)}\n`;
-              }
-            }
+          // Dynamic attribute selector style injection for instant live updates
+          let style = document.getElementById('cms-theme-overrides') as HTMLStyleElement;
+          if (!style) {
+            style = document.createElement('style');
+            style.id = 'cms-theme-overrides';
+            document.head.appendChild(style);
           }
 
-          style.textContent = css;
-          document.head.appendChild(style);
+          const primary = theme.primaryAccent || '#FF2B2B';
+          const bodyBg = theme.bodyBg || '#0D0D0D';
+          const cardBg = theme.cardBg || '#161619';
+          const cardElevatedBg = theme.cardElevatedBg || '#1A1A1E';
+          const borderSubtle = theme.borderSubtle || '#2A2A32';
+
+          style.textContent = `
+            [class*="bg-[#FF2B2B]"], [class*="bg-[#ff2b2b]"], [class*="bg-[#DC2626]"] { background-color: ${primary} !important; }
+            [class*="text-[#FF2B2B]"], [class*="text-[#ff2b2b]"], [class*="text-[#DC2626]"] { color: ${primary} !important; }
+            [class*="border-[#FF2B2B]"], [class*="border-[#ff2b2b]"], [class*="border-[#DC2626]"] { border-color: ${primary} !important; }
+            [class*="from-[#FF2B2B]"], [class*="from-[#ff2b2b]"] { --tw-gradient-from: ${primary} !important; }
+            [class*="to-[#FF2B2B]"], [class*="to-[#ff2b2b]"] { --tw-gradient-to: ${primary} !important; }
+            [class*="bg-[#0D0D0D]"], [class*="bg-[#0d0d0d]"], [class*="bg-[#0D0D0F]"] { background-color: ${bodyBg} !important; }
+            [class*="bg-[#161619]"], [class*="bg-[#161619]"], [class*="bg-[#1B1B1F]"] { background-color: ${cardBg} !important; }
+            [class*="bg-[#1A1A1E]"], [class*="bg-[#1a1a1e]"], [class*="bg-[#222228]"] { background-color: ${cardElevatedBg} !important; }
+            [class*="border-[#2A2A32]"], [class*="border-[#2a2a32]"], [class*="border-[#2D2D35]"] { border-color: ${borderSubtle} !important; }
+          `;
         }
       })
       .catch(err => console.error('Failed to load CMS data:', err));

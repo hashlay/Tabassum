@@ -118,16 +118,17 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, onNavigate, cmsSe
               <button
                 key={link.id}
                 onClick={() => handleLinkClick(link.id)}
+                style={isActive ? { backgroundColor: 'var(--color-primary-accent, #FF2B2B)' } : undefined}
                 className={`relative px-3.5 py-1.5 text-xs font-medium rounded-full transition-all duration-200 flex items-center gap-1.5 ${
                   isActive
-                    ? 'text-white bg-[#FF2B2B] shadow-lg shadow-[#FF2B2B]/30'
+                    ? 'text-white shadow-lg shadow-emerald-950/30'
                     : 'text-zinc-400 hover:text-zinc-100 hover:bg-white/5'
                 }`}
               >
                 {link.isLive && (
                   <span className="relative flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF2B2B]"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: 'var(--color-primary-accent, #FF2B2B)' }}></span>
                   </span>
                 )}
                 {link.label}
@@ -141,7 +142,8 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, onNavigate, cmsSe
           {/* Participant Login Pill Button */}
           <button
             onClick={handleUserPillClick}
-            className="px-4.5 py-2 text-xs font-extrabold text-white bg-[#FF2B2B] hover:bg-red-600 rounded-full flex items-center gap-2 transition-all shadow-lg shadow-[#FF2B2B]/25 hover:scale-105 cursor-pointer"
+            style={{ backgroundColor: 'var(--color-primary-accent, #FF2B2B)' }}
+            className="px-4.5 py-2 text-xs font-extrabold text-white hover:brightness-110 rounded-full flex items-center gap-2 transition-all shadow-lg hover:scale-105 cursor-pointer"
           >
             {authUser && authUser.role === 'participant' ? (
               <>
