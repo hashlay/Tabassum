@@ -210,7 +210,7 @@ export const PublicGalleryPage: React.FC = () => {
                 setCopied(false);
                 setShowShareMenu(false);
               }}
-              className="group relative bg-[#161619] border border-[#2A2A32] rounded-xl overflow-hidden cursor-pointer shadow-md sm:hover:border-[#FF2B2B] transition-colors duration-300 flex flex-col"
+              className="group relative bg-[#161619] border border-[#2A2A32] rounded-xl overflow-hidden cursor-pointer shadow-md sm:hover:border-white/40 transition-colors duration-300 flex flex-col"
             >
               {/* Image Frame */}
               <div className="relative aspect-[4/3] overflow-hidden bg-black">
@@ -243,14 +243,14 @@ export const PublicGalleryPage: React.FC = () => {
                 </div>
 
                 {/* Zoom Icon Button */}
-                <div className="absolute top-2 right-2 bg-[#FF2B2B] p-1 rounded-full text-white opacity-0 sm:group-hover:opacity-100 transition-opacity shadow-md">
+                <div className="absolute top-2 right-2 p-1 rounded-full text-white opacity-0 sm:group-hover:opacity-100 transition-opacity shadow-md" style={{ backgroundColor: 'var(--color-primary-accent)' }}>
                   <ZoomIn className="w-3 h-3 text-white" />
                 </div>
               </div>
 
               {/* Title & Info */}
               <div className="p-2.5 bg-[#141417] border-t border-[#25252D] flex flex-col justify-between flex-1">
-                <h3 className="text-xs font-bold text-white line-clamp-1 group-hover:text-[#FF2B2B] transition-colors">
+                <h3 className="text-xs font-bold text-white line-clamp-1 group-hover:text-white transition-colors">
                   {item.title}
                 </h3>
                 {item.date && (

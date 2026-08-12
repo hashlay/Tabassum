@@ -20,7 +20,23 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
           <div style={{ color: 'var(--color-primary-accent)', borderColor: 'var(--color-primary-accent)' }} className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/5 border text-[11px] font-mono font-bold uppercase tracking-wider mb-2">
             <span>{cmsSettings?.aboutBadge || 'Festival Vision'}</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-white uppercase tracking-tight" dangerouslySetInnerHTML={{ __html: cmsSettings?.aboutMainHeading || 'ABOUT THE FESTIVAL' }}></h2>
+          <h2
+            className="text-2xl sm:text-4xl font-extrabold text-white uppercase tracking-tight"
+            dangerouslySetInnerHTML={{
+              __html: (cmsSettings?.aboutMainHeading || 'ABOUT THE <span style="color: var(--color-primary-accent)">FESTIVAL</span>')
+                .replace(/#FF2B2B/gi, 'var(--color-primary-accent)')
+                .replace(/#ff2b2b/gi, 'var(--color-primary-accent)')
+                .replace(/text-\[#FF2B2B\]/gi, '')
+                .replace(/text-[#FF2B2B]/gi, '')
+                .replace(/text-red-\d+/gi, '')
+                .replace(/<span([^>]*)>/gi, (m, p1) => {
+                  if (p1.includes('style=')) {
+                    return `<span ${p1.replace(/style="([^"]*)"/gi, 'style="$1; color: var(--color-primary-accent)"')}>`;
+                  }
+                  return `<span ${p1} style="color: var(--color-primary-accent)">`;
+                })
+            }}
+          />
           <div style={{ backgroundColor: 'var(--color-primary-accent)' }} className="w-16 h-1 mt-2 rounded-full" />
         </div>
 

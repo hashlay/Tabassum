@@ -49,11 +49,16 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
       onClick={onClose}
     >
       {/* Background Subtle Ambient Glow */}
-      <div className="absolute top-1/3 right-1/3 w-96 h-96 bg-[#FF2B2B]/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/3 right-1/3 w-96 h-96 rounded-full blur-3xl pointer-events-none opacity-10" style={{ backgroundColor: 'var(--color-primary-accent)' }} />
 
       {/* Main Card matching Reference Design */}
       <div
-        className="relative w-full max-w-[560px] min-h-[620px] bg-[#1E1E20] border border-[#333338] rounded-2xl shadow-2xl overflow-hidden p-6 sm:p-8 space-y-5 my-auto"
+        className="relative w-full bg-[#1E1E20] border border-[#333338] rounded-2xl shadow-2xl overflow-hidden p-6 sm:p-8 space-y-5 mx-auto"
+        style={{
+          width: '100%',
+          maxWidth: '560px',
+          height: 'auto',
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Card Header Bar */}
@@ -70,7 +75,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
         {/* Participant Portal Section Heading */}
         <div>
-          <span className="text-[#D4AF37] text-[10px] font-bold tracking-[0.2em] uppercase font-mono block">
+          <span style={{ color: 'var(--color-primary-accent)' }} className="text-[10px] font-bold tracking-[0.2em] uppercase font-mono block">
             PARTICIPANT PORTAL
           </span>
           <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight mt-0.5 mb-1 font-sans">
@@ -92,7 +97,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
               placeholder="e.g. 1042"
               value={chestNumber}
               onChange={(e) => setChestNumber(e.target.value)}
-              className="w-full bg-[#141416] border border-[#38383C] focus:border-[#DC2626] rounded-xl px-4 py-3 text-sm text-white font-mono placeholder:text-zinc-500 focus:outline-none transition-colors"
+              className="w-full bg-[#141416] border border-[#38383C] focus:border-white rounded-xl px-4 py-3 text-sm text-white font-mono placeholder:text-zinc-500 focus:outline-none transition-colors"
             />
           </div>
 
@@ -106,7 +111,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                 type="date"
                 value={dob}
                 onChange={(e) => setDob(e.target.value)}
-                className="w-full bg-[#141416] border border-[#38383C] focus:border-[#DC2626] rounded-xl pl-4 pr-11 py-3 text-sm text-white font-mono placeholder:text-zinc-500 focus:outline-none transition-colors [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:hidden"
+                className="w-full bg-[#141416] border border-[#38383C] focus:border-white rounded-xl pl-4 pr-11 py-3 text-sm text-white font-mono placeholder:text-zinc-500 focus:outline-none transition-colors [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:hidden"
                 placeholder="DD/MM/YYYY"
               />
               <Calendar

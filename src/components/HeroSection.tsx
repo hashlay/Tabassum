@@ -125,7 +125,23 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
         {/* Dynamic Titles from CMS or fallback */}
         <div className="flex flex-col items-center">
           {cmsSettings?.heroTitle ? (
-            <h1 className="text-[32px] xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white leading-none tracking-tight flex flex-col items-center mb-4 sm:mb-6 uppercase font-display text-center" dangerouslySetInnerHTML={{ __html: cmsSettings.heroTitle }} />
+            <h1
+              className="text-[32px] xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white leading-none tracking-tight flex flex-col items-center mb-4 sm:mb-6 uppercase font-display text-center"
+              dangerouslySetInnerHTML={{
+                __html: cmsSettings.heroTitle
+                  .replace(/#FF2B2B/gi, 'var(--color-primary-accent)')
+                  .replace(/#ff2b2b/gi, 'var(--color-primary-accent)')
+                  .replace(/text-\[#FF2B2B\]/gi, '')
+                  .replace(/text-[#FF2B2B]/gi, '')
+                  .replace(/text-red-\d+/gi, '')
+                  .replace(/<span([^>]*)>/gi, (m, p1) => {
+                    if (p1.includes('style=')) {
+                      return `<span ${p1.replace(/style="([^"]*)"/gi, 'style="$1; color: var(--color-primary-accent)"')}>`;
+                    }
+                    return `<span ${p1} style="color: var(--color-primary-accent)">`;
+                  })
+              }}
+            />
           ) : (
             <>
               <h1 className="text-2xl sm:text-4xl md:text-6xl font-black text-white uppercase tracking-tight max-w-4xl mx-auto leading-tight mb-2 sm:mb-4 drop-shadow-md text-center">
