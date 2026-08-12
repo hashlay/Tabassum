@@ -28,6 +28,51 @@
   }
 }
 
+/* === ANTI-GLITCH: UNIVERSAL FIXES === */
+* {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Force compositing layer on scrollable containers */
+main, aside,
+[class*="overflow-y-auto"],
+[class*="overflow-x-auto"] {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Kill all backdrop-filter on touch devices to prevent GPU striping/tearing */
+@media (pointer: coarse) {
+  * {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  
+  .shadow-lg, .shadow-xl, .shadow-2xl,
+  [class*="shadow-lg"], [class*="shadow-xl"], [class*="shadow-2xl"] {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1) !important;
+  }
+}
+
+/* Prevent flex and grid children from overflowing */
+.grid > *, .flex > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
 /* Scrollbar Customization */
 ::-webkit-scrollbar {
   width: 6px;
