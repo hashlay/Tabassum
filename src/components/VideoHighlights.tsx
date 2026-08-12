@@ -29,7 +29,7 @@ const VideoCard: React.FC<{
       className="group cursor-pointer space-y-2"
     >
       {/* Thumbnail Container */}
-      <div className="relative aspect-video rounded-xl overflow-hidden bg-[#18181B] border border-[#333338] shadow-md sm:group-hover:border-[#FF2B2B]/60 transition-colors">
+      <div className="relative aspect-video rounded-xl overflow-hidden bg-[#18181B] border border-white/10 shadow-md sm:group-hover:border-white/30 transition-colors">
         {isVisible ? (
           video.thumbnailUrl ? (
             <img

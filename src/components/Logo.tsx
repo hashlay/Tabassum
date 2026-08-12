@@ -76,7 +76,7 @@ export const Logo: React.FC<LogoProps> = ({
                 <path
                   key={i}
                   d={generateWaveLine(i)}
-                  stroke="var(--color-primary-accent, #FF2B2B)"
+                  stroke="#FF2B2B"
                   strokeWidth="3.2"
                   strokeLinecap="round"
                 />
@@ -101,8 +101,8 @@ export const Logo: React.FC<LogoProps> = ({
 
           {showSubBadge && (
             <div className="flex items-center justify-start gap-1.5 mt-1 w-full">
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#FF2B2B] shrink-0 animate-pulse" />
-              <span className={`uppercase font-medium tracking-wider text-[#E60000] ${subTextSize} text-left`}>
+              <span className="inline-block w-1.5 h-1.5 rounded-full shrink-0 animate-pulse" style={{ backgroundColor: 'var(--color-primary-accent)' }} />
+              <span className={`uppercase font-bold tracking-wider ${subTextSize} text-left`} style={{ color: 'var(--color-primary-accent)' }}>
                 {displayBadge}
               </span>
             </div>

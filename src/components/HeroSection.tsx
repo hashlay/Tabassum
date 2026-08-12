@@ -84,11 +84,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
 
         {/* Background wave grid patterns */}
         <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden opacity-30">
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[450px] bg-gradient-to-tr from-[#FF2B2B]/30 via-[#990000]/20 to-transparent blur-[140px] rounded-full opacity-70" />
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[450px] bg-gradient-to-tr from-white/10 to-transparent blur-[140px] rounded-full opacity-30" />
           <svg className="absolute inset-0 w-full h-full opacity-20" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <pattern id="wave-pattern" width="120" height="80" patternUnits="userSpaceOnUse">
-                <path d="M 0 40 C 30 20, 60 60, 90 40 C 105 30, 115 50, 120 40" fill="none" stroke="#FF2B2B" strokeWidth="0.8" />
+                <path d="M 0 40 C 30 20, 60 60, 90 40 C 105 30, 115 50, 120 40" fill="none" stroke="currentColor" strokeWidth="0.8" className="text-white/15" />
               </pattern>
             </defs>
             <rect width="100%" height="100%" fill="url(#wave-pattern)" />

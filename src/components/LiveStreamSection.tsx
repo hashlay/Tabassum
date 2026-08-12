@@ -57,7 +57,7 @@ export const LiveStreamSection: React.FC = () => {
           {stages.map((stage, index) => (
             <div
               key={stage.id}
-              className="bg-[#18181B] border border-[#333338] rounded-xl overflow-hidden p-3 sm:p-4 space-y-2.5 shadow-xl relative hover:border-[#FF2B2B]/40 transition-all"
+              className="bg-[#18181B] border border-white/10 rounded-xl overflow-hidden p-3 sm:p-4 space-y-2.5 shadow-xl relative transition-all"
             >
               {/* Video Player Frame */}
               <div className="relative aspect-video bg-black rounded-lg overflow-hidden border border-white/10 flex items-center justify-center">

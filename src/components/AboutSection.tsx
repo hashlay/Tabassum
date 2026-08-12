@@ -50,7 +50,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
               </div>
 
               {/* Theme Breakdown Box */}
-              <div className="bg-gradient-to-r from-red-950/40 via-black to-zinc-900 border border-red-500/20 rounded-xl p-4 mb-5">
+              <div className="bg-zinc-900/60 border rounded-xl p-4 mb-5" style={{ borderColor: 'var(--color-primary-accent)' }}>
                 <div className="flex items-center gap-2 text-white font-bold text-xs mb-1.5">
 
                   <span>Theme: "{cmsSettings?.themeTitle || 'Transcending the Illusions'}"</span>
