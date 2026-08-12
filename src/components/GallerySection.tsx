@@ -158,6 +158,17 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
                     referrerPolicy="no-referrer"
                     loading={index < 4 ? "eager" : "lazy"}
                     decoding="async"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      if (!target.dataset.triedFallback && item.imageUrl) {
+                        target.dataset.triedFallback = 'true';
+                        if (item.imageUrl.startsWith('/data/uploads/')) {
+                          target.src = `https://rendevouz-8sfp.onrender.com/api${item.imageUrl}`;
+                        } else if (!item.imageUrl.startsWith('http')) {
+                          target.src = `https://rendevouz-8sfp.onrender.com${item.imageUrl.startsWith('/') ? item.imageUrl : '/' + item.imageUrl}`;
+                        }
+                      }
+                    }}
                   />
 
                   {/* Hover Gradient */}
