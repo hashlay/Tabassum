@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { GalleryItem } from '../types';
-import { ZoomIn, ArrowRight, X, ChevronLeft, ChevronRight, Download, Share2, Check, Send, Copy, Image as ImageIcon, Maximize2 } from 'lucide-react';
+import { ZoomIn, ArrowRight, X, ChevronLeft, ChevronRight, Download, Share2, Check, Send, Copy, Image as ImageIcon } from 'lucide-react';
 import { getMediaUrl } from '../utils/mediaUrl';
 
 interface GallerySectionProps {
@@ -195,65 +195,44 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
         )}
       </div>
 
-      {/* Lightbox Preview Modal matching Reference Design */}
+      {/* Lightbox Preview Modal */}
       {activeItem && (
         <div
-          className="fixed inset-0 z-[9999] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200"
           onClick={() => {
             setActiveItem(null);
             setShowShareMenu(false);
           }}
         >
-          {/* Centered Modal Card */}
           <div
-            className="relative max-w-4xl w-full bg-[#121215] border border-white/20 rounded-2xl overflow-hidden shadow-2xl flex flex-col items-center p-3.5 sm:p-5"
+            className="relative max-w-4xl w-full bg-[#18181B] border border-white/15 rounded-2xl overflow-hidden shadow-2xl flex flex-col my-auto max-h-[90vh]"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Top Control Bar */}
-            <div className="w-full flex items-center justify-between mb-3 shrink-0">
+            {/* Header bar with title & close button */}
+            <div className="flex items-center justify-between p-3.5 sm:p-4 bg-[#141416] border-b border-white/10 shrink-0">
               <div className="flex items-center gap-2">
-                <span style={{ color: 'var(--color-primary-accent)', borderColor: 'var(--color-primary-accent)' }} className="px-2.5 py-0.5 bg-white/5 border rounded-md text-[10px] font-mono font-bold uppercase tracking-wider">
+                <span style={{ color: 'var(--color-primary-accent)', borderColor: 'var(--color-primary-accent)' }} className="px-2 py-0.5 bg-white/5 border rounded text-[10px] font-mono font-bold uppercase tracking-wider">
                   {activeItem.category || 'Gallery'}
                 </span>
-                <h3 className="text-xs sm:text-sm font-bold text-white line-clamp-1">{activeItem.title}</h3>
+                <h3 className="text-sm font-bold text-white line-clamp-1">{activeItem.title}</h3>
               </div>
-
-              <div className="flex items-center gap-1.5">
-                <button
-                  onClick={() => {
-                    if (!document.fullscreenElement) {
-                      document.documentElement.requestFullscreen().catch(() => {});
-                    } else {
-                      document.exitFullscreen().catch(() => {});
-                    }
-                  }}
-                  className="p-1.5 text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
-                  title="Full Screen"
-                >
-                  <Maximize2 className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => {
-                    setActiveItem(null);
-                    setShowShareMenu(false);
-                  }}
-                  className="p-1.5 text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
-                  title="Close"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
+              <button
+                onClick={() => {
+                  setActiveItem(null);
+                  setShowShareMenu(false);
+                }}
+                className="p-1.5 text-zinc-400 hover:text-white bg-white/5 border border-white/10 rounded-lg transition-colors cursor-pointer"
+                title="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
-            {/* Photo Canvas Box - 100% UNCROPPED ORIGINAL SIZE */}
-            <div className="relative w-full max-h-[60vh] sm:max-h-[65vh] bg-black flex items-center justify-center overflow-hidden rounded-xl p-2 shrink-0">
+            {/* Image Container with Prev/Next Navigation overlay */}
+            <div className="relative w-full max-h-[60vh] bg-black flex items-center justify-center overflow-hidden flex-shrink-0">
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handlePrev();
-                }}
-                className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-black/75 hover:bg-black/95 border border-white/20 text-white rounded-full transition-all z-20 cursor-pointer shadow-xl"
-                title="Previous"
+                onClick={handlePrev}
+                className="absolute left-3 top-1/2 -translate-y-1/2 p-2.5 text-zinc-200 hover:text-white bg-black/70 border border-white/15 rounded-full transition-colors z-20 cursor-pointer"
               >
                 <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
@@ -261,89 +240,74 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
               <img
                 src={getMediaUrl(activeItem.imageUrl)}
                 alt={activeItem.title}
-                className="max-h-[58vh] sm:max-h-[62vh] max-w-full w-auto h-auto object-contain rounded-lg shadow-2xl"
+                className="w-full h-full max-h-[60vh] object-contain"
                 referrerPolicy="no-referrer"
                 decoding="async"
               />
 
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleNext();
-                }}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-black/75 hover:bg-black/95 border border-white/20 text-white rounded-full transition-all z-20 cursor-pointer shadow-xl"
-                title="Next"
+                onClick={handleNext}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 text-zinc-200 hover:text-white bg-black/70 border border-white/15 rounded-full transition-colors z-20 cursor-pointer"
               >
                 <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
             </div>
 
-            {/* Bottom Caption & Action Bar matching Reference Design */}
-            <div className="w-full flex flex-col items-center gap-2.5 mt-3 shrink-0">
-              <span className="text-xs font-mono text-zinc-400 tracking-wider">
-                {activeItem.title}
-              </span>
+            {/* Modal Footer Controls */}
+            <div className="p-4 bg-[#121214] border-t border-white/10 overflow-y-auto">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="text-xs text-zinc-400 font-mono">
+                  {activeItem.caption && <p className="text-zinc-300 font-sans mb-1">{activeItem.caption}</p>}
+                  {activeItem.photographer && <span>Photo by {activeItem.photographer}</span>}
+                </div>
 
-              <div className="flex items-center justify-center gap-2 flex-wrap relative">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (!document.fullscreenElement) {
-                      document.documentElement.requestFullscreen().catch(() => {});
-                    } else {
-                      document.exitFullscreen().catch(() => {});
-                    }
-                  }}
-                  className="px-3.5 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-all flex items-center gap-1.5 cursor-pointer shadow-md"
-                >
-                  <Maximize2 className="w-3.5 h-3.5" />
-                  <span>FULL SCREEN</span>
-                </button>
+                {/* Action Buttons Bar */}
+                <div className="flex items-center gap-2.5 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => handleDownload(activeItem.imageUrl, activeItem.title)}
+                    style={{ backgroundColor: 'var(--color-primary-accent)' }}
+                    className="px-4 py-2 hover:opacity-90 text-white text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-all duration-200 flex items-center gap-1.5 shadow-md cursor-pointer min-h-[38px]"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>DOWNLOAD</span>
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() => handleDownload(activeItem.imageUrl, activeItem.title)}
-                  style={{ backgroundColor: 'var(--color-primary-accent)' }}
-                  className="px-4 py-2 hover:opacity-90 border border-white/20 text-white text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-all flex items-center gap-1.5 cursor-pointer shadow-md"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>DOWNLOAD</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleShare(activeItem)}
-                  className="px-3.5 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-all flex items-center gap-1.5 cursor-pointer shadow-md"
-                >
-                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Share2 className="w-3.5 h-3.5" />}
-                  <span>{copied ? 'COPIED!' : 'SHARE'}</span>
-                </button>
-
-                {/* Share Options Drawer */}
-                {showShareMenu && (
-                  <div className="absolute bottom-full right-0 mb-2 w-56 bg-[#18181C] border border-[#2D2D35] rounded-xl p-2.5 shadow-2xl z-50">
-                    <a
-                      href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out this photo from Rendezvous Silver Edition: ${activeItem.title}\n${activeItem.imageUrl}`)}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="w-full text-left px-3 py-2 text-xs font-mono text-zinc-300 hover:text-white hover:bg-[#25D366]/20 rounded-lg transition-all flex items-center gap-2"
-                    >
-                      <Send className="w-3.5 h-3.5 text-[#25D366]" />
-                      <span>WhatsApp</span>
-                    </a>
-
-                    <button
-                      type="button"
-                      onClick={() => handleCopyLink(activeItem.imageUrl)}
-                      style={{ backgroundColor: 'var(--color-primary-accent)' }}
-                      className="w-full text-left px-3 py-2 border border-white/20 hover:opacity-90 text-white text-xs font-mono font-bold uppercase rounded-lg transition-all flex items-center gap-2 cursor-pointer mt-1"
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                      <span>{copied ? 'Copied!' : 'Copy Link'}</span>
-                    </button>
-                  </div>
-                )}
+                  <button
+                    type="button"
+                    onClick={() => handleShare(activeItem)}
+                    className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-colors duration-200 flex items-center gap-1.5 shadow-md cursor-pointer min-h-[38px]"
+                  >
+                    {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Share2 className="w-3.5 h-3.5" />}
+                    <span>{copied ? 'COPIED!' : 'SHARE'}</span>
+                  </button>
+                </div>
               </div>
+
+              {/* Share Options Drawer / Modal */}
+              {showShareMenu && (
+                <div className="mt-3 p-3 bg-[#18181C] border border-[#2D2D35] rounded-xl flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2">
+                  <a
+                    href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out this photo from Rendezvous Silver Edition: ${activeItem.title}\n${activeItem.imageUrl}`)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-3 py-1.5 bg-[#25D366]/20 border border-[#25D366]/40 hover:bg-[#25D366] text-white text-xs font-mono font-bold uppercase rounded-lg transition-all flex items-center gap-1.5"
+                  >
+                    <Send className="w-3.5 h-3.5 text-[#25D366]" />
+                    <span>WhatsApp</span>
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={() => handleCopyLink(activeItem.imageUrl)}
+                    style={{ backgroundColor: 'var(--color-primary-accent)' }}
+                    className="px-3 py-1.5 border border-white/20 hover:opacity-90 text-white text-xs font-mono font-bold uppercase rounded-lg transition-all flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                    <span>{copied ? 'Copied!' : 'Copy Link'}</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
