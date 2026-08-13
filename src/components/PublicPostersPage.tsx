@@ -20,6 +20,7 @@ export const PublicPostersPage: React.FC = () => {
   const [activePoster, setActivePoster] = useState<CompetitionPoster | null>(null);
   const [copied, setCopied] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // Group verified published results by Competition (competitionId or eventName + category)
   // Sort so latest announced is at the top

@@ -24,14 +24,14 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, onNavigate, cmsSe
   }, []);
 
   const getDynamicNavLinks = () => {
-    const defaultLinks = [
+    const defaultLinks: { id: string; label: string; isLive?: boolean; badge?: string }[] = [
       { id: 'hero', label: 'Home' },
       { id: 'about', label: 'About' },
       { id: 'results', label: 'Results' },
       { id: 'team-points', label: 'Team Points' },
       { id: 'posters', label: 'Posters' },
       { id: 'smile', label: 'Photo Hub' },
-      { id: 'live', label: 'Live Stream' },
+      { id: 'live', label: 'Live Stream', isLive: true },
       { id: 'gallery', label: 'Gallery' },
       { id: 'highlights', label: 'Highlights' },
     ];
@@ -43,7 +43,7 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, onNavigate, cmsSe
 
     const enabledBlocks = blocks.filter((b: any) => b.enabled !== false).sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
 
-    const links: { id: string; label: string; isLive?: boolean }[] = [];
+    const links: { id: string; label: string; isLive?: boolean; badge?: string }[] = [];
     links.push({ id: 'hero', label: 'Home' });
 
     enabledBlocks.forEach((block: any) => {
@@ -89,11 +89,10 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, onNavigate, cmsSe
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled || mobileMenuOpen
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled || mobileMenuOpen
           ? 'bg-black/80 backdrop-blur-md border-b border-white/10 shadow-lg py-3'
           : 'bg-transparent py-5'
-      }`}
+        }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         {/* Logo & Institution Branding */}
@@ -101,9 +100,9 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, onNavigate, cmsSe
           onClick={() => handleLinkClick('hero')}
           className="cursor-pointer group flex items-center gap-3"
         >
-          <Logo 
-            size="md" 
-            showSubBadge={false} 
+          <Logo
+            size="md"
+            showSubBadge={false}
             title={cmsSettings?.headerLogoTitle || cmsSettings?.heroLogoTitle}
             subtitle={cmsSettings?.headerLogoSubtitle || cmsSettings?.heroLogoSubtitle}
             customIconUrl={cmsSettings?.headerLogo || cmsSettings?.heroLogo}
@@ -119,11 +118,10 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, onNavigate, cmsSe
                 key={link.id}
                 onClick={() => handleLinkClick(link.id)}
                 style={isActive ? { backgroundColor: 'var(--color-primary-accent)' } : {}}
-                className={`relative px-3.5 py-1.5 text-xs font-medium rounded-full transition-all duration-200 flex items-center gap-1.5 ${
-                  isActive
+                className={`relative px-3.5 py-1.5 text-xs font-medium rounded-full transition-all duration-200 flex items-center gap-1.5 ${isActive
                     ? 'text-white shadow-lg'
                     : 'text-zinc-400 hover:text-zinc-100 hover:bg-white/5'
-                }`}
+                  }`}
               >
                 {link.isLive && (
                   <span className="relative flex h-2 w-2">
@@ -185,7 +183,7 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, onNavigate, cmsSe
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div 
+        <div
           className="md:hidden border-b border-white/10 backdrop-blur-xl px-4 py-6 mt-2 space-y-2 animate-in slide-in-from-top duration-200"
           style={{ backgroundColor: 'var(--color-body-bg, #0D0D0D)' }}
         >
@@ -197,11 +195,10 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, onNavigate, cmsSe
               key={link.id}
               onClick={() => handleLinkClick(link.id)}
               style={activeSection === link.id ? { color: 'var(--color-primary-accent)', borderColor: 'var(--color-primary-accent)' } : {}}
-              className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center justify-between ${
-                activeSection === link.id
+              className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium flex items-center justify-between ${activeSection === link.id
                   ? 'bg-white/10 border font-semibold'
                   : 'text-zinc-300 hover:bg-white/5'
-              }`}
+                }`}
             >
               <div className="flex items-center gap-2">
                 {link.isLive && <Radio className="w-4 h-4 animate-pulse" style={{ color: 'var(--color-primary-accent)' }} />}
