@@ -272,149 +272,152 @@ export const PublicPostersPage: React.FC = () => {
       {/* Lightbox Modal matching Reference Design */}
       {activePoster && (
         <div
-          className="fixed inset-0 z-[9999] bg-black/95 flex flex-col items-center justify-between p-4 sm:p-6 animate-in fade-in duration-200 select-none overflow-hidden"
+          className="fixed inset-0 z-[9999] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200"
           onClick={() => {
             setActivePoster(null);
             setShowShareMenu(false);
           }}
         >
-          {/* Top Control Bar */}
-          <div className="w-full flex items-center justify-between z-[10000] shrink-0" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full backdrop-blur-md">
-              <span style={{ color: 'var(--color-primary-accent)' }} className="text-xs font-mono font-bold uppercase tracking-wider">
-                {activePoster.category} Category
-              </span>
-              <span className="text-zinc-500">•</span>
-              <span className="text-xs font-bold text-white line-clamp-1">{activePoster.eventName}</span>
+          {/* Centered Modal Card */}
+          <div
+            className="relative max-w-4xl w-full bg-[#121215] border border-white/20 rounded-2xl overflow-hidden shadow-2xl flex flex-col items-center p-3.5 sm:p-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Top Control Bar */}
+            <div className="w-full flex items-center justify-between mb-3 shrink-0">
+              <div className="flex items-center gap-2">
+                <span style={{ color: 'var(--color-primary-accent)', borderColor: 'var(--color-primary-accent)' }} className="px-2.5 py-0.5 bg-white/5 border rounded-md text-[10px] font-mono font-bold uppercase tracking-wider">
+                  {activePoster.category} Category
+                </span>
+                <h3 className="text-xs sm:text-sm font-bold text-white line-clamp-1">{activePoster.eventName}</h3>
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => {
+                    if (!document.fullscreenElement) {
+                      document.documentElement.requestFullscreen().catch(() => {});
+                    } else {
+                      document.exitFullscreen().catch(() => {});
+                    }
+                  }}
+                  className="p-1.5 text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+                  title="Full Screen"
+                >
+                  <Maximize2 className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => {
+                    setActivePoster(null);
+                    setShowShareMenu(false);
+                  }}
+                  className="p-1.5 text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+                  title="Close"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => {
-                  if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen().catch(() => {});
-                  } else {
-                    document.exitFullscreen().catch(() => {});
-                  }
-                }}
-                className="p-2.5 text-zinc-400 hover:text-white bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl transition-colors cursor-pointer"
-                title="Full Screen"
-              >
-                <Maximize2 className="w-5 h-5" />
-              </button>
-              <button
-                onClick={() => {
-                  setActivePoster(null);
-                  setShowShareMenu(false);
-                }}
-                className="p-2.5 text-zinc-400 hover:text-white bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl transition-colors cursor-pointer"
-                title="Close"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-
-          {/* Left Navigation Arrow */}
-          {filteredPosters.length > 1 && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handlePrev();
-              }}
-              className="fixed left-3 sm:left-6 top-1/2 -translate-y-1/2 p-3 bg-black/70 hover:bg-black/90 border border-white/20 text-zinc-200 hover:text-white rounded-xl transition-all z-[10000] cursor-pointer shadow-2xl"
-              title="Previous"
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
-          )}
-
-          {/* Center Poster Container - 100% UNCROPPED ORIGINAL SIZE */}
-          <div className="flex-1 w-full max-w-6xl flex items-center justify-center my-auto p-2 overflow-hidden z-10" onClick={(e) => e.stopPropagation()}>
-            <PosterImage
-              competitionId={activePoster.id}
-              eventName={activePoster.eventName}
-              category={activePoster.category}
-              compIndex={activePoster.compIndex}
-              results={activePoster.results}
-              className="max-h-[75vh] max-w-full w-auto h-auto object-contain rounded-lg shadow-2xl"
-              onLoadUrl={(url) => { activePoster.imageUrl = url; }}
-            />
-          </div>
-
-          {/* Right Navigation Arrow */}
-          {filteredPosters.length > 1 && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleNext();
-              }}
-              className="fixed right-3 sm:right-6 top-1/2 -translate-y-1/2 p-3 bg-black/70 hover:bg-black/90 border border-white/20 text-zinc-200 hover:text-white rounded-xl transition-all z-[10000] cursor-pointer shadow-2xl"
-              title="Next"
-            >
-              <ChevronRight className="w-6 h-6" />
-            </button>
-          )}
-
-          {/* Bottom Floating Action Bar matching Reference Design */}
-          <div className="w-full flex flex-col items-center gap-3 z-[10000] shrink-0" onClick={(e) => e.stopPropagation()}>
-            <span className="text-xs font-mono text-zinc-400 tracking-wider">
-              {activePoster.eventName} ({activePoster.category})
-            </span>
-
-            <div className="flex items-center justify-center gap-2 flex-wrap relative">
-              <button
-                onClick={() => {
-                  if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen().catch(() => {});
-                  } else {
-                    document.exitFullscreen().catch(() => {});
-                  }
-                }}
-                className="px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-lg"
-              >
-                <Maximize2 className="w-4 h-4" />
-                <span>FULL SCREEN</span>
-              </button>
-
-              <button
-                onClick={() => handleDownload(activePoster)}
-                style={{ backgroundColor: 'var(--color-primary-accent)' }}
-                className="px-5 py-2.5 hover:opacity-90 border border-white/20 text-white text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-lg"
-              >
-                <Download className="w-4 h-4" />
-                <span>DOWNLOAD</span>
-              </button>
-
-              <button
-                onClick={() => handleShare(activePoster)}
-                className="px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-lg"
-              >
-                <Share2 className="w-4 h-4" />
-                <span>SHARE</span>
-              </button>
-
-              {/* Share Menu Drawer */}
-              {showShareMenu && (
-                <div className="absolute bottom-full right-0 mb-3 w-56 bg-[#18181C] border border-[#2D2D35] rounded-xl p-2.5 shadow-2xl z-50">
-                  <button
-                    onClick={() => handleCopyLink(activePoster)}
-                    className="w-full text-left px-3 py-2 text-xs font-mono text-zinc-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors flex items-center gap-2"
-                  >
-                    {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                    {copied ? 'Link Copied!' : 'Copy Result Link'}
-                  </button>
-                  <a
-                    href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`🏆 Official Result Poster: ${activePoster.eventName} (${activePoster.category}) - ${window.location.origin}/results?category=${encodeURIComponent(activePoster.category)}&event=${encodeURIComponent(activePoster.eventName)}`)}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="w-full text-left px-3 py-2 text-xs font-mono text-zinc-300 hover:text-white hover:bg-[#25D366]/20 rounded-lg transition-colors flex items-center gap-2 mt-1"
-                  >
-                    <Send className="w-3.5 h-3.5 text-[#25D366]" />
-                    Share on WhatsApp
-                  </a>
-                </div>
+            {/* Poster Canvas Image Box - 100% UNCROPPED ORIGINAL SIZE */}
+            <div className="relative w-full max-h-[60vh] sm:max-h-[65vh] bg-black flex items-center justify-center overflow-hidden rounded-xl p-2 shrink-0">
+              {filteredPosters.length > 1 && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handlePrev();
+                  }}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-black/75 hover:bg-black/95 border border-white/20 text-white rounded-full transition-all z-20 cursor-pointer shadow-xl"
+                  title="Previous"
+                >
+                  <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+                </button>
               )}
+
+              <PosterImage
+                competitionId={activePoster.id}
+                eventName={activePoster.eventName}
+                category={activePoster.category}
+                compIndex={activePoster.compIndex}
+                results={activePoster.results}
+                className="max-h-[58vh] sm:max-h-[62vh] max-w-full w-auto h-auto object-contain rounded-lg shadow-2xl"
+                onLoadUrl={(url) => { activePoster.imageUrl = url; }}
+              />
+
+              {filteredPosters.length > 1 && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleNext();
+                  }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-black/75 hover:bg-black/95 border border-white/20 text-white rounded-full transition-all z-20 cursor-pointer shadow-xl"
+                  title="Next"
+                >
+                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                </button>
+              )}
+            </div>
+
+            {/* Bottom Caption & Action Bar matching Reference Design */}
+            <div className="w-full flex flex-col items-center gap-2.5 mt-3 shrink-0">
+              <span className="text-xs font-mono text-zinc-400 tracking-wider">
+                {activePoster.eventName} ({activePoster.category})
+              </span>
+
+              <div className="flex items-center justify-center gap-2 flex-wrap relative">
+                <button
+                  onClick={() => {
+                    if (!document.fullscreenElement) {
+                      document.documentElement.requestFullscreen().catch(() => {});
+                    } else {
+                      document.exitFullscreen().catch(() => {});
+                    }
+                  }}
+                  className="px-3.5 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-all flex items-center gap-1.5 cursor-pointer shadow-md"
+                >
+                  <Maximize2 className="w-3.5 h-3.5" />
+                  <span>FULL SCREEN</span>
+                </button>
+
+                <button
+                  onClick={() => handleDownload(activePoster)}
+                  style={{ backgroundColor: 'var(--color-primary-accent)' }}
+                  className="px-4 py-2 hover:opacity-90 border border-white/20 text-white text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-all flex items-center gap-1.5 cursor-pointer shadow-md"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>DOWNLOAD</span>
+                </button>
+
+                <button
+                  onClick={() => handleShare(activePoster)}
+                  className="px-3.5 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-all flex items-center gap-1.5 cursor-pointer shadow-md"
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                  <span>SHARE</span>
+                </button>
+
+                {/* Share Options Drawer */}
+                {showShareMenu && (
+                  <div className="absolute bottom-full right-0 mb-2 w-56 bg-[#18181C] border border-[#2D2D35] rounded-xl p-2.5 shadow-2xl z-50">
+                    <button
+                      onClick={() => handleCopyLink(activePoster)}
+                      className="w-full text-left px-3 py-2 text-xs font-mono text-zinc-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors flex items-center gap-2"
+                    >
+                      {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                      {copied ? 'Link Copied!' : 'Copy Result Link'}
+                    </button>
+                    <a
+                      href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`🏆 Official Result Poster: ${activePoster.eventName} (${activePoster.category}) - ${window.location.origin}/results?category=${encodeURIComponent(activePoster.category)}&event=${encodeURIComponent(activePoster.eventName)}`)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="w-full text-left px-3 py-2 text-xs font-mono text-zinc-300 hover:text-white hover:bg-[#25D366]/20 rounded-lg transition-colors flex items-center gap-2 mt-1"
+                    >
+                      <Send className="w-3.5 h-3.5 text-[#25D366]" />
+                      Share on WhatsApp
+                    </a>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
