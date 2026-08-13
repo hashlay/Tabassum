@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { VideoHighlight } from '../types';
-import { Play, X, Download, Share2, Video } from 'lucide-react';
+import { Play, X, Download, Share2, Video, Maximize2 } from 'lucide-react';
 import { getMediaUrl } from '../utils/mediaUrl';
 
 // Lazy-rendered card that only mounts when visible in viewport
@@ -194,42 +194,55 @@ export const VideoHighlights: React.FC = React.memo(() => {
         )}
       </div>
 
-      {/* Video Modal Player */}
+      {/* Video Modal Player matching Reference Design */}
       {activeVideo && (
         <div
-          className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200"
+          className="fixed inset-0 z-[9999] bg-black/95 flex flex-col items-center justify-between p-4 sm:p-6 animate-in fade-in duration-200 select-none overflow-hidden"
           onClick={handleClose}
         >
-          <div
-            className="relative max-w-4xl w-full bg-[#18181B] border border-white/15 rounded-2xl overflow-hidden shadow-2xl flex flex-col my-auto max-h-[90vh]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Header bar with close button */}
-            <div className="flex items-center justify-between p-3.5 sm:p-4 bg-[#141416] border-b border-white/10 shrink-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span style={{ color: 'var(--color-primary-accent)', borderColor: 'var(--color-primary-accent)' }} className="px-2 py-0.5 bg-white/5 border rounded text-[10px] font-mono font-bold uppercase tracking-wider">
-                  {activeVideo.event}
-                </span>
-                <span className="text-xs text-zinc-400 font-mono uppercase">{activeVideo.stageName}</span>
-              </div>
+          {/* Top Control Bar */}
+          <div className="w-full flex items-center justify-between z-[10000] shrink-0" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full backdrop-blur-md">
+              <span style={{ color: 'var(--color-primary-accent)' }} className="text-xs font-mono font-bold uppercase tracking-wider">
+                {activeVideo.event}
+              </span>
+              <span className="text-zinc-500">•</span>
+              <span className="text-xs font-bold text-white line-clamp-1">{activeVideo.title}</span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(() => {});
+                  } else {
+                    document.exitFullscreen().catch(() => {});
+                  }
+                }}
+                className="p-2.5 text-zinc-400 hover:text-white bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl transition-colors cursor-pointer"
+                title="Full Screen"
+              >
+                <Maximize2 className="w-5 h-5" />
+              </button>
               <button
                 onClick={handleClose}
-                className="p-1.5 text-zinc-400 hover:text-white bg-white/5 border border-white/10 rounded-lg transition-colors cursor-pointer"
+                className="p-2.5 text-zinc-400 hover:text-white bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl transition-colors cursor-pointer"
                 aria-label="Close video"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
+          </div>
 
-            {/* Video Player Container */}
-            <div className="relative aspect-video bg-black flex-shrink-0">
+          {/* Center Video Container */}
+          <div className="flex-1 w-full max-w-5xl flex items-center justify-center my-auto p-2 overflow-hidden z-10" onClick={(e) => e.stopPropagation()}>
+            <div className="relative w-full max-h-[75vh] aspect-video bg-black rounded-xl overflow-hidden shadow-2xl border border-white/15">
               <video
                 src={getMediaUrl(activeVideo.videoUrl)}
                 title={activeVideo.title}
                 className="w-full h-full object-contain"
                 autoPlay
                 controls
-                controlsList="nodownload"
                 playsInline
                 preload="auto"
                 onError={(e) => {
@@ -245,33 +258,50 @@ export const VideoHighlights: React.FC = React.memo(() => {
                 }}
               />
             </div>
-            
-            {/* Modal Footer Controls */}
-            <div className="p-4 sm:p-5 bg-[#121214] overflow-y-auto">
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-                <div>
-                  <h3 className="text-lg sm:text-xl font-bold text-white leading-tight">{activeVideo.title}</h3>
-                  <p className="text-xs text-zinc-400 mt-1">Performer: <span className="text-zinc-200 font-mono">{activeVideo.performer}</span></p>
-                </div>
-                
-                <div className="flex gap-2 flex-shrink-0">
-                  <button
-                    onClick={() => handleShare(activeVideo)}
-                    className="flex items-center gap-2 px-3.5 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-mono font-bold transition-colors cursor-pointer min-h-[40px]"
-                  >
-                    <Share2 className="w-4 h-4" />
-                    <span>Share</span>
-                  </button>
-                  <button
-                    onClick={() => handleDownload(activeVideo)}
-                    style={{ backgroundColor: 'var(--color-primary-accent)' }}
-                    className="flex items-center gap-2 px-3.5 py-2 hover:opacity-90 text-white rounded-xl text-xs font-mono font-bold transition-colors cursor-pointer shadow-lg min-h-[40px]"
-                  >
-                    <Download className="w-4 h-4" />
-                    <span>Download HD</span>
-                  </button>
-                </div>
-              </div>
+          </div>
+
+          {/* Bottom Floating Action Bar matching Reference Design */}
+          <div className="w-full flex flex-col items-center gap-3 z-[10000] shrink-0" onClick={(e) => e.stopPropagation()}>
+            <span className="text-xs font-mono text-zinc-400 tracking-wider">
+              {activeVideo.title} — Performer: {activeVideo.performer}
+            </span>
+
+            <div className="flex items-center justify-center gap-2 flex-wrap">
+              <button
+                onClick={() => {
+                  if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(() => {});
+                  } else {
+                    document.exitFullscreen().catch(() => {});
+                  }
+                }}
+                className="px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-lg"
+              >
+                <Maximize2 className="w-4 h-4" />
+                <span>FULL SCREEN</span>
+              </button>
+
+              {activeVideo.videoUrl && (
+                <a
+                  href={getMediaUrl(activeVideo.videoUrl)}
+                  download={`${activeVideo.title}.mp4`}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ backgroundColor: 'var(--color-primary-accent)' }}
+                  className="px-5 py-2.5 hover:opacity-90 border border-white/20 text-white text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-lg"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>DOWNLOAD</span>
+                </a>
+              )}
+
+              <button
+                onClick={() => handleShare(activeVideo)}
+                className="px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-lg"
+              >
+                <Share2 className="w-4 h-4" />
+                <span>SHARE</span>
+              </button>
             </div>
           </div>
         </div>
