@@ -55,20 +55,34 @@
    DYNAMIC CMS COLOR THEME ENGINE (ALL 10 COLOR KEYS)
    ==================================================== */
 
+/* 1. Primary Accent (--color-primary-accent) - LEFT UNTOUCHED & WORKING */
+
 /* 2. Page Body & Modal Background (--color-body-bg) */
 body,
+main,
 [class*="bg-[#0D0D0D]"],
 [class*="bg-[#0d0d0d]"],
-[class*="bg-[#09090b]"],
-[class*="bg-[#0A0A0C]"] {
+[class*="bg-[#080808]"],
+[class*="bg-[#0A0A0C]"],
+[class*="bg-[#0a0a0c]"],
+[class*="bg-[#0E0E10]"],
+[class*="bg-[#0D0D0F]"],
+[class*="bg-[#0A0A0A]"],
+[class*="bg-[#121212]"],
+[class*="bg-[#09090b]"] {
   background-color: var(--color-body-bg, #0D0D0D) !important;
 }
 
 /* 3. Card & Section Container Background (--color-card-bg) */
 [class*="bg-[#161619]"],
 [class*="bg-[#141417]"],
-[class*="bg-[#151518]"],
+[class*="bg-[#141414]"],
 [class*="bg-[#141416]"],
+[class*="bg-[#181818]"],
+[class*="bg-[#111114]"],
+[class*="bg-[#181214]"],
+[class*="bg-[#1C1C20]"],
+[class*="bg-[#151518]"],
 [class*="bg-[#17171A]"] {
   background-color: var(--color-card-bg, #161619) !important;
 }
@@ -76,67 +90,109 @@ body,
 /* 4. Elevated Card & Header Background (--color-card-elevated-bg) */
 [class*="bg-[#1A1A1E]"],
 [class*="bg-[#18181C]"],
+[class*="bg-[#18181B]"],
+[class*="bg-[#1A1A1A]"],
 [class*="bg-[#1C1C21]"],
-[class*="bg-[#202026]"],
-[class*="bg-[#121215]"],
-[class*="bg-[#18181b]"] {
+[class*="bg-[#1B1B1F]"],
+[class*="bg-[#222228]"],
+[class*="bg-[#18181A]"],
+[class*="bg-[#121214]"],
+[class*="bg-[#1E1E20]"],
+[class*="bg-[#131316]"],
+[class*="bg-[#111113]"] {
   background-color: var(--color-card-elevated-bg, #1A1A1E) !important;
 }
 
 /* 5. Subtle Border & Divider Lines (--color-border-subtle) */
+[class*="border-[#2D2D35]"],
 [class*="border-[#2A2A32]"],
 [class*="border-[#25252D]"],
-[class*="border-[#2D2D35]"],
+[class*="border-[#333338]"],
+[class*="border-[#38383C]"],
+[class*="border-[#2A2A30]"],
 [class*="border-[#33333D]"],
-[class*="border-[#25252d]"],
-[class*="border-[#27272a]"] {
+[class*="border-[#2A2A35]"],
+[class*="border-[#3F3F46]"],
+[class*="border-[#202028]"],
+[class*="border-[#33333C]"],
+[class*="border-[#282830]"],
+[class*="border-zinc-800"],
+[class*="border-white/10"],
+[class*="border-white/15"],
+[class*="border-white/20"] {
   border-color: var(--color-border-subtle, #2A2A32) !important;
 }
 
 /* 6. Primary Heading & Title Text (--color-text-primary) */
+h1:not(.logo-text):not(.text-primary-accent),
+h2:not(.logo-text):not(.text-primary-accent),
+h3:not(.logo-text):not(.text-primary-accent),
 .text-primary-heading {
-  color: var(--color-text-primary, #FFFFFF) !important;
+  color: var(--color-text-primary, #FFFFFF);
 }
 
 /* 7. Secondary Sub-header Text (--color-text-secondary) */
 [class*="text-[#E4E4E7]"],
-.text-secondary-subhead {
+[class*="text-zinc-200"],
+[class*="text-zinc-300"],
+[class*="text-slate-200"],
+[class*="text-gray-200"] {
   color: var(--color-text-secondary, #E4E4E7) !important;
 }
 
 /* 8. Muted Text & Timestamps (--color-text-muted) */
 [class*="text-[#A1A1AA]"],
-.text-muted-label {
+[class*="text-zinc-400"],
+[class*="text-zinc-500"],
+[class*="text-slate-400"],
+[class*="text-gray-400"] {
   color: var(--color-text-muted, #A1A1AA) !important;
 }
 
 /* 9. Gold Rank #1 & Distinction Badge (--color-gold-accent) */
 [class*="text-[#F59E0B]"],
-.gold-badge-text {
+[class*="text-[#D4AF37]"],
+[class*="text-amber-400"],
+[class*="text-amber-500"],
+[class*="text-yellow-400"],
+[class*="text-yellow-500"] {
   color: var(--color-gold-accent, #F59E0B) !important;
 }
 
 [class*="bg-[#F59E0B]"],
-.gold-badge-bg {
+[class*="bg-[#D4AF37]"],
+[class*="bg-amber-400"],
+[class*="bg-amber-500"],
+[class*="bg-yellow-500"] {
   background-color: var(--color-gold-accent, #F59E0B) !important;
 }
 
-[class*="border-[#F59E0B]"] {
+[class*="border-[#F59E0B]"],
+[class*="border-amber-400"],
+[class*="border-amber-500"] {
   border-color: var(--color-gold-accent, #F59E0B) !important;
 }
 
 /* 10. Success & Verification Green (--color-success-accent) */
 [class*="text-[#10B981]"],
-.success-badge-text {
+[class*="text-[#25D366]"],
+[class*="text-emerald-400"],
+[class*="text-emerald-500"],
+[class*="text-green-500"] {
   color: var(--color-success-accent, #10B981) !important;
 }
 
 [class*="bg-[#10B981]"],
-.success-badge-bg {
+[class*="bg-[#25D366]"],
+[class*="bg-emerald-400"],
+[class*="bg-emerald-500"],
+[class*="bg-green-500"] {
   background-color: var(--color-success-accent, #10B981) !important;
 }
 
-[class*="border-[#10B981]"] {
+[class*="border-[#10B981]"],
+[class*="border-emerald-400"],
+[class*="border-emerald-500"] {
   border-color: var(--color-success-accent, #10B981) !important;
 }
 
