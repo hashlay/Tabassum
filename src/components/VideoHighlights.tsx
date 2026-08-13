@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { VideoHighlight } from '../types';
 import { Play, X, Download, Share2, Video } from 'lucide-react';
 import { getMediaUrl } from '../utils/mediaUrl';
@@ -194,14 +195,14 @@ export const VideoHighlights: React.FC = React.memo(() => {
         )}
       </div>
 
-      {/* Video Modal Player */}
-      {activeVideo && (
+      {/* Video Modal Player rendered directly on document.body via Portal */}
+      {activeVideo && createPortal(
         <div
-          className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200"
+          className="fixed inset-0 z-[99999] bg-black/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200"
           onClick={handleClose}
         >
           <div
-            className="relative max-w-4xl w-full bg-[#18181B] border border-white/15 rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
+            className="relative max-w-4xl w-full bg-[#18181B] border border-white/15 rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header bar with close button */}
@@ -274,7 +275,8 @@ export const VideoHighlights: React.FC = React.memo(() => {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );

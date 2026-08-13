@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { GalleryItem } from '../types';
 import { ZoomIn, ArrowRight, X, ChevronLeft, ChevronRight, Download, Share2, Check, Send, Copy, Image as ImageIcon } from 'lucide-react';
 import { getMediaUrl } from '../utils/mediaUrl';
@@ -195,17 +196,17 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
         )}
       </div>
 
-      {/* Lightbox Preview Modal */}
-      {activeItem && (
+      {/* Lightbox Preview Modal rendered directly on document.body via Portal */}
+      {activeItem && createPortal(
         <div
-          className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200"
+          className="fixed inset-0 z-[99999] bg-black/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200"
           onClick={() => {
             setActiveItem(null);
             setShowShareMenu(false);
           }}
         >
           <div
-            className="relative max-w-4xl w-full bg-[#18181B] border border-white/15 rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
+            className="relative max-w-4xl w-full bg-[#18181B] border border-white/15 rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header bar with title & close button */}
@@ -310,7 +311,8 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );
