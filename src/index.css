@@ -207,14 +207,10 @@ html, body, #root {
   overflow-x: hidden;
 }
 
-/* Force compositing layer on scrollable containers */
-main, aside,
+/* GPU compositing hint for scrollable containers (safe — does NOT break position:fixed) */
 [class*="overflow-y-auto"],
 [class*="overflow-x-auto"] {
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
+  will-change: scroll-position;
 }
 
 /* Kill all backdrop-filter on touch devices to prevent GPU striping/tearing */
