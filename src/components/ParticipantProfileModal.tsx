@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { X, User, QrCode, Calendar, Award, Sparkles, Download, ScanFace, CheckCircle, ExternalLink, ShieldCheck, MapPin } from 'lucide-react';
+import { X, User, QrCode, Calendar, Award, Sparkles, Download, ScanFace, CheckCircle, ExternalLink, ShieldCheck, MapPin, Printer } from 'lucide-react';
 import { useFestival } from '../context/FestivalContext';
 import { CertificateImage } from './CertificateImage';
 import { PosterImage } from './PosterImage';
@@ -335,7 +335,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
           <div className="flex flex-col items-center gap-3 shrink-0">
             <div className="relative group">
               <img
-                src={p.avatarUrl}
+                src={p.avatarUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(p.name)}`}
                 alt={cleanName}
                 className="w-36 h-36 rounded-full object-cover shadow-2xl bg-zinc-900 border-2 border-transparent transition-all"
                 style={{ borderColor: 'var(--color-primary-accent)' }}
@@ -375,7 +375,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
           <span className="text-xs text-zinc-400 font-mono">Verified Credentials</span>
         </div>
 
-        {/* Section A: Competition Schedule / Your Programs */}
+        {/* Section A: Registered Programs */}
         <div className="space-y-4">
           <h4 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
             <Calendar className="w-5 h-5" style={{ color: 'var(--color-primary-accent)' }} />
@@ -395,20 +395,18 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                     <p className="text-xs text-zinc-400 font-mono uppercase tracking-wider">{sc.category} Category</p>
                   </div>
                   <div>
-                    {sc.status === 'live' && (
+                    {sc.status === 'live' ? (
                       <span style={{ backgroundColor: 'var(--color-primary-accent)' }} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-white text-[10px] font-bold uppercase tracking-widest rounded-full animate-pulse shadow-md">
                         <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
                         LIVE NOW
                       </span>
-                    )}
-                    {sc.status === 'completed' && (
-                      <span className="px-3 py-1.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold uppercase tracking-widest rounded-full">
+                    ) : (sc.status === 'completed' || sc.status === 'done' || sc.status === 'finished') ? (
+                      <span className="px-3 py-1.5 bg-emerald-500 text-slate-950 border border-emerald-400 text-[10px] font-extrabold uppercase tracking-widest rounded-full shadow-sm">
                         Completed
                       </span>
-                    )}
-                    {sc.status === 'upcoming' && (
-                      <span className="px-3 py-1.5 bg-white/10 text-zinc-300 border border-white/20 text-[10px] font-bold uppercase tracking-widest rounded-full">
-                        Registered
+                    ) : (
+                      <span className="px-3 py-1.5 bg-white/10 text-zinc-200 border border-white/20 text-[10px] font-mono font-bold uppercase tracking-widest rounded-full">
+                        {sc.status ? String(sc.status).toUpperCase() : 'REGISTERED'}
                       </span>
                     )}
                   </div>
@@ -453,11 +451,11 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                 return (
                   <div key={res.id || `res-${Math.random()}`} className="bg-[#18181B] border border-white/10 rounded-3xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 transition-all">
                     <div className="flex items-center gap-4">
-                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-2xl shrink-0 shadow-inner ${
-                        res.rank === 1 ? 'bg-amber-500/20 border border-amber-500/40 text-amber-400' :
-                        res.rank === 2 ? 'bg-slate-300/20 border border-slate-300/40 text-slate-200' :
-                        res.rank === 3 ? 'bg-amber-700/20 border border-amber-700/40 text-amber-600' :
-                        'bg-emerald-500/20 border border-emerald-500/40 text-emerald-400'
+                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-2xl shrink-0 shadow-md ${
+                        res.rank === 1 ? 'bg-amber-400 text-slate-950 border-2 border-amber-300 shadow-amber-500/20' :
+                        res.rank === 2 ? 'bg-slate-200 text-slate-950 border-2 border-slate-300 shadow-slate-400/20' :
+                        res.rank === 3 ? 'bg-amber-700 text-white border-2 border-amber-600 shadow-amber-800/20' :
+                        'bg-emerald-600 text-white border-2 border-emerald-500'
                       }`}>
                         {res.rank ? `#${res.rank}` : 'Pass'}
                       </div>
@@ -534,7 +532,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                             alert("Please wait for certificate to load");
                           }
                         }}
-                        className="flex-1 px-3 py-2 bg-white/5 hover:bg-emerald-500 hover:text-black text-white text-xs font-mono font-bold rounded-lg transition-colors flex items-center justify-center gap-2"
+                        className="flex-1 px-3 py-2.5 bg-white/10 hover:bg-emerald-500 hover:text-black text-white text-xs font-mono font-bold rounded-xl border border-white/15 transition-all flex items-center justify-center gap-2 shadow-sm"
                       >
                         <Download className="w-4 h-4" /> Download
                       </button>
@@ -545,7 +543,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                             handleShare('Official Certificate', `Rank ${res.rank} Certificate for ${res.eventName}`, imgEl.src);
                           }
                         }}
-                        className="flex-1 px-3 py-2 bg-white/5 hover:bg-emerald-500 hover:text-black text-white text-xs font-mono font-bold rounded-lg transition-colors flex items-center justify-center gap-2"
+                        className="flex-1 px-3 py-2.5 bg-white/10 hover:bg-emerald-500 hover:text-black text-white text-xs font-mono font-bold rounded-xl border border-white/15 transition-all flex items-center justify-center gap-2 shadow-sm"
                       >
                         <ExternalLink className="w-4 h-4" /> Share
                       </button>
@@ -554,9 +552,9 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                           const imgEl = document.getElementById(`cert-img-data-${res.id}`) as HTMLImageElement;
                           if (imgEl && imgEl.src) handlePrint(imgEl.src);
                         }}
-                        className="flex-1 px-3 py-2 bg-emerald-500/20 hover:bg-emerald-500 hover:text-black text-emerald-400 text-xs font-mono font-bold rounded-lg transition-colors flex items-center justify-center gap-2"
+                        className="flex-1 px-3 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm shadow-emerald-900/40"
                       >
-                        Print
+                        <Printer className="w-4 h-4" /> Print
                       </button>
                     </div>
                   </div>
