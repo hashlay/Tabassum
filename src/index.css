@@ -207,10 +207,10 @@ html, body, #root {
   overflow-x: hidden;
 }
 
-/* GPU compositing hint for scrollable containers (safe — does NOT break position:fixed) */
+/* Smooth momentum touch scrolling for containers without GPU layer bloat */
 [class*="overflow-y-auto"],
 [class*="overflow-x-auto"] {
-  will-change: scroll-position;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Kill all backdrop-filter on touch devices to prevent GPU striping/tearing */
