@@ -153,8 +153,18 @@ export const renderPosterToCanvas = async (
   const themeRules: any[] = migratedConfig.themeRules || [];
   const themeConfigs: any = migratedConfig.themeConfigs || {};
 
-  const getThemeIndexForResult = (resultNum: number): number => {
-    const rule = themeRules.find((r: any) => resultNum >= r.startResult && resultNum <= r.endResult);
+  const getThemeIndexForResult = (resultNum: number, catName?: string, catId?: string): number => {
+    const rule = themeRules.find((r: any) => {
+      if (r.type === 'category' || r.categoryId || r.categoryName) {
+        if (catId && r.categoryId && r.categoryId === catId) return true;
+        if (catName && (r.categoryName || r.category)) {
+          const rCat = (r.categoryName || r.category).toString().trim().toLowerCase();
+          if (rCat === catName.trim().toLowerCase()) return true;
+        }
+        return false;
+      }
+      return resultNum >= r.startResult && resultNum <= r.endResult;
+    });
     if (rule && rule.themeIndex !== undefined && rule.themeIndex < customThemes.length) {
       return rule.themeIndex;
     }
@@ -165,7 +175,7 @@ export const renderPosterToCanvas = async (
     return 0;
   };
 
-  const themeIdx = getThemeIndexForResult(compIdx);
+  const themeIdx = getThemeIndexForResult(compIdx, categoryName);
   const c = { ...getDefaultThemeConfig(), ...(themeConfigs[themeIdx] || {}) };
   const backgroundSource = customThemes[themeIdx] || customThemes[0];
   
