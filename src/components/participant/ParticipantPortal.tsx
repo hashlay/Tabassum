@@ -17,30 +17,44 @@ import {
 } from 'lucide-react';
 
 import { Logo } from '../Logo';
+import { useFestival } from '../../context/FestivalContext';
 
 export const ParticipantPortal: React.FC<{ onBackToApp?: () => void }> = ({ onBackToApp }) => {
+  const { eventSettings, loginUnified } = useFestival();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loginMethod, setLoginMethod] = useState<'dob' | 'qr'>('dob');
   const [chestNoInput, setChestNoInput] = useState('1042');
   const [dobInput, setDobInput] = useState('');
+  const [selectedClass, setSelectedClass] = useState('');
   const [activeTab, setActiveTab] = useState<'dashboard' | 'pass' | 'competitions' | 'photos' | 'results' | 'certificates'>('dashboard');
   const [errorMsg, setErrorMsg] = useState('');
 
+  const criteriaMode = eventSettings?.participantLoginCriteria || 'dob';
+  const classStart = eventSettings?.classRangeStart ?? 1;
+  const classEnd = eventSettings?.classRangeEnd ?? 10;
+  const availableClasses: string[] = eventSettings?.availableClasses || Array.from({ length: Math.max(1, classEnd - classStart + 1) }, (_, i) => `Class ${classStart + i}`);
+
   const [activeParticipant, setActiveParticipant] = useState<ParticipantProfile>(DEMO_PARTICIPANTS[0]);
 
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
-    if (!chestNoInput.trim() || !dobInput.trim()) {
-      setErrorMsg('No participant found for that chest number and date of birth.');
+    const secVal = criteriaMode === 'class' ? selectedClass : dobInput;
+    if (!chestNoInput.trim() || !secVal.trim()) {
+      setErrorMsg(`No participant found for that chest number and ${criteriaMode === 'class' ? 'class' : 'date of birth'}.`);
       return;
     }
-    const found = DEMO_PARTICIPANTS.find(p => p.codeNumber.toLowerCase() === chestNoInput.toLowerCase());
-    if (found) {
-      setActiveParticipant(found);
+    const res = await loginUnified(chestNoInput.trim(), secVal.trim());
+    if (res.success) {
       setIsLoggedIn(true);
     } else {
-      setErrorMsg('No participant found for that chest number and date of birth.');
+      const found = DEMO_PARTICIPANTS.find(p => p.codeNumber.toLowerCase() === chestNoInput.toLowerCase());
+      if (found) {
+        setActiveParticipant(found);
+        setIsLoggedIn(true);
+      } else {
+        setErrorMsg(res.error || `No participant found for that chest number and ${criteriaMode === 'class' ? 'class' : 'date of birth'}.`);
+      }
     }
   };
 
@@ -64,7 +78,7 @@ export const ParticipantPortal: React.FC<{ onBackToApp?: () => void }> = ({ onBa
               Sign in
             </h2>
             <p className="text-zinc-400 text-xs leading-relaxed font-sans">
-              Use the chest number on your badge and your date of birth.
+              Use the chest number on your badge and your {criteriaMode === 'class' ? 'class / grade' : 'date of birth'}.
             </p>
           </div>
 
@@ -83,19 +97,39 @@ export const ParticipantPortal: React.FC<{ onBackToApp?: () => void }> = ({ onBa
               />
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-zinc-300 uppercase tracking-widest mb-1.5 font-mono">
-                DATE OF BIRTH
-              </label>
-              <div className="relative flex items-center">
-                <input
-                  type="date"
-                  value={dobInput}
-                  onChange={(e) => setDobInput(e.target.value)}
-                  className="w-full bg-[#141416] border border-[#38383C] focus:border-[#DC2626] rounded-xl px-4 py-3 text-sm text-white font-mono placeholder:text-zinc-500 focus:outline-none transition-colors [color-scheme:dark]"
-                />
+            {criteriaMode === 'class' ? (
+              <div>
+                <label className="block text-xs font-bold text-zinc-300 uppercase tracking-widest mb-1.5 font-mono">
+                  CLASS / GRADE
+                </label>
+                <select
+                  value={selectedClass}
+                  onChange={(e) => setSelectedClass(e.target.value)}
+                  className="w-full bg-[#141416] border border-[#38383C] focus:border-[#DC2626] rounded-xl px-4 py-3 text-sm text-white font-mono focus:outline-none transition-colors"
+                >
+                  <option value="">Select Class</option>
+                  {availableClasses.map((cls, idx) => (
+                    <option key={idx} value={cls}>
+                      {cls}
+                    </option>
+                  ))}
+                </select>
               </div>
-            </div>
+            ) : (
+              <div>
+                <label className="block text-xs font-bold text-zinc-300 uppercase tracking-widest mb-1.5 font-mono">
+                  DATE OF BIRTH
+                </label>
+                <div className="relative flex items-center">
+                  <input
+                    type="date"
+                    value={dobInput}
+                    onChange={(e) => setDobInput(e.target.value)}
+                    className="w-full bg-[#141416] border border-[#38383C] focus:border-[#DC2626] rounded-xl px-4 py-3 text-sm text-white font-mono placeholder:text-zinc-500 focus:outline-none transition-colors [color-scheme:dark]"
+                  />
+                </div>
+              </div>
+            )}
 
             {errorMsg && (
               <p className="text-[#DC2626] text-[13px] font-sans pt-1">

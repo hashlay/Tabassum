@@ -143,6 +143,7 @@ export interface Participant {
   course?: string;
   yearSemester?: string;
   selectedCategoryId: string;
+  candidateClass?: string;
   phone?: string;
   guardianPhone?: string;
   address?: string;

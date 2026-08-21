@@ -10,11 +10,17 @@ interface LoginModalProps {
 }
 
 export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
-  const { loginUnified } = useFestival();
+  const { loginUnified, eventSettings } = useFestival();
   const [chestNumber, setChestNumber] = useState('');
   const [dob, setDob] = useState('');
+  const [selectedClass, setSelectedClass] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const dateInputRef = React.useRef<HTMLInputElement>(null);
+
+  const criteriaMode = eventSettings?.participantLoginCriteria || 'dob';
+  const classStart = eventSettings?.classRangeStart ?? 1;
+  const classEnd = eventSettings?.classRangeEnd ?? 10;
+  const availableClasses: string[] = eventSettings?.availableClasses || Array.from({ length: Math.max(1, classEnd - classStart + 1) }, (_, i) => `Class ${classStart + i}`);
 
   React.useEffect(() => {
     if (isOpen) {
@@ -37,13 +43,14 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
-    if (!chestNumber.trim() || !dob.trim()) {
-      setErrorMsg('No participant found for that chest number and date of birth.');
+    const secVal = criteriaMode === 'class' ? selectedClass : dob;
+    if (!chestNumber.trim() || !secVal.trim()) {
+      setErrorMsg(`No participant found for that chest number and ${criteriaMode === 'class' ? 'class' : 'date of birth'}.`);
       return;
     }
-    const res = await loginUnified(chestNumber.trim(), dob.trim());
+    const res = await loginUnified(chestNumber.trim(), secVal.trim());
     if (!res.success) {
-      setErrorMsg(res.error || 'No participant found for that chest number and date of birth.');
+      setErrorMsg(res.error || `No participant found for that chest number and ${criteriaMode === 'class' ? 'class' : 'date of birth'}.`);
     } else {
       onClose();
     }
@@ -88,7 +95,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             Sign in
           </h2>
           <p className="text-zinc-400 text-xs leading-relaxed font-sans">
-            Use the chest number on your badge and your date of birth.
+            Use the chest number on your badge and your {criteriaMode === 'class' ? 'class / grade' : 'date of birth'}.
           </p>
         </div>
 
@@ -107,31 +114,51 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             />
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-zinc-300 uppercase tracking-widest mb-1.5 font-mono">
-              DATE OF BIRTH
-            </label>
-            <div className="relative flex items-center">
-              <input
-                ref={dateInputRef}
-                type="date"
-                value={dob}
-                onChange={(e) => setDob(e.target.value)}
-                className="w-full bg-[#141416] border border-[#38383C] focus:border-white rounded-xl pl-4 pr-11 py-3 text-sm text-white font-mono placeholder:text-zinc-500 focus:outline-none transition-colors [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:hidden"
-                placeholder="DD/MM/YYYY"
-              />
-              <Calendar
-                className="absolute right-4 w-5 h-5 text-zinc-500 cursor-pointer hover:text-white transition-colors"
-                onClick={() => {
-                  try {
-                    dateInputRef.current?.showPicker();
-                  } catch (err) {
-                    dateInputRef.current?.focus();
-                  }
-                }}
-              />
+          {criteriaMode === 'class' ? (
+            <div>
+              <label className="block text-xs font-bold text-zinc-300 uppercase tracking-widest mb-1.5 font-mono">
+                CLASS / GRADE
+              </label>
+              <select
+                value={selectedClass}
+                onChange={(e) => setSelectedClass(e.target.value)}
+                className="w-full bg-[#141416] border border-[#38383C] focus:border-white rounded-xl px-4 py-3 text-sm text-white font-mono focus:outline-none transition-colors"
+              >
+                <option value="">Select Class</option>
+                {availableClasses.map((cls, idx) => (
+                  <option key={idx} value={cls}>
+                    {cls}
+                  </option>
+                ))}
+              </select>
             </div>
-          </div>
+          ) : (
+            <div>
+              <label className="block text-xs font-bold text-zinc-300 uppercase tracking-widest mb-1.5 font-mono">
+                DATE OF BIRTH
+              </label>
+              <div className="relative flex items-center">
+                <input
+                  ref={dateInputRef}
+                  type="date"
+                  value={dob}
+                  onChange={(e) => setDob(e.target.value)}
+                  className="w-full bg-[#141416] border border-[#38383C] focus:border-white rounded-xl pl-4 pr-11 py-3 text-sm text-white font-mono placeholder:text-zinc-500 focus:outline-none transition-colors [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:hidden"
+                  placeholder="DD/MM/YYYY"
+                />
+                <Calendar
+                  className="absolute right-4 w-5 h-5 text-zinc-500 cursor-pointer hover:text-white transition-colors"
+                  onClick={() => {
+                    try {
+                      dateInputRef.current?.showPicker();
+                    } catch (err) {
+                      dateInputRef.current?.focus();
+                    }
+                  }}
+                />
+              </div>
+            </div>
+          )}
 
           {errorMsg && (
             <p className="text-[#DC2626] text-[13px] font-sans pt-1">
