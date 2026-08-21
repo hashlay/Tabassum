@@ -49,11 +49,17 @@ export const TeamPointsPage: React.FC = () => {
           </div>
         ) : (
           <>
-            {/* Podium Top 3 Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 items-center mb-10 sm:mb-12">
-              {/* Rank 02 Card (Left) */}
+            {/* Podium Top 3 Cards - Dynamically centered for 1, 2, or 3+ teams */}
+            <div className={`mb-10 sm:mb-12 ${
+              sortedHouses.length === 1 
+                ? 'flex justify-center max-w-md mx-auto' 
+                : sortedHouses.length === 2 
+                ? 'grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-2xl mx-auto' 
+                : 'grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 items-center'
+            }`}>
+              {/* Rank 02 Card (Second Place) */}
               {top2 && (
-                <div className="bg-[#161619] border border-[#2A2A32] rounded-2xl p-5 text-center shadow-lg order-2 md:order-1">
+                <div className="bg-[#161619] border border-[#2A2A32] rounded-2xl p-5 text-center shadow-lg order-2 md:order-1 flex-1">
                   <span className="text-zinc-400 text-[10px] font-bold font-mono tracking-widest uppercase mb-1 block">
                     SECOND PLACE
                   </span>
@@ -67,7 +73,7 @@ export const TeamPointsPage: React.FC = () => {
 
               {/* Rank 01 Card (Center Champion) */}
               {top1 && (
-                <div style={{ borderColor: 'var(--color-primary-accent)' }} className="bg-[#161619] border-2 rounded-2xl p-6 text-center shadow-2xl relative order-1 md:order-2">
+                <div style={{ borderColor: 'var(--color-primary-accent)' }} className="bg-[#161619] border-2 rounded-2xl p-6 text-center shadow-2xl relative order-1 md:order-2 flex-1">
                   <div style={{ backgroundColor: 'var(--color-primary-accent)' }} className="absolute -top-3 left-1/2 -translate-x-1/2 text-white font-mono font-black text-[9px] uppercase px-3 py-0.5 rounded-full tracking-widest shadow-md">
                     LEADING
                   </div>
@@ -82,9 +88,9 @@ export const TeamPointsPage: React.FC = () => {
                 </div>
               )}
 
-              {/* Rank 03 Card (Right) */}
+              {/* Rank 03 Card (Third Place) */}
               {top3 && (
-                <div className="bg-[#161619] border border-[#2A2A32] rounded-2xl p-5 text-center shadow-lg order-3">
+                <div className="bg-[#161619] border border-[#2A2A32] rounded-2xl p-5 text-center shadow-lg order-3 flex-1">
                   <span className="text-zinc-400 text-[10px] font-bold font-mono tracking-widest uppercase mb-1 block">
                     THIRD PLACE
                   </span>
