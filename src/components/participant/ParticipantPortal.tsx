@@ -60,10 +60,10 @@ export const ParticipantPortal: React.FC<{ onBackToApp?: () => void }> = ({ onBa
 
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen bg-[#0D0D0D] text-white flex items-center justify-center p-4 selection:bg-[#FF2B2B] font-sans relative overflow-hidden">
-        <div className="absolute top-1/3 right-1/3 w-96 h-96 bg-[#FF2B2B]/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="min-h-screen bg-black/75 backdrop-blur-md text-white flex items-center justify-center p-4 selection:bg-[#FF2B2B] font-sans relative overflow-hidden">
+        <div className="absolute top-1/3 right-1/3 w-80 h-80 bg-[#FF2B2B]/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative w-full max-w-[450px] bg-[#1E1E20] border border-[#333338] rounded-2xl shadow-2xl overflow-hidden p-6 sm:p-8 space-y-5 my-auto">
+        <div className="relative w-full max-w-[460px] bg-[#1E1E20] border border-[#333338] rounded-2xl shadow-2xl overflow-hidden p-6 sm:p-8 space-y-5 my-auto">
           {/* Card Header Bar */}
           <div className="flex items-center justify-between border-b border-[#333338] pb-3">
             <Logo size="sm" showSubBadge={false} />
