@@ -15,8 +15,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
   const [desktopIndex, setDesktopIndex] = React.useState(0);
   const [mobileIndex, setMobileIndex] = React.useState(0);
   
-  const desktopImages = cmsSettings?.heroDesktopImages?.length > 0 ? cmsSettings.heroDesktopImages : ['/hero1.jpg', '/hero2.jpg'];
-  const mobileImages = cmsSettings?.heroMobileImages?.length > 0 ? cmsSettings.heroMobileImages : desktopImages;
+  const desktopImages = cmsSettings?.heroDesktopImages?.length > 0 ? cmsSettings.heroDesktopImages : [];
+  const mobileImages = cmsSettings?.heroMobileImages?.length > 0 ? cmsSettings.heroMobileImages : [];
   
   React.useEffect(() => {
     if (desktopImages.length <= 1 || cmsSettings?.heroDesktopLoopEnabled === false) return;
