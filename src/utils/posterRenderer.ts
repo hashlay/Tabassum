@@ -184,7 +184,7 @@ export const renderPosterToCanvas = async (
   const compId = compResults && compResults[0] ? compResults[0].competitionId : null;
   const compOverride = (eventSettings?.posterOverrides && compName && eventSettings.posterOverrides[compName]) ||
                        (eventSettings?.posterOverrides && compId && eventSettings.posterOverrides[compId]);
-  const isOverrideValid = compOverride && (compOverride._savedThemeIndex === undefined || compOverride._savedThemeIndex === themeIdx);
+  const isOverrideValid = compOverride && compOverride._savedThemeIndex === themeIdx;
   const c = isOverrideValid ? { ...baseConf, ...compOverride } : baseConf;
 
   const backgroundSource = customThemes[themeIdx] || customThemes[0];
