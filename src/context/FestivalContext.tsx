@@ -357,6 +357,14 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setAuthUser(user);
       setIsLoginModalOpen(false);
       setActiveModalView('participant-profile');
+      
+      // Update the URL to explicitly show the chest number link
+      if (typeof window !== 'undefined') {
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.set('chestNo', updatedParticipant.codeNumber);
+        window.history.pushState({}, '', newUrl.toString());
+      }
+      
       return { success: true };
     } catch (err) {
       return { success: false, error: 'Network error. Please try again later.' };
@@ -448,6 +456,18 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const logout = () => {
     setAuthUser(null);
     setActiveModalView('none');
+    
+    // Clear URL parameter if logging out
+    if (typeof window !== 'undefined') {
+      const newUrl = new URL(window.location.href);
+      if (newUrl.searchParams.has('chestNo') || newUrl.searchParams.has('chestNumber') || newUrl.searchParams.has('c') || newUrl.searchParams.has('id')) {
+        newUrl.searchParams.delete('chestNo');
+        newUrl.searchParams.delete('chestNumber');
+        newUrl.searchParams.delete('c');
+        newUrl.searchParams.delete('id');
+        window.history.pushState({}, '', newUrl.toString());
+      }
+    }
   };
 
   // Hero Media Handlers (Max 5 items limit enforcement)

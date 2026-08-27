@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FestivalProvider, useFestival } from './context/FestivalContext';
-import { ParticipantPortal } from './components/participant/ParticipantPortal';
+import ErrorBoundary from './components/ErrorBoundary';
 import { Category } from './types';
 
 import { Header } from './components/Header';
@@ -278,9 +278,7 @@ export default function App() {
     const portalParam = (searchParams.get('portal') || searchParams.get('mode'))?.toLowerCase();
     const port = window.location.port;
 
-    const hasChestParam = searchParams.has('chestNo') || searchParams.has('chestNumber') || searchParams.has('c');
-
-    if (portalParam === 'participant' || path.startsWith('/participant') || port === '3002' || hasChestParam) {
+    if (portalParam === 'participant' || path.startsWith('/participant') || port === '3002') {
       return 'participant';
     }
 
@@ -298,13 +296,7 @@ export default function App() {
   return (
     <ErrorBoundary>
       <FestivalProvider>
-        {appMode === 'participant' ? (
-          <div className="relative">
-            <ParticipantPortal onBackToApp={() => setAppMode('public')} />
-          </div>
-        ) : (
-          <PublicWebsiteContent onSwitchToApp={(mode) => setAppMode(mode as any)} />
-        )}
+        <PublicWebsiteContent onSwitchToApp={(mode) => setAppMode(mode as any)} />
       </FestivalProvider>
     </ErrorBoundary>
   );
