@@ -278,9 +278,12 @@ export default function App() {
     const portalParam = (searchParams.get('portal') || searchParams.get('mode'))?.toLowerCase();
     const port = window.location.port;
 
-    if (portalParam === 'participant' || path.startsWith('/participant') || port === '3002') {
+    const hasChestParam = searchParams.has('chestNo') || searchParams.has('chestNumber') || searchParams.has('c');
+
+    if (portalParam === 'participant' || path.startsWith('/participant') || port === '3002' || hasChestParam) {
       return 'participant';
     }
+
     return 'public';
   });
 

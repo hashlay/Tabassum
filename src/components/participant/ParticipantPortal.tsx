@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ParticipantProfile } from '../../types';
 import { DEMO_PARTICIPANTS } from '../../data/festivalData';
 import {
@@ -36,6 +36,46 @@ export const ParticipantPortal: React.FC<{ onBackToApp?: () => void }> = ({ onBa
 
   const [activeParticipant, setActiveParticipant] = useState<ParticipantProfile>(DEMO_PARTICIPANTS[0]);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const urlChest = params.get('chestNo') || params.get('chestNumber') || params.get('c') || params.get('id');
+    if (urlChest) {
+      setChestNoInput(urlChest);
+      // Fetch from public API by chest number
+      fetch(`/api/public/participant/by-chest/${encodeURIComponent(urlChest)}`)
+        .then(res => {
+          if (res.ok) return res.json();
+          throw new Error('Not found');
+        })
+        .then(data => {
+          if (data && data.name) {
+            setActiveParticipant({
+              id: data.id || `p_${data.codeNumber}`,
+              name: data.name,
+              codeNumber: data.codeNumber || urlChest,
+              dob: data.dob || '',
+              category: data.category || 'General',
+              department: data.department || 'Unit',
+              institution: data.institution || 'Unit',
+              phone: data.phone || '',
+              avatarUrl: data.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
+              schedule: data.schedule || [],
+              results: data.results || []
+            });
+            setIsLoggedIn(true);
+          }
+        })
+        .catch(() => {
+          // Fallback to local demo dataset if offline / demo mode
+          const found = DEMO_PARTICIPANTS.find(p => p.codeNumber.toLowerCase() === urlChest.toLowerCase());
+          if (found) {
+            setActiveParticipant(found);
+            setIsLoggedIn(true);
+          }
+        });
+    }
+  }, []);
+
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
@@ -57,6 +97,7 @@ export const ParticipantPortal: React.FC<{ onBackToApp?: () => void }> = ({ onBa
       }
     }
   };
+
 
   if (!isLoggedIn) {
     return (

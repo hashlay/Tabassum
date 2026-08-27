@@ -176,8 +176,16 @@ export const renderPosterToCanvas = async (
   };
 
   const themeIdx = getThemeIndexForResult(compIdx, categoryName);
-  const c = { ...getDefaultThemeConfig(), ...(themeConfigs[themeIdx] || {}) };
+  const baseConf = { ...getDefaultThemeConfig(), ...(themeConfigs[themeIdx] || {}) };
+  
+  // Merge individual poster position overrides if saved for this specific poster/competition
+  const compId = compResults && compResults[0] ? compResults[0].competitionId : null;
+  const compOverride = (eventSettings?.posterOverrides && compName && eventSettings.posterOverrides[compName]) ||
+                       (eventSettings?.posterOverrides && compId && eventSettings.posterOverrides[compId]);
+  const c = compOverride ? { ...baseConf, ...compOverride } : baseConf;
+
   const backgroundSource = customThemes[themeIdx] || customThemes[0];
+
   
   const festivalName = eventSettings?.festivalName || 'Sahityotsav';
   const campusName = eventSettings?.campusName || eventSettings?.sectorName || 'Campus';
