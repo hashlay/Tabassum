@@ -32,6 +32,7 @@ interface FestivalContextType {
   // Auth state
   authUser: AuthUser | null;
   loginUnified: (username: string, password?: string) => { success: boolean; error?: string };
+  loginUnifiedByChestNo: (chestNo: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   isLoginModalOpen: boolean;
   setIsLoginModalOpen: (open: boolean) => void;
@@ -362,6 +363,88 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
 
+  const loginUnifiedByChestNo = async (chestNo: string) => {
+    try {
+      const cleanChest = chestNo.trim();
+      if (!cleanChest) return { success: false, error: 'Chest number empty' };
+
+      const res = await fetch(`/api/public/participant/by-chest/${encodeURIComponent(cleanChest)}`);
+      let found: any = null;
+      if (res.ok) {
+        const data = await res.json();
+        found = data.participant || data;
+      }
+
+      if (!found) {
+        const demo = DEMO_PARTICIPANTS.find(p => p.codeNumber.toLowerCase() === cleanChest.toLowerCase());
+        if (demo) {
+          const user: AuthUser = {
+            role: 'participant',
+            username: cleanChest,
+            name: demo.name,
+            avatarUrl: demo.avatarUrl || NO_DP_AVATAR,
+            participant: demo
+          };
+          setAuthUser(user);
+          setActiveModalView('participant-profile');
+          return { success: true };
+        }
+        return { success: false, error: 'Participant not found' };
+      }
+
+      const participantResults = (results || []).filter(r => 
+        (r.participantId === found.id || (r.raw && r.raw.participantId === found.id)) ||
+        (r.raw && r.raw.teamMemberIds && Array.isArray(r.raw.teamMemberIds) && r.raw.teamMemberIds.includes(found.id))
+      );
+
+      const updatedParticipant: ParticipantProfile = {
+        codeNumber: found.chestNumber?.toString() || found.codeNumber || cleanChest,
+        password: '',
+        name: found.fullName || found.name || cleanChest,
+        department: found.unitName || found.department || 'Main Team',
+        category: found.categoryName || found.category || 'General',
+        dob: found.dob || '',
+        avatarUrl: found.avatarUrl || NO_DP_AVATAR,
+        qrCodeData: found.chestNumber?.toString() || found.codeNumber || cleanChest,
+        schedule: (found.registeredPrograms || found.schedule || []).map((prog: any, idx: number) => ({
+          id: prog.id || `prog_${idx}`,
+          program: prog.program || prog.name || 'Registered Program',
+          category: prog.category || found.categoryName || 'General',
+          stage: 'Main Stage',
+          time: '09:00 AM',
+          status: prog.status || 'upcoming'
+        })),
+        results: participantResults,
+        matchedPhotos: []
+      };
+
+      const user: AuthUser = {
+        role: 'participant',
+        username: cleanChest,
+        name: updatedParticipant.name,
+        avatarUrl: updatedParticipant.avatarUrl,
+        participant: updatedParticipant
+      };
+
+      setAuthUser(user);
+      setIsLoginModalOpen(false);
+      setActiveModalView('participant-profile');
+      return { success: true };
+    } catch (err) {
+      console.error("loginUnifiedByChestNo error:", err);
+      return { success: false, error: 'Network error. Please try again later.' };
+    }
+  };
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const urlChest = params.get('chestNo') || params.get('chestNumber') || params.get('c') || params.get('id');
+    if (urlChest) {
+      loginUnifiedByChestNo(urlChest);
+    }
+  }, []);
+
   const logout = () => {
     setAuthUser(null);
     setActiveModalView('none');
@@ -497,6 +580,7 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       value={{
         authUser,
         loginUnified,
+        loginUnifiedByChestNo,
         logout,
         isLoginModalOpen,
         setIsLoginModalOpen,
