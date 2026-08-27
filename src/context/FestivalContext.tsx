@@ -376,7 +376,7 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const cleanChest = chestNo.trim();
       if (!cleanChest) return { success: false, error: 'Chest number empty' };
 
-      const res = await fetch(`/api/public/participant/by-chest/${encodeURIComponent(cleanChest)}`);
+      const res = await fetch(`/api/public/participant/by-chest/${encodeURIComponent(cleanChest)}?t=${Date.now()}`);
       let found: any = null;
       if (res.ok) {
         const data = await res.json();
