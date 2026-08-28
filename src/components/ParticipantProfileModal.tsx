@@ -42,6 +42,19 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
 
   const p = authUser.participant;
 
+  const handleClosePortal = () => {
+    if (typeof window !== 'undefined') {
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete('chestNo');
+      newUrl.searchParams.delete('chestNumber');
+      newUrl.searchParams.delete('c');
+      newUrl.searchParams.delete('id');
+      newUrl.pathname = '/';
+      window.history.pushState({ page: 'home' }, '', newUrl.toString());
+    }
+    onClose();
+  };
+
   const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -315,7 +328,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
               Sign Out
             </button>
             <button
-              onClick={onClose}
+              onClick={handleClosePortal}
               className="p-2.5 text-zinc-400 hover:text-white bg-white/5 border border-white/10 rounded-xl transition-colors shrink-0 cursor-pointer"
               title="Close Portal"
             >
@@ -645,8 +658,8 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
         <div className="max-w-6xl mx-auto p-8">
           <button
             type="button"
-            onClick={onClose}
-            className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-zinc-400 hover:text-white transition-colors"
+            onClick={handleClosePortal}
+            className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-zinc-400 hover:text-white transition-colors cursor-pointer"
           >
             ← Back to the Festival
           </button>

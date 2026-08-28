@@ -492,11 +492,20 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setIsLoginModalOpen(false);
       setActiveModalView('participant-profile');
 
-      // Preserve ?chestNo=... in browser URL bar
+      // Preserve ?chestNo=... in browser URL bar and manage browser history stack
       if (typeof window !== 'undefined') {
         const newUrl = new URL(window.location.href);
         newUrl.searchParams.set('chestNo', cleanChest);
-        window.history.pushState({}, '', newUrl.toString());
+
+        const currentState = window.history.state;
+        if (!currentState || currentState.page !== 'participant' || currentState.chestNo !== cleanChest) {
+          if (!currentState || currentState.page !== 'home') {
+            window.history.replaceState({ page: 'home' }, '', '/');
+          }
+          window.history.pushState({ page: 'participant', chestNo: cleanChest }, '', newUrl.toString());
+        } else {
+          window.history.replaceState({ page: 'participant', chestNo: cleanChest }, '', newUrl.toString());
+        }
       }
       return { success: true };
     } catch (err) {
@@ -507,11 +516,30 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const params = new URLSearchParams(window.location.search);
-    const urlChest = params.get('chestNo') || params.get('chestNumber') || params.get('c') || params.get('id');
-    if (urlChest) {
-      loginUnifiedByChestNo(urlChest);
-    }
+
+    const checkUrlAndLogin = () => {
+      const params = new URLSearchParams(window.location.search);
+      const urlChest = params.get('chestNo') || params.get('chestNumber') || params.get('c') || params.get('id');
+      if (urlChest) {
+        loginUnifiedByChestNo(urlChest);
+      }
+    };
+
+    checkUrlAndLogin();
+
+    // Listen for mobile back button or browser back gesture to navigate to Home Page instead of closing site
+    const handlePopState = (e: PopStateEvent) => {
+      const params = new URLSearchParams(window.location.search);
+      const urlChest = params.get('chestNo') || params.get('chestNumber') || params.get('c') || params.get('id');
+      if (urlChest) {
+        loginUnifiedByChestNo(urlChest);
+      } else {
+        setActiveModalView('none');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
   const logout = () => {
@@ -521,13 +549,12 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     // Clear URL parameter if logging out
     if (typeof window !== 'undefined') {
       const newUrl = new URL(window.location.href);
-      if (newUrl.searchParams.has('chestNo') || newUrl.searchParams.has('chestNumber') || newUrl.searchParams.has('c') || newUrl.searchParams.has('id')) {
-        newUrl.searchParams.delete('chestNo');
-        newUrl.searchParams.delete('chestNumber');
-        newUrl.searchParams.delete('c');
-        newUrl.searchParams.delete('id');
-        window.history.pushState({}, '', newUrl.toString());
-      }
+      newUrl.searchParams.delete('chestNo');
+      newUrl.searchParams.delete('chestNumber');
+      newUrl.searchParams.delete('c');
+      newUrl.searchParams.delete('id');
+      newUrl.pathname = '/';
+      window.history.pushState({ page: 'home' }, '', newUrl.toString());
     }
   };
 
