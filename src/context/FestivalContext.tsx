@@ -497,13 +497,18 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
       }
 
-      const participantResults = (results || []).filter(r => 
-        (r.participantId === found.id || (r.raw && r.raw.participantId === found.id)) ||
-        (r.codeNumber && r.codeNumber.toString().trim().toLowerCase() === cleanChest.toLowerCase()) ||
-        (r.chestNumber && r.chestNumber.toString().trim().toLowerCase() === cleanChest.toLowerCase()) ||
-        (r.participantName && found.name && r.participantName.trim().toLowerCase() === found.name.trim().toLowerCase()) ||
-        (r.raw && r.raw.teamMemberIds && Array.isArray(r.raw.teamMemberIds) && (r.raw.teamMemberIds.includes(found.id) || r.raw.teamMemberIds.includes(cleanChest)))
-      );
+      const participantResults = (results || []).filter(r => {
+        const rPartId = r.participantId || (r.raw && r.raw.participantId);
+        const rCode = (r.codeNumber || r.chestNumber || (r.raw && r.raw.codeNumber) || (r.raw && r.raw.chestNumber) || '').toString().trim().toLowerCase();
+        const rName = (r.participantName || (r.raw && r.raw.participantName) || '').toString().trim().toLowerCase();
+        
+        const isIdMatch = Boolean(rPartId && found.id && rPartId === found.id);
+        const isCodeMatch = Boolean(rCode && cleanChest && rCode === cleanChest.toLowerCase());
+        const isNameMatchFallback = Boolean(!rCode && !rPartId && rName && found.name && rName === found.name.trim().toLowerCase());
+        const isTeamMatch = Boolean(r.raw && r.raw.teamMemberIds && Array.isArray(r.raw.teamMemberIds) && (r.raw.teamMemberIds.includes(found.id) || r.raw.teamMemberIds.includes(cleanChest)));
+
+        return isIdMatch || isCodeMatch || isNameMatchFallback || isTeamMatch;
+      });
 
       if (cleanChest === '3012' && participantResults.length < 5) {
         const ajmalResults = [
