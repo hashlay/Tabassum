@@ -157,17 +157,13 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
 
     if (Array.isArray(p.schedule)) p.schedule.forEach(checkAndAddProgram);
     if (Array.isArray(p.registeredPrograms)) p.registeredPrograms.forEach(checkAndAddProgram);
-    if (Array.isArray(p.results)) {
-      p.results.forEach((r: any) => {
-        if (r.competitionId) registeredCompIds.add(r.competitionId);
-        if (r.eventName) registeredCompNames.add(r.eventName.trim().toLowerCase());
-      });
-    }
 
     const resultsList: any[] = [];
     const seenResultKeys = new Set<string>();
 
     (allResults || []).forEach((r: any) => {
+      if (!r.publishedStatus) return;
+
       const rCompId = r.competitionId || r.raw?.competitionId;
       const rCategory = (r.category || r.categoryName || r.raw?.categoryName || '').trim().toLowerCase();
       const rEventName = (r.eventName || r.program || r.raw?.program || '').trim().toLowerCase();
@@ -175,62 +171,49 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
 
       // Check category compatibility to prevent cross-category matches
       if (participantCategory && rCategory && !participantCategory.includes('general') && !rCategory.includes('general')) {
-        const sub1 = participantCategory.substring(0, 5);
-        const sub2 = rCategory.substring(0, 5);
+        const sub1 = participantCategory.substring(0, 4);
+        const sub2 = rCategory.substring(0, 4);
         if (sub1 !== sub2 && !rCategory.includes(participantCategory) && !participantCategory.includes(rCategory)) {
           return;
         }
       }
+
+      // MUST BE A REGISTERED COMPETITION FOR THIS EXACT PARTICIPANT!
+      const isCompMatch = Boolean(
+        (rCompId && registeredCompIds.has(rCompId)) ||
+        (rEventName && registeredCompNames.has(rEventName)) ||
+        (cleanEventName && registeredCompNames.has(cleanEventName))
+      );
+
+      if (!isCompMatch) return; // STRICTLY REJECT ANY UNREGISTERED COMPETITION RESULTS!
 
       // Extract result participant and team info
       const rPartId = r.participantId || r.raw?.participantId;
       const rCodeNumber = (r.codeNumber || r.chestNumber || r.raw?.codeNumber || r.raw?.chestNumber || '').toString().trim().toLowerCase();
       const rParticipantName = (r.participantName || r.raw?.participantName || '').trim().toLowerCase();
       const rTeamId = r.teamId || r.raw?.teamId;
-      const rTeamMemberIds: string[] = r.teamMemberIds || r.raw?.teamMemberIds || [];
-      const rDepartment = (r.department || r.unitName || r.raw?.unitName || '').trim().toLowerCase();
+      const rTeamMemberIds: string[] = (r.teamMemberIds || r.raw?.teamMemberIds || []).map((id: any) => id.toString().trim().toLowerCase());
+
+      const isGroupEvent = Boolean(
+        r.participationType === 'group' || r.participationType === 'Group' || r.participationType === 'Group Event' || r.raw?.participationType === 'group'
+      );
 
       // INDIVIDUAL PARTICIPANT MATCHING
-      const isIndividualMatch = Boolean(
+      const isIndividualMatch = !isGroupEvent && Boolean(
         (participantId && rPartId && participantId === rPartId) ||
         (participantCode && rCodeNumber && participantCode === rCodeNumber) ||
-        (participantName && rParticipantName && (participantName === rParticipantName || rParticipantName.includes(participantName)))
+        (participantName && rParticipantName && participantName === rParticipantName)
       );
-
-      // Must be a registered competition for this participant OR a direct individual result match
-      const isCompMatch = (
-        isIndividualMatch ||
-        (rCompId && registeredCompIds.has(rCompId)) ||
-        (rEventName && registeredCompNames.has(rEventName)) ||
-        (cleanEventName && registeredCompNames.has(cleanEventName))
-      );
-
-      if (!isCompMatch) return;
 
       // GROUP / TEAM MATCHING
-      const isGroupEvent = Boolean(
-        r.participationType === 'group' ||
-        r.participationType === 'Group' ||
-        r.participationType === 'Group Event' ||
-        r.raw?.participationType === 'group'
-      );
-
-      // Category compatibility check
-      const isCategoryMatch = !participantCategory || !rCategory || 
-        participantCategory === rCategory || 
-        rCategory.includes(participantCategory) || 
-        participantCategory.includes(rCategory);
-
       const isGroupMatch = isGroupEvent && Boolean(
         (participantId && rTeamMemberIds.includes(participantId)) ||
         (participantCode && rTeamMemberIds.includes(participantCode)) ||
-        (rTeamId && registeredTeamIds.has(rTeamId)) ||
-        (participantUnit && rDepartment && participantUnit === rDepartment && (isCompMatch || !rCompId) && isCategoryMatch)
+        (rTeamId && registeredTeamIds.has(rTeamId))
       );
 
-      // A result belongs to this participant if it's their individual result or their matching group team result
-      if (isIndividualMatch || (isGroupMatch && (isCompMatch || isCategoryMatch))) {
-        const uniqueKey = r.id || `${rCompId}_${r.rank}_${rParticipantName}_${r.program || r.eventName}`;
+      if (isIndividualMatch || isGroupMatch) {
+        const uniqueKey = r.id || `${rCompId}_${r.rank}_${rParticipantName}_${rEventName}`;
         if (!seenResultKeys.has(uniqueKey)) {
           seenResultKeys.add(uniqueKey);
           resultsList.push({
@@ -403,34 +386,54 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {p.schedule.map((sc) => (
-                <div key={sc.id} className="bg-black/50 border border-white/10 rounded-2xl p-5 flex items-center justify-between hover:border-white/20 transition-all">
-                  <div className="space-y-1">
-                    <h5 className="text-base font-bold text-white">{sc.program}</h5>
-                    <p className="text-xs text-zinc-400 font-mono uppercase tracking-wider">{sc.category} Category</p>
+              {p.schedule.map((sc) => {
+                const scCleanName = (sc.program || sc.name || sc.eventName || '').replace(/\s*\([^)]*Group[^)]*\)/gi, '').trim().toLowerCase();
+                const matchingResult = participantDeclaredResults.find(r => {
+                  const rName = (r.eventName || r.program || r.raw?.program || '').replace(/\s*\([^)]*Group[^)]*\)/gi, '').trim().toLowerCase();
+                  return (sc.id && r.competitionId === sc.id) || (scCleanName && rName === scCleanName);
+                });
+
+                let statusToRender = sc.status;
+                if (matchingResult) {
+                  const isAbsentResult = Boolean(
+                    matchingResult.isAbsent || 
+                    matchingResult.status === 'absent' || 
+                    matchingResult.raw?.isAbsent || 
+                    matchingResult.raw?.status === 'absent' || 
+                    ((!matchingResult.rank || matchingResult.rank === 0) && (matchingResult.totalMarks === 0 || matchingResult.averageMark === 0 || matchingResult.marks === 0))
+                  );
+                  statusToRender = isAbsentResult ? 'absent' : 'completed';
+                }
+
+                return (
+                  <div key={sc.id} className="bg-black/50 border border-white/10 rounded-2xl p-5 flex items-center justify-between hover:border-white/20 transition-all">
+                    <div className="space-y-1">
+                      <h5 className="text-base font-bold text-white">{sc.program}</h5>
+                      <p className="text-xs text-zinc-400 font-mono uppercase tracking-wider">{sc.category} Category</p>
+                    </div>
+                    <div>
+                      {(statusToRender === 'absent' || sc.isAbsent) ? (
+                        <span className="px-3 py-1.5 bg-rose-600 text-white border border-rose-500 text-[10px] font-extrabold uppercase tracking-widest rounded-full shadow-sm">
+                          ABSENT
+                        </span>
+                      ) : statusToRender === 'live' ? (
+                        <span style={{ backgroundColor: 'var(--color-primary-accent)' }} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-white text-[10px] font-bold uppercase tracking-widest rounded-full animate-pulse shadow-md">
+                          <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+                          LIVE NOW
+                        </span>
+                      ) : (statusToRender === 'completed' || statusToRender === 'done' || statusToRender === 'finished') ? (
+                        <span className="px-3 py-1.5 bg-emerald-500 text-slate-950 border border-emerald-400 text-[10px] font-extrabold uppercase tracking-widest rounded-full shadow-sm">
+                          Completed
+                        </span>
+                      ) : (
+                        <span className="px-3 py-1.5 bg-white/10 text-zinc-200 border border-white/20 text-[10px] font-mono font-bold uppercase tracking-widest rounded-full">
+                          {statusToRender ? String(statusToRender).toUpperCase() : 'UPCOMING'}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <div>
-                    {(sc.status === 'absent' || sc.isAbsent) ? (
-                      <span className="px-3 py-1.5 bg-rose-600 text-white border border-rose-500 text-[10px] font-extrabold uppercase tracking-widest rounded-full shadow-sm">
-                        ABSENT
-                      </span>
-                    ) : sc.status === 'live' ? (
-                      <span style={{ backgroundColor: 'var(--color-primary-accent)' }} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-white text-[10px] font-bold uppercase tracking-widest rounded-full animate-pulse shadow-md">
-                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
-                        LIVE NOW
-                      </span>
-                    ) : (sc.status === 'completed' || sc.status === 'done' || sc.status === 'finished') ? (
-                      <span className="px-3 py-1.5 bg-emerald-500 text-slate-950 border border-emerald-400 text-[10px] font-extrabold uppercase tracking-widest rounded-full shadow-sm">
-                        Completed
-                      </span>
-                    ) : (
-                      <span className="px-3 py-1.5 bg-white/10 text-zinc-200 border border-white/20 text-[10px] font-mono font-bold uppercase tracking-widest rounded-full">
-                        {sc.status ? String(sc.status).toUpperCase() : 'REGISTERED'}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
