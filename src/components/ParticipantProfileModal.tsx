@@ -158,10 +158,11 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
     if (Array.isArray(p.schedule)) p.schedule.forEach(checkAndAddProgram);
     if (Array.isArray(p.registeredPrograms)) p.registeredPrograms.forEach(checkAndAddProgram);
 
+    // Prioritize allResults (real API data) before local p.results (fallback mock data)
     const candidateSourceResults = [
+      ...(Array.isArray(allResults) ? allResults : []),
       ...(Array.isArray(p.results) ? p.results : []),
-      ...(Array.isArray((p as any).raw?.results) ? (p as any).raw.results : []),
-      ...(Array.isArray(allResults) ? allResults : [])
+      ...(Array.isArray((p as any).raw?.results) ? (p as any).raw.results : [])
     ];
 
     const resultsList: any[] = [];
@@ -224,7 +225,8 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
       const isDirectParticipantResult = Array.isArray(p.results) && p.results.some(pr => pr === r || (pr.id && r.id && pr.id === r.id));
 
       if (isIndividualMatch || isGroupMatch || isDirectParticipantResult) {
-        const uniqueKey = r.id || `${rCompId}_${r.rank}_${rParticipantName}_${rEventName}`;
+        // Deduplicate strictly by competition to prevent the same participant from having multiple results for the same event
+        const uniqueKey = cleanEventName || rEventName || rCompId || r.id;
         if (!seenResultKeys.has(uniqueKey)) {
           seenResultKeys.add(uniqueKey);
           resultsList.push({
