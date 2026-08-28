@@ -452,7 +452,7 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
       let rawScheduleList = validProgramsFilter(found.registeredPrograms || found.schedule || []);
 
-      if (cleanChest === '3012' || rawScheduleList.length < 5) {
+      if (cleanChest === '3012' || cleanChest === '3016' || rawScheduleList.length < 5) {
         if (cleanChest === '3012') {
           found.name = 'Muhammad Ajmal';
           found.fullName = 'Muhammad Ajmal';
@@ -467,6 +467,21 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             { id: 'prog_3012_3', program: 'Translation (arabic To Kannada)', category: 'Senior', stage: 'Off Stage', time: '01:30 PM', status: 'completed', type: 'individual' },
             { id: 'prog_3012_4', program: 'Nasheeda (arabic)', category: 'Senior', stage: 'Main Stage', time: '03:00 PM', status: 'completed', type: 'group' },
             { id: 'prog_3012_5', program: 'Burda Sharif', category: 'Senior', stage: 'Main Stage', time: '05:00 PM', status: 'completed', type: 'group' }
+          ];
+        } else if (cleanChest === '3016') {
+          found.name = 'Muhammad Tashmir';
+          found.fullName = 'Muhammad Tashmir';
+          found.department = 'Muchila';
+          found.unitName = 'Muchila';
+          found.category = 'Senior';
+          found.categoryName = 'Senior';
+          found.dob = '2026-08-28';
+          rawScheduleList = [
+            { id: 'prog_3016_1', program: 'Poetry Recitation (english)', category: 'Senior', stage: 'Main Stage', time: '09:00 AM', status: 'completed', type: 'individual' },
+            { id: 'prog_3016_2', program: 'Essay Writing (english)', category: 'Senior', stage: 'Off Stage', time: '10:30 AM', status: 'absent', isAbsent: true, type: 'individual' },
+            { id: 'prog_3016_3', program: 'Story Writing (kannada)', category: 'Senior', stage: 'Off Stage', time: '01:30 PM', status: 'completed', type: 'individual' },
+            { id: 'prog_3016_4', program: 'Nasheeda (arabic)', category: 'Senior', stage: 'Main Stage', time: '03:00 PM', status: 'completed', type: 'group' },
+            { id: 'prog_3016_5', program: 'Burda Sharif', category: 'Senior', stage: 'Main Stage', time: '05:00 PM', status: 'completed', type: 'group' }
           ];
         } else if (rawScheduleList.length === 0) {
           const demo = DEMO_PARTICIPANTS.find(p => p.codeNumber.toLowerCase() === cleanChest.toLowerCase());
@@ -498,6 +513,16 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         ];
 
         ajmalResults.forEach(r => {
+          if (!participantResults.some(existing => (existing.eventName || existing.program) === r.program)) {
+            participantResults.push(r);
+          }
+        });
+      } else if (cleanChest === '3016') {
+        const tashmirResults = [
+          { id: 'res_3016_essay', competitionId: 'comp_essay', program: 'Essay Writing (english)', eventName: 'Essay Writing (english)', category: 'Senior', rank: undefined, isAbsent: true, status: 'absent', grade: 'N/A', totalMarks: 0, points: 0, publishedStatus: true, codeNumber: '3016', participantName: 'Muhammad Tashmir', teamName: 'Muchila' }
+        ];
+
+        tashmirResults.forEach(r => {
           if (!participantResults.some(existing => (existing.eventName || existing.program) === r.program)) {
             participantResults.push(r);
           }

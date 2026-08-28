@@ -410,7 +410,11 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                     <p className="text-xs text-zinc-400 font-mono uppercase tracking-wider">{sc.category} Category</p>
                   </div>
                   <div>
-                    {sc.status === 'live' ? (
+                    {(sc.status === 'absent' || sc.isAbsent) ? (
+                      <span className="px-3 py-1.5 bg-rose-600 text-white border border-rose-500 text-[10px] font-extrabold uppercase tracking-widest rounded-full shadow-sm">
+                        ABSENT
+                      </span>
+                    ) : sc.status === 'live' ? (
                       <span style={{ backgroundColor: 'var(--color-primary-accent)' }} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-white text-[10px] font-bold uppercase tracking-widest rounded-full animate-pulse shadow-md">
                         <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
                         LIVE NOW
@@ -448,8 +452,19 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
             <div className="space-y-4">
               {participantDeclaredResults.map((res) => {
                 const rawMarks = res.averageMark ?? (res.raw ? res.raw.averageMark : undefined) ?? res.totalMark ?? res.marks ?? (res.raw ? (res.raw.totalMark ?? res.raw.judge1Mark) : undefined);
+                
+                const isAbsentResult = Boolean(
+                  res.isAbsent || 
+                  res.status === 'absent' || 
+                  res.raw?.isAbsent || 
+                  res.raw?.status === 'absent' || 
+                  ((!res.rank || res.rank === 0) && (rawMarks === 0 || rawMarks === '0' || rawMarks === undefined))
+                );
+
                 let computedGrade = res.grade;
-                if (rawMarks !== undefined && rawMarks !== null) {
+                if (isAbsentResult) {
+                  computedGrade = 'N/A';
+                } else if (rawMarks !== undefined && rawMarks !== null) {
                   const m = Number(rawMarks);
                   if (m >= 90) computedGrade = 'A+';
                   else if (m >= 80) computedGrade = 'A';
@@ -467,12 +482,13 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                   <div key={res.id || `res-${Math.random()}`} className="bg-[#18181B] border border-white/10 rounded-3xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 transition-all">
                     <div className="flex items-center gap-4">
                       <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-2xl shrink-0 shadow-md ${
+                        isAbsentResult ? 'bg-rose-600 text-white border-2 border-rose-500 shadow-rose-900/30' :
                         res.rank === 1 ? 'bg-amber-400 text-slate-950 border-2 border-amber-300 shadow-amber-500/20' :
                         res.rank === 2 ? 'bg-slate-200 text-slate-950 border-2 border-slate-300 shadow-slate-400/20' :
                         res.rank === 3 ? 'bg-amber-700 text-white border-2 border-amber-600 shadow-amber-800/20' :
                         'bg-emerald-600 text-white border-2 border-emerald-500'
                       }`}>
-                        {res.rank ? `#${res.rank}` : 'Pass'}
+                        {isAbsentResult ? 'AB' : (res.rank ? `#${res.rank}` : 'Pass')}
                       </div>
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
@@ -484,7 +500,12 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                           )}
                         </div>
                         <p className="text-sm text-zinc-400 font-mono">
-                          Grade: <strong className="text-emerald-400">{computedGrade || 'A'}</strong>{rawMarks !== undefined ? <> • Total Marks: <strong className="text-amber-400">{rawMarks} marks</strong></> : null}
+                          Grade: <strong className={isAbsentResult ? "text-rose-400 font-bold" : "text-emerald-400"}>{computedGrade || 'A'}</strong>
+                          {isAbsentResult ? (
+                            <> • Total Marks: <strong className="text-rose-400 font-bold">N/A</strong></>
+                          ) : rawMarks !== undefined ? (
+                            <> • Total Marks: <strong className="text-amber-400">{rawMarks} marks</strong></>
+                          ) : null}
                         </p>
                       </div>
                     </div>
