@@ -227,7 +227,13 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
     return resultsList;
   }, [allResults, p]);
 
-  // Filter posters where this participant or their group team won Rank 1, 2, or 3 in THEIR exact category & competition
+  // Dynamically compute published certificates directly from candidate's declared results (Rank 1, 2, 3)
+  const participantCertificates = useMemo(() => {
+    if (!p) return [];
+    return participantDeclaredResults.filter(r => r.rank >= 1 && r.rank <= 3);
+  }, [participantDeclaredResults, p]);
+
+  // Dynamically compute winner posters directly from candidate's declared results (Rank 1, 2, 3)
   const participantPosters = useMemo(() => {
     if (!p) return [];
 
@@ -235,50 +241,64 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
       r => r.rank === 1 || r.rank === 2 || r.rank === 3
     );
 
-    if (wonRanks.length === 0) return [];
+    const postersList: any[] = [];
 
-    const wonCompIds = new Set<string>();
-    const wonCompKeys = new Set<string>();
-
-    wonRanks.forEach(r => {
+    wonRanks.forEach((r, idx) => {
       const cId = r.competitionId || r.raw?.competitionId;
-      if (cId) wonCompIds.add(cId);
+      const ev = (r.eventName || r.program || r.raw?.program || '').trim();
+      const cat = (r.category || r.categoryName || r.raw?.categoryName || p.category || 'Senior').trim();
 
-      const cat = (r.category || r.categoryName || r.raw?.categoryName || '').trim().toLowerCase();
-      const ev = (r.eventName || r.program || r.raw?.program || '').trim().toLowerCase();
-      if (ev && cat) {
-        wonCompKeys.add(`${ev}__${cat}`);
+      const matchedAdminPoster = (competitionPosters || []).find(poster => {
+        const firstRes = poster.results?.[0];
+        if (!firstRes) return false;
+        const posterCompId = firstRes.competitionId || firstRes.raw?.competitionId;
+        if (posterCompId && cId && posterCompId === cId) return true;
+        const posterCat = (poster.category || firstRes.category || '').trim().toLowerCase();
+        const posterEv = (poster.eventName || firstRes.eventName || '').trim().toLowerCase();
+        return posterEv === ev.toLowerCase() && posterCat === cat.toLowerCase();
+      });
+
+      if (matchedAdminPoster) {
+        postersList.push(matchedAdminPoster);
+      } else {
+        postersList.push({
+          id: `poster_${r.id || idx}_${cId || idx}`,
+          eventName: ev,
+          category: cat,
+          compIndex: idx + 1,
+          results: [r]
+        });
       }
     });
 
-    return competitionPosters.filter(poster => {
-      const firstRes = poster.results?.[0];
-      if (!firstRes) return false;
-
-      const posterCompId = firstRes.competitionId || firstRes.raw?.competitionId;
-      if (posterCompId && wonCompIds.has(posterCompId)) return true;
-
-      const posterCat = (poster.category || firstRes.category || '').trim().toLowerCase();
-      const posterEv = (poster.eventName || firstRes.eventName || '').trim().toLowerCase();
-
-      if (posterEv && posterCat && wonCompKeys.has(`${posterEv}__${posterCat}`)) {
-        return true;
-      }
-
-      return false;
-    });
+    return postersList;
   }, [competitionPosters, participantDeclaredResults, p]);
 
-  // Dynamically compute published certificates directly from candidate's declared results (Only Rank 1, 2, 3 where published)
-  const participantCertificates = useMemo(() => {
-    if (!p) return [];
-
-    return participantDeclaredResults.filter(r => {
-      const isPublished = r.certificatePublished || r.raw?.certificatePublished;
-      const isTopRank = r.rank >= 1 && r.rank <= 3;
-      return isPublished && isTopRank;
-    });
-  }, [participantDeclaredResults, p]);
+  if (!p || p.isNotFound || !p.name || (p.name.startsWith('Participant ') && (!p.schedule || p.schedule.length === 0))) {
+    return (
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0D0D0F] p-6 text-center animate-in fade-in duration-200">
+        <div className="max-w-md w-full bg-[#18181B] border border-white/10 rounded-3xl p-8 space-y-6 shadow-2xl">
+          <div className="w-16 h-16 rounded-full bg-rose-500/10 border border-rose-500/30 flex items-center justify-center mx-auto text-rose-400">
+            <User className="w-8 h-8" />
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-2xl font-black text-white tracking-wide">No Participant Found</h3>
+            <p className="text-sm text-zinc-400 font-mono">
+              No participant is registered with Chest Number <strong className="text-rose-400">#{p?.codeNumber || ''}</strong> in the festival database.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={handleClosePortal}
+            style={{ backgroundColor: 'var(--color-primary-accent)', color: '#ffffff' }}
+            className="w-full py-3 px-6 text-sm font-mono font-bold rounded-xl hover:opacity-90 transition-all cursor-pointer shadow-lg"
+          >
+            ← Back to Festival
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-[#0D0D0F] animate-in fade-in duration-200 overflow-y-auto">

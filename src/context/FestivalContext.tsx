@@ -422,22 +422,22 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           if (demo) {
             found = demo;
           } else {
-            // Dynamic fallback for any participant chest number accessed via URL
             found = {
-              id: `part_${cleanChest}`,
+              id: `not_found_${cleanChest}`,
               codeNumber: cleanChest,
               chestNumber: cleanChest,
-              fullName: `Participant ${cleanChest}`,
-              name: `Participant ${cleanChest}`,
-              unitName: 'Ninthikal Team',
-              department: 'Ninthikal Team',
-              categoryName: 'Senior',
-              category: 'Senior',
+              isNotFound: true,
+              fullName: '',
+              name: '',
+              unitName: '',
+              department: '',
+              categoryName: '',
+              category: '',
               dob: '',
               avatarUrl: NO_DP_AVATAR,
-              registeredPrograms: [
-                { id: `prog_${cleanChest}_1`, program: 'General Competition', category: 'Senior', stage: 'Main Stage', time: '09:00 AM', status: 'completed' }
-              ]
+              registeredPrograms: [],
+              schedule: [],
+              results: []
             };
           }
         }
