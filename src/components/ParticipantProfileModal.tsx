@@ -158,11 +158,19 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
     if (Array.isArray(p.schedule)) p.schedule.forEach(checkAndAddProgram);
     if (Array.isArray(p.registeredPrograms)) p.registeredPrograms.forEach(checkAndAddProgram);
 
+    const candidateSourceResults = [
+      ...(Array.isArray(p.results) ? p.results : []),
+      ...(Array.isArray((p as any).raw?.results) ? (p as any).raw.results : []),
+      ...(Array.isArray(allResults) ? allResults : [])
+    ];
+
     const resultsList: any[] = [];
     const seenResultKeys = new Set<string>();
 
-    (allResults || []).forEach((r: any) => {
-      if (!r.publishedStatus) return;
+    candidateSourceResults.forEach((r: any) => {
+      if (!r) return;
+      const isPublished = r.publishedStatus !== false && r.isPublished !== false && r.status !== 'draft';
+      if (!isPublished) return;
 
       const rCompId = r.competitionId || r.raw?.competitionId;
       const rCategory = (r.category || r.categoryName || r.raw?.categoryName || '').trim().toLowerCase();
@@ -202,17 +210,22 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
       const isIndividualMatch = !isGroupEvent && Boolean(
         (participantId && rPartId && participantId === rPartId) ||
         (participantCode && rCodeNumber && participantCode === rCodeNumber) ||
-        (participantName && rParticipantName && participantName === rParticipantName)
+        (participantName && rParticipantName && participantName === rParticipantName) ||
+        (Array.isArray(p.results) && p.results.includes(r))
       );
 
       // GROUP / TEAM MATCHING
       const isGroupMatch = isGroupEvent && Boolean(
         (participantId && rTeamMemberIds.includes(participantId)) ||
         (participantCode && rTeamMemberIds.includes(participantCode)) ||
-        (rTeamId && registeredTeamIds.has(rTeamId))
+        (rTeamId && registeredTeamIds.has(rTeamId)) ||
+        (Array.isArray(p.results) && p.results.includes(r))
       );
 
-      if (isIndividualMatch || isGroupMatch) {
+      // Direct match if r is in p.results
+      const isDirectParticipantResult = Array.isArray(p.results) && p.results.some(pr => pr === r || pr.id === r.id || (pr.program || pr.eventName) === (r.program || r.eventName));
+
+      if (isIndividualMatch || isGroupMatch || isDirectParticipantResult) {
         const uniqueKey = r.id || `${rCompId}_${r.rank}_${rParticipantName}_${rEventName}`;
         if (!seenResultKeys.has(uniqueKey)) {
           seenResultKeys.add(uniqueKey);
