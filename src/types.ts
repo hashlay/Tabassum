@@ -460,6 +460,7 @@ export interface ParticipantScheduleItem {
 }
 
 export interface ParticipantProfile {
+  id?: string;
   codeNumber: string;
   password: string;
   name: string;
@@ -471,6 +472,8 @@ export interface ParticipantProfile {
   phone?: string;
   email?: string;
   institution?: string;
+  teamId?: string;
+  registeredPrograms?: any[];
   isCheckedIn?: boolean;
   checkInTime?: string;
   schedule: ParticipantScheduleItem[];

@@ -210,11 +210,11 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
       const isGroupMatch = isGroupEvent && Boolean(
         (participantId && rTeamMemberIds.includes(participantId)) ||
         (rTeamId && registeredTeamIds.has(rTeamId)) ||
-        (participantUnit && rDepartment && participantUnit === rDepartment && isCompMatch && isCategoryMatch)
+        (participantUnit && rDepartment && participantUnit === rDepartment && (isCompMatch || !rCompId) && isCategoryMatch)
       );
 
-      // A result ONLY belongs to this participant if it's their individual result or their group team result
-      if (isIndividualMatch || isGroupMatch) {
+      // A result belongs to this participant if it's their individual result or their matching group team result
+      if (isIndividualMatch || (isGroupMatch && (isCompMatch || isCategoryMatch))) {
         const uniqueKey = r.id || `${rCompId}_${r.rank}_${rParticipantName}`;
         if (!seenResultKeys.has(uniqueKey)) {
           seenResultKeys.add(uniqueKey);

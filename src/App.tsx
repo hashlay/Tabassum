@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { FestivalProvider, useFestival } from './context/FestivalContext';
-import ErrorBoundary from './components/ErrorBoundary';
 import { Category } from './types';
 
 import { Header } from './components/Header';
