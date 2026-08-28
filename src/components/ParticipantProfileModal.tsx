@@ -211,7 +211,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
       const isIndividualMatch = !isGroupEvent && Boolean(
         (participantId && rPartId && participantId === rPartId) ||
         (participantCode && rCodeNumber && participantCode === rCodeNumber) ||
-        (participantName && rParticipantName && participantName === rParticipantName && participantName !== '')
+        (!rCodeNumber && !rPartId && participantName && rParticipantName && participantName === rParticipantName && participantName !== '')
       );
 
       // GROUP / TEAM MATCHING
