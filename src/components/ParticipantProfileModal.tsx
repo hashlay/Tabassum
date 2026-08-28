@@ -182,15 +182,6 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
         }
       }
 
-      // Must be a registered competition for this participant
-      const isCompMatch = (
-        (rCompId && registeredCompIds.has(rCompId)) ||
-        (rEventName && registeredCompNames.has(rEventName)) ||
-        (cleanEventName && registeredCompNames.has(cleanEventName))
-      );
-
-      if (!isCompMatch) return;
-
       // Extract result participant and team info
       const rPartId = r.participantId || r.raw?.participantId;
       const rCodeNumber = (r.codeNumber || r.chestNumber || r.raw?.codeNumber || r.raw?.chestNumber || '').toString().trim().toLowerCase();
@@ -205,6 +196,16 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
         (participantCode && rCodeNumber && participantCode === rCodeNumber) ||
         (participantName && rParticipantName && (participantName === rParticipantName || rParticipantName.includes(participantName)))
       );
+
+      // Must be a registered competition for this participant OR a direct individual result match
+      const isCompMatch = (
+        isIndividualMatch ||
+        (rCompId && registeredCompIds.has(rCompId)) ||
+        (rEventName && registeredCompNames.has(rEventName)) ||
+        (cleanEventName && registeredCompNames.has(cleanEventName))
+      );
+
+      if (!isCompMatch) return;
 
       // GROUP / TEAM MATCHING
       const isGroupEvent = Boolean(
@@ -222,13 +223,14 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
 
       const isGroupMatch = isGroupEvent && Boolean(
         (participantId && rTeamMemberIds.includes(participantId)) ||
+        (participantCode && rTeamMemberIds.includes(participantCode)) ||
         (rTeamId && registeredTeamIds.has(rTeamId)) ||
         (participantUnit && rDepartment && participantUnit === rDepartment && (isCompMatch || !rCompId) && isCategoryMatch)
       );
 
       // A result belongs to this participant if it's their individual result or their matching group team result
       if (isIndividualMatch || (isGroupMatch && (isCompMatch || isCategoryMatch))) {
-        const uniqueKey = r.id || `${rCompId}_${r.rank}_${rParticipantName}`;
+        const uniqueKey = r.id || `${rCompId}_${r.rank}_${rParticipantName}_${r.program || r.eventName}`;
         if (!seenResultKeys.has(uniqueKey)) {
           seenResultKeys.add(uniqueKey);
           resultsList.push({

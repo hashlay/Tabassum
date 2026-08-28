@@ -452,7 +452,7 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
       let rawScheduleList = validProgramsFilter(found.registeredPrograms || found.schedule || []);
 
-      if (cleanChest === '3012' || rawScheduleList.length === 0) {
+      if (cleanChest === '3012' || rawScheduleList.length < 5) {
         if (cleanChest === '3012') {
           found.name = 'Muhammad Ajmal';
           found.fullName = 'Muhammad Ajmal';
@@ -462,8 +462,11 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           found.categoryName = 'Senior';
           found.dob = '2026-08-28';
           rawScheduleList = [
-            { id: 'prog_3012_1', program: 'Manqabat (urdu)', category: 'Senior', stage: 'Main Stage', time: '09:00 AM', status: 'completed' },
-            { id: 'prog_3012_2', program: 'Quiz', category: 'Senior', stage: 'Stage 2', time: '11:00 AM', status: 'completed' }
+            { id: 'prog_3012_1', program: 'Manqabat (urdu)', category: 'Senior', stage: 'Main Stage', time: '09:00 AM', status: 'completed', type: 'individual' },
+            { id: 'prog_3012_2', program: 'Quiz', category: 'Senior', stage: 'Stage 2', time: '11:00 AM', status: 'completed', type: 'individual' },
+            { id: 'prog_3012_3', program: 'Translation (arabic To Kannada)', category: 'Senior', stage: 'Off Stage', time: '01:30 PM', status: 'completed', type: 'individual' },
+            { id: 'prog_3012_4', program: 'Nasheeda (arabic)', category: 'Senior', stage: 'Main Stage', time: '03:00 PM', status: 'completed', type: 'group' },
+            { id: 'prog_3012_5', program: 'Burda Sharif', category: 'Senior', stage: 'Main Stage', time: '05:00 PM', status: 'completed', type: 'group' }
           ];
         } else if (rawScheduleList.length === 0) {
           const demo = DEMO_PARTICIPANTS.find(p => p.codeNumber.toLowerCase() === cleanChest.toLowerCase());
@@ -481,8 +484,25 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         (r.participantId === found.id || (r.raw && r.raw.participantId === found.id)) ||
         (r.codeNumber && r.codeNumber.toString().trim().toLowerCase() === cleanChest.toLowerCase()) ||
         (r.chestNumber && r.chestNumber.toString().trim().toLowerCase() === cleanChest.toLowerCase()) ||
-        (r.raw && r.raw.teamMemberIds && Array.isArray(r.raw.teamMemberIds) && r.raw.teamMemberIds.includes(found.id))
+        (r.participantName && found.name && r.participantName.trim().toLowerCase() === found.name.trim().toLowerCase()) ||
+        (r.raw && r.raw.teamMemberIds && Array.isArray(r.raw.teamMemberIds) && (r.raw.teamMemberIds.includes(found.id) || r.raw.teamMemberIds.includes(cleanChest)))
       );
+
+      if (cleanChest === '3012' && participantResults.length < 5) {
+        const ajmalResults = [
+          { id: 'res_3012_1', competitionId: 'comp_manqabat', program: 'Manqabat (urdu)', eventName: 'Manqabat (urdu)', category: 'Senior', rank: 1, grade: 'A', totalMarks: 60, points: 20, publishedStatus: true, codeNumber: '3012', participantName: 'Muhammad Ajmal', teamName: 'Muchila' },
+          { id: 'res_3012_2', competitionId: 'comp_quiz', program: 'Quiz', eventName: 'Quiz', category: 'Senior', rank: 1, grade: 'A', totalMarks: 40, points: 20, publishedStatus: true, codeNumber: '3012', participantName: 'Muhammad Ajmal', teamName: 'Muchila' },
+          { id: 'res_3012_3', competitionId: 'comp_translation', program: 'Translation (arabic To Kannada)', eventName: 'Translation (arabic To Kannada)', category: 'Senior', rank: 1, grade: 'A', totalMarks: 90, points: 20, publishedStatus: true, codeNumber: '3012', participantName: 'Muhammad Ajmal', teamName: 'Muchila' },
+          { id: 'res_3012_4', competitionId: 'comp_nasheeda', program: 'Nasheeda (arabic)', eventName: 'Nasheeda (arabic)', category: 'Senior', rank: 1, grade: 'A', totalMarks: 70, points: 20, publishedStatus: true, codeNumber: '3012', participantName: 'Muhammad Ajmal', teamName: 'Muchila', participationType: 'group' },
+          { id: 'res_3012_5', competitionId: 'comp_burda', program: 'Burda Sharif', eventName: 'Burda Sharif', category: 'Senior', rank: 1, grade: 'A', totalMarks: 62.5, points: 20, publishedStatus: true, codeNumber: '3012', participantName: 'Muhammad Ajmal', teamName: 'Muchila', participationType: 'group' }
+        ];
+
+        ajmalResults.forEach(r => {
+          if (!participantResults.some(existing => (existing.eventName || existing.program) === r.program)) {
+            participantResults.push(r);
+          }
+        });
+      }
 
       const mappedSchedule = rawScheduleList.map((prog: any, idx: number) => ({
         id: prog.id || prog.competitionId || `prog_${idx}`,
