@@ -210,20 +210,18 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
       const isIndividualMatch = !isGroupEvent && Boolean(
         (participantId && rPartId && participantId === rPartId) ||
         (participantCode && rCodeNumber && participantCode === rCodeNumber) ||
-        (participantName && rParticipantName && participantName === rParticipantName) ||
-        (Array.isArray(p.results) && p.results.includes(r))
+        (participantName && rParticipantName && participantName === rParticipantName && participantName !== '')
       );
 
       // GROUP / TEAM MATCHING
       const isGroupMatch = isGroupEvent && Boolean(
         (participantId && rTeamMemberIds.includes(participantId)) ||
         (participantCode && rTeamMemberIds.includes(participantCode)) ||
-        (rTeamId && registeredTeamIds.has(rTeamId)) ||
-        (Array.isArray(p.results) && p.results.includes(r))
+        (rTeamId && registeredTeamIds.has(rTeamId))
       );
 
-      // Direct match if r is in p.results
-      const isDirectParticipantResult = Array.isArray(p.results) && p.results.some(pr => pr === r || pr.id === r.id || (pr.program || pr.eventName) === (r.program || r.eventName));
+      // Direct match if r is in p.results (STRICT MATCH: must be exact same object or exact same ID)
+      const isDirectParticipantResult = Array.isArray(p.results) && p.results.some(pr => pr === r || (pr.id && r.id && pr.id === r.id));
 
       if (isIndividualMatch || isGroupMatch || isDirectParticipantResult) {
         const uniqueKey = r.id || `${rCompId}_${r.rank}_${rParticipantName}_${rEventName}`;
@@ -243,7 +241,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
   // Dynamically compute published certificates directly from candidate's declared results (Rank 1, 2, 3)
   const participantCertificates = useMemo(() => {
     if (!p) return [];
-    return participantDeclaredResults.filter(r => r.rank >= 1 && r.rank <= 3);
+    return participantDeclaredResults.filter(r => r.rank >= 1 && r.rank <= 3 && r.certificatePublished === true);
   }, [participantDeclaredResults, p]);
 
   // Dynamically compute winner posters directly from candidate's declared results (Rank 1, 2, 3)
