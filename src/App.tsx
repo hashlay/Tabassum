@@ -127,9 +127,26 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
       .catch(err => console.error('Failed to load CMS data:', err));
   }, []);
 
+  // Push history state whenever a modal opens so back gestures close the modal & return home
+  React.useEffect(() => {
+    if (activeModalView !== 'none' || isLoginModalOpen) {
+      window.history.pushState({ modalOpen: true }, '', window.location.href);
+    }
+  }, [activeModalView, isLoginModalOpen]);
+
   // Listen for browser back button & mobile swipe back gestures to return to home section
   React.useEffect(() => {
     const handlePopState = () => {
+      let closedModal = false;
+      if (activeModalView !== 'none') {
+        setActiveModalView('none');
+        closedModal = true;
+      }
+      if (isLoginModalOpen) {
+        setIsLoginModalOpen(false);
+        closedModal = true;
+      }
+
       const path = window.location.pathname.toLowerCase();
       if (path.includes('gallery')) {
         setPageView('gallery');
@@ -142,15 +159,12 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
       } else {
         setPageView('home');
         setActiveSection('hero');
-        if (activeModalView !== 'none') {
-          setActiveModalView('none');
-        }
       }
     };
 
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, [activeModalView, setActiveModalView]);
+  }, [activeModalView, setActiveModalView, isLoginModalOpen, setIsLoginModalOpen]);
 
   const handleNavigate = (sectionId: string, filter?: { category?: Category; eventName?: string }) => {
     if (filter) {

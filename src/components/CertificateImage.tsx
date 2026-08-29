@@ -137,16 +137,50 @@ export const CertificateImage: React.FC<CertificateImageProps> = ({
           ctx.drawImage(imageElement, 0, 0, imageElement.width, imageElement.height);
 
           const centerX = imageElement.width / 2;
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'bottom';
-          
-          ctx.fillStyle = nameColor;
-          ctx.font = `bold ${nameSize}px ${nameFont}`;
-          ctx.fillText((displayName || 'PARTICIPANT NAME').toUpperCase(), centerX + nameX, nameY);
 
-          ctx.fillStyle = compColor;
-          ctx.font = `bold ${compSize}px ${compFont}`;
-          ctx.fillText((displayComp || 'COMPETITION').toUpperCase(), centerX + compX, compY);
+          const fillMultiLinePublicText = (
+            rawText: string,
+            x: number,
+            y: number,
+            fontSize: number,
+            fontStyle: string,
+            color: string
+          ) => {
+            ctx.fillStyle = color;
+            ctx.font = fontStyle;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+
+            const textStr = (rawText || '').toUpperCase();
+            const lines = textStr.split('\n').filter(Boolean);
+            if (lines.length <= 1) {
+              ctx.fillText(lines[0] || '', x, y);
+              return;
+            }
+            const lineGap = fontSize * 1.15;
+            const startY = y - ((lines.length - 1) * lineGap);
+            lines.forEach((line, i) => {
+              ctx.fillText(line, x, startY + i * lineGap);
+            });
+          };
+
+          fillMultiLinePublicText(
+            displayName || 'PARTICIPANT NAME',
+            centerX + nameX,
+            nameY,
+            nameSize,
+            `bold ${nameSize}px ${nameFont}`,
+            nameColor
+          );
+
+          fillMultiLinePublicText(
+            displayComp || 'COMPETITION',
+            centerX + compX,
+            compY,
+            compSize,
+            `bold ${compSize}px ${compFont}`,
+            compColor
+          );
 
           const url = canvas.toDataURL('image/jpeg', 0.95);
           if (active) {
