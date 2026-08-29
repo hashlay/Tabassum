@@ -288,32 +288,39 @@ export const renderPosterToCanvas = async (
     ctx.textAlign = 'left';
     ctx.font = `900 ${c.compNameSize ?? 52}px ${c.compNameFont || c.fontFamily || 'sans-serif'}`;
     ctx.fillStyle = c.compNameColor || '#ffffff';
-    const rawComp = activeComp.name;
+    const rawComp = c.compNameOverride !== undefined && c.compNameOverride !== '' ? c.compNameOverride : activeComp.name;
     const compText = c.compNameUppercase ? rawComp.toUpperCase() : rawComp;
-    const compMetrics = ctx.measureText(compText);
+    const compLines = compText.split('\n').filter(Boolean);
+    const compGap = (c.compNameSize ?? 52) * 1.15;
     const compX = c.compNameX ?? 540;
     const compY = c.compNameY ?? 330;
-    ctx.fillText(compText, compX, compY);
-    addRegion('compName', compX - 10, compY - (c.compNameSize ?? 52) - 5, compMetrics.width + 20, (c.compNameSize ?? 52) + 20);
-
-
+    let maxCompW = 0;
+    compLines.forEach((line: string, i: number) => {
+      ctx.fillText(line, compX, compY + i * compGap);
+      const w = ctx.measureText(line).width;
+      if (w > maxCompW) maxCompW = w;
+    });
+    addRegion('compName', compX - 10, compY - (c.compNameSize ?? 52) - 5, maxCompW + 20, (compLines.length * compGap) + 10);
 
     // Draw each rank with per-rank positions
     compResults.forEach((res) => {
       const rank = res.rank || 1;
       if (rank > 3) return;
 
-      let winnerName = 'Participant Name';
-      let winnerUnit = 'Unit Name';
+      const overrideName = c[`rank${rank}NameOverride`];
+      const rawWinnerName = overrideName !== undefined && overrideName !== '' ? overrideName : (res.participantName || 'Participant Name');
+      const winnerName = c.winnerUppercase === false && !c.uppercaseNames ? rawWinnerName : rawWinnerName.toUpperCase();
 
-      winnerName = c.winnerUppercase === false && !c.uppercaseNames ? res.participantName : res.participantName.toUpperCase();
-      winnerUnit = res.department;
+      const overrideUnit = c[`rank${rank}UnitOverride`];
+      const rawWinnerUnit = overrideUnit !== undefined && overrideUnit !== '' ? overrideUnit : (res.department || res.unitName || 'Unit Name');
+      const winnerUnit = c.unitUppercase !== false ? rawWinnerUnit.toUpperCase() : rawWinnerUnit;
+
       const bx = c[`rank${rank}BadgeX`] ?? 140;
       const by = c[`rank${rank}BadgeY`] ?? (460 + (rank - 1) * 180);
       const nx = c[`rank${rank}NameX`] ?? 260;
       const ny = c[`rank${rank}NameY`] ?? (448 + (rank - 1) * 180);
-      const ux = c[`rank${rank}UnitX`] ?? 260;
-      const uy = c[`rank${rank}UnitY`] ?? (483 + (rank - 1) * 180);
+      const ux = c[`rank${rank}UnitX`];
+      const uy = c[`rank${rank}UnitY`];
 
       const rColor = rank === 1 ? c.rank1Color : rank === 2 ? c.rank2Color : c.rank3Color;
       const rankText = rank === 1 ? c.rank1Text : rank === 2 ? c.rank2Text : c.rank3Text;
@@ -340,21 +347,35 @@ export const renderPosterToCanvas = async (
       ctx.fillText(rankText, bx, by);
       addRegion(`rank${rank}Badge`, bx - textWidth / 2 - 25, by - 42, textWidth + 50, 60);
 
-      // Winner name
+      // Winner name (supports multi-line \n)
       ctx.textAlign = 'left';
       ctx.font = `800 ${c.winnerSize}px ${c.winnerFont || c.fontFamily || 'sans-serif'}`;
       ctx.fillStyle = c.winnerColor;
-      ctx.fillText(winnerName, nx, ny);
-      const nameMetrics = ctx.measureText(winnerName);
-      addRegion(`rank${rank}Name`, nx - 5, ny - (c.winnerSize ?? 44) - 5, nameMetrics.width + 10, (c.winnerSize ?? 44) + 15);
+      const nameLines = winnerName.split('\n').filter(Boolean);
+      const nameGap = (c.winnerSize ?? 44) * 1.15;
+      let maxNameW = 0;
+      nameLines.forEach((line: string, i: number) => {
+        ctx.fillText(line, nx, ny + i * nameGap);
+        const w = ctx.measureText(line).width;
+        if (w > maxNameW) maxNameW = w;
+      });
+      addRegion(`rank${rank}Name`, nx - 5, ny - (c.winnerSize ?? 44) - 5, maxNameW + 10, (nameLines.length * nameGap) + 10);
 
-      // Unit name
+      // Unit name (supports multi-line \n)
       ctx.font = `700 ${c.unitSize}px ${c.unitFont || 'monospace'}`;
       ctx.fillStyle = c.unitColor;
-      const unitText = c.unitUppercase !== false ? winnerUnit.toUpperCase() : winnerUnit;
-      ctx.fillText(unitText, ux, uy);
-      const unitMetrics = ctx.measureText(unitText);
-      addRegion(`rank${rank}Unit`, ux - 5, uy - (c.unitSize ?? 30) - 5, unitMetrics.width + 10, (c.unitSize ?? 30) + 15);
+      const unitText = winnerUnit;
+      const unitLines = unitText.split('\n').filter(Boolean);
+      const unitGap = (c.unitSize ?? 30) * 1.15;
+      const calcUx = nx; 
+      const calcUy = ny + (nameLines.length * nameGap) + 5;
+      let maxUnitW = 0;
+      unitLines.forEach((line: string, i: number) => {
+        ctx.fillText(line, ux ?? calcUx, (uy ?? calcUy) + i * unitGap);
+        const w = ctx.measureText(line).width;
+        if (w > maxUnitW) maxUnitW = w;
+      });
+      addRegion(`rank${rank}Unit`, (ux ?? calcUx) - 5, (uy ?? calcUy) - (c.unitSize ?? 30) - 5, maxUnitW + 10, (unitLines.length * unitGap) + 10);
     });
 
     // Footer
