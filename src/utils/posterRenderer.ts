@@ -303,16 +303,21 @@ export const renderPosterToCanvas = async (
     addRegion('compName', compX - 10, compY - (c.compNameSize ?? 52) - 5, maxCompW + 20, (compLines.length * compGap) + 10);
 
     // Draw each rank with per-rank positions
-    compResults.forEach((res) => {
-      const rank = res.rank || 1;
-      if (rank > 3) return;
+    [1, 2, 3].forEach((rank) => {
+      const res = compResults.find(r => r.rank === rank);
 
       const overrideName = c[`rank${rank}NameOverride`];
-      const rawWinnerName = overrideName !== undefined && overrideName !== '' ? overrideName : (res.participantName || 'Participant Name');
+      const hasNameOverride = overrideName !== undefined && overrideName !== '';
+      
+      const overrideUnit = c[`rank${rank}UnitOverride`];
+      const hasUnitOverride = overrideUnit !== undefined && overrideUnit !== '';
+
+      if (!res && !hasNameOverride && !hasUnitOverride) return;
+
+      const rawWinnerName = hasNameOverride ? overrideName : (res?.participantName || 'Participant Name');
       const winnerName = c.winnerUppercase === false && !c.uppercaseNames ? rawWinnerName : rawWinnerName.toUpperCase();
 
-      const overrideUnit = c[`rank${rank}UnitOverride`];
-      const rawWinnerUnit = overrideUnit !== undefined && overrideUnit !== '' ? overrideUnit : (res.department || res.unitName || 'Unit Name');
+      const rawWinnerUnit = hasUnitOverride ? overrideUnit : (res?.department || res?.unitName || 'Unit Name');
       const winnerUnit = c.unitUppercase !== false ? rawWinnerUnit.toUpperCase() : rawWinnerUnit;
 
       const bx = c[`rank${rank}BadgeX`] ?? 140;
