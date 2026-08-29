@@ -144,11 +144,12 @@ export const CertificateImage: React.FC<CertificateImageProps> = ({
             y: number,
             fontSize: number,
             fontStyle: string,
-            color: string
+            color: string,
+            align: CanvasTextAlign = 'center'
           ) => {
             ctx.fillStyle = color;
             ctx.font = fontStyle;
-            ctx.textAlign = 'center';
+            ctx.textAlign = align;
             ctx.textBaseline = 'bottom';
 
             const textStr = (rawText || '').toUpperCase();
@@ -170,7 +171,8 @@ export const CertificateImage: React.FC<CertificateImageProps> = ({
             nameY,
             nameSize,
             `bold ${nameSize}px ${nameFont}`,
-            nameColor
+            nameColor,
+            'center'
           );
 
           fillMultiLinePublicText(
@@ -179,7 +181,8 @@ export const CertificateImage: React.FC<CertificateImageProps> = ({
             compY,
             compSize,
             `bold ${compSize}px ${compFont}`,
-            compColor
+            compColor,
+            'left'
           );
 
           const url = canvas.toDataURL('image/jpeg', 0.95);
