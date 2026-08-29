@@ -127,6 +127,31 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
       .catch(err => console.error('Failed to load CMS data:', err));
   }, []);
 
+  // Listen for browser back button & mobile swipe back gestures to return to home section
+  React.useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname.toLowerCase();
+      if (path.includes('gallery')) {
+        setPageView('gallery');
+      } else if (path.includes('posters')) {
+        setPageView('posters');
+      } else if (path.includes('team-points') || path.includes('standings')) {
+        setPageView('team-points');
+      } else if (path.includes('results')) {
+        setPageView('results');
+      } else {
+        setPageView('home');
+        setActiveSection('hero');
+        if (activeModalView !== 'none') {
+          setActiveModalView('none');
+        }
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [activeModalView, setActiveModalView]);
+
   const handleNavigate = (sectionId: string, filter?: { category?: Category; eventName?: string }) => {
     if (filter) {
       setResultsFilter({

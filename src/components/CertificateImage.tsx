@@ -111,6 +111,11 @@ export const CertificateImage: React.FC<CertificateImageProps> = ({
       const defaultColor = rank === 1 ? '#cc0000' : '#000000';
       const nameColor = templateConfig.nameColor ?? defaultColor;
       const compColor = templateConfig.compColor ?? defaultColor;
+      const nameFont = templateConfig.nameFont || '"Montserrat", "Inter", sans-serif';
+      const compFont = templateConfig.compFont || '"Montserrat", "Inter", sans-serif';
+
+      const displayName = eventSettings?.certificateOverrides?.[`${compKey}_${participantName}`] || eventSettings?.certificateOverrides?.[participantName] || participantName;
+      const displayComp = eventSettings?.certificateOverrides?.[`comp_${competitionId || competitionName}`] || eventSettings?.certificateOverrides?.[`comp_${competitionName}`] || competitionName;
 
       const customUrl = rank === 1 
         ? eventSettings?.certTheme1Url 
@@ -136,12 +141,12 @@ export const CertificateImage: React.FC<CertificateImageProps> = ({
           ctx.textBaseline = 'bottom';
           
           ctx.fillStyle = nameColor;
-          ctx.font = `bold ${nameSize}px "Montserrat", "Inter", sans-serif`;
-          ctx.fillText(participantName.toUpperCase(), centerX + nameX, nameY);
+          ctx.font = `bold ${nameSize}px ${nameFont}`;
+          ctx.fillText((displayName || 'PARTICIPANT NAME').toUpperCase(), centerX + nameX, nameY);
 
           ctx.fillStyle = compColor;
-          ctx.font = `bold ${compSize}px "Montserrat", "Inter", sans-serif`;
-          ctx.fillText(competitionName.toUpperCase(), centerX + compX, compY);
+          ctx.font = `bold ${compSize}px ${compFont}`;
+          ctx.fillText((displayComp || 'COMPETITION').toUpperCase(), centerX + compX, compY);
 
           const url = canvas.toDataURL('image/jpeg', 0.95);
           if (active) {
