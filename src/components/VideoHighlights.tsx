@@ -44,9 +44,7 @@ const VideoCard: React.FC<{
                 const target = e.target as HTMLImageElement;
                 if (!target.dataset.triedFallback && video.videoUrl) {
                   target.dataset.triedFallback = 'true';
-                  if (video.videoUrl.startsWith('/data/uploads/')) {
-                    target.src = `https://rendevouz-8sfp.onrender.com/api${video.videoUrl}`;
-                  }
+                  target.src = getMediaUrl(video.videoUrl);
                 }
               }}
             />
@@ -61,11 +59,7 @@ const VideoCard: React.FC<{
                 const target = e.target as HTMLVideoElement;
                 if (!target.dataset.triedFallback && video.videoUrl) {
                   target.dataset.triedFallback = 'true';
-                  if (video.videoUrl.startsWith('/data/uploads/')) {
-                    target.src = `https://rendevouz-8sfp.onrender.com/api${video.videoUrl}`;
-                  } else if (!video.videoUrl.startsWith('http')) {
-                    target.src = `https://rendevouz-8sfp.onrender.com/api/data/uploads/${video.videoUrl.split('/').pop()}`;
-                  }
+                  target.src = getMediaUrl(video.videoUrl);
                 }
               }}
             />
@@ -237,11 +231,7 @@ export const VideoHighlights: React.FC = React.memo(() => {
                   const target = e.target as HTMLVideoElement;
                   if (!target.dataset.triedFallback && activeVideo.videoUrl) {
                     target.dataset.triedFallback = 'true';
-                    if (activeVideo.videoUrl.startsWith('/data/uploads/')) {
-                      target.src = `https://rendevouz-8sfp.onrender.com/api${activeVideo.videoUrl}`;
-                    } else if (!activeVideo.videoUrl.startsWith('http')) {
-                      target.src = `https://rendevouz-8sfp.onrender.com/api/data/uploads/${activeVideo.videoUrl.split('/').pop()}`;
-                    }
+                    target.src = getMediaUrl(activeVideo.videoUrl);
                   }
                 }}
               />
