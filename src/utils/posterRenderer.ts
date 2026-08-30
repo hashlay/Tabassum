@@ -178,16 +178,28 @@ export const renderPosterToCanvas = async (
   const themeIdx = getThemeIndexForResult(compIdx, categoryName);
   const baseConf = { ...getDefaultThemeConfig(), ...(themeConfigs[themeIdx] || {}) };
   
+  const backgroundSource = customThemes[themeIdx] || customThemes[0];
+  
   // Merge individual poster position overrides if saved for this specific poster/competition
-  // Only apply if the override was saved for the SAME theme that is currently assigned
-  // (prevents stale positions from an old theme bleeding through when theme rules change)
+  // Only apply if the override was saved for the SAME theme AND the SAME background image
   const compId = compResults && compResults[0] ? compResults[0].competitionId : null;
   const compOverride = (eventSettings?.posterOverrides && compName && eventSettings.posterOverrides[compName]) ||
                        (eventSettings?.posterOverrides && compId && eventSettings.posterOverrides[compId]);
-  const isOverrideValid = compOverride && compOverride._savedThemeIndex === themeIdx;
-  const c = isOverrideValid ? { ...baseConf, ...compOverride } : baseConf;
+  
+  const isOverrideValid = compOverride && 
+                          compOverride._savedThemeIndex === themeIdx && 
+                          compOverride._savedBgImageUrl === getBgHash(backgroundSource);
 
-  const backgroundSource = customThemes[themeIdx] || customThemes[0];
+  const c = isOverrideValid ? { ...baseConf, ...compOverride } : {
+    ...baseConf,
+    compNameOverride: compOverride?.compNameOverride,
+    rank1NameOverride: compOverride?.rank1NameOverride,
+    rank1UnitOverride: compOverride?.rank1UnitOverride,
+    rank2NameOverride: compOverride?.rank2NameOverride,
+    rank2UnitOverride: compOverride?.rank2UnitOverride,
+    rank3NameOverride: compOverride?.rank3NameOverride,
+    rank3UnitOverride: compOverride?.rank3UnitOverride
+  };
 
   
   const festivalName = eventSettings?.festivalName || 'Sahityotsav';

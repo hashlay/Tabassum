@@ -3,7 +3,7 @@ export const getMediaUrl = (url: string | undefined): string => {
   if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
     return url;
   }
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://rendevouz-8sfp.onrender.com';
+  const baseUrl = import.meta.env.VITE_API_BASE_URL !== undefined ? import.meta.env.VITE_API_BASE_URL : (typeof window !== 'undefined' ? window.location.origin : '');
   const cleanBase = baseUrl.replace(/\/$/, '');
   let cleanPath = url.startsWith('/') ? url : `/${url}`;
 

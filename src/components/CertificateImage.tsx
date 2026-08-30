@@ -85,7 +85,7 @@ export const CertificateImage: React.FC<CertificateImageProps> = ({
       ctx.fillText('CONVENER', 275, 735);
       ctx.fillText('GENERAL SECRETARY', 925, 735);
 
-      const url = canvas.toDataURL('image/jpeg', 0.95);
+      const url = canvas.toDataURL('image/webp', 0.78) || canvas.toDataURL('image/jpeg', 0.80);
       if (active) {
         setDataUrl(url);
         if (onLoadRef.current) onLoadRef.current(url);
@@ -185,7 +185,7 @@ export const CertificateImage: React.FC<CertificateImageProps> = ({
             'left'
           );
 
-          const url = canvas.toDataURL('image/jpeg', 0.95);
+          const url = canvas.toDataURL('image/webp', 0.78) || canvas.toDataURL('image/jpeg', 0.80);
           if (active) {
             setDataUrl(url);
             if (onLoadRef.current) onLoadRef.current(url);

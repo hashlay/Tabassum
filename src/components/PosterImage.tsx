@@ -39,7 +39,8 @@ export const PosterImage: React.FC<PosterImageProps> = ({
         );
         
         if (!active) return;
-        const url = canvas.toDataURL('image/jpeg', 0.95);
+        // Use compressed WebP format for grid preview images (80% bandwidth reduction)
+        const url = canvas.toDataURL('image/webp', 0.78) || canvas.toDataURL('image/jpeg', 0.80);
         setDataUrl(url);
         if (onLoadRef.current) onLoadRef.current(url);
       } catch (err) {

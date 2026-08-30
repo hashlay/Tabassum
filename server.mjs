@@ -1,7 +1,9 @@
-import express from 'express';
-import http from 'http';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+dotenv.config();
+import fs from 'fs';
+import os from 'os';
+import multer from 'multer';
+import { v2 as cloudinary } from 'cloudinary';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -12,11 +14,36 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Enable CORS for frontend clients on ports 3000 & 3001
+// Cloudinary Configuration Helper
+const configureCloudinary = () => {
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME || process.env.VITE_CLOUDINARY_CLOUD_NAME;
+  const apiKey = process.env.CLOUDINARY_API_KEY || process.env.VITE_CLOUDINARY_API_KEY;
+  const apiSecret = process.env.CLOUDINARY_API_SECRET || process.env.VITE_CLOUDINARY_API_SECRET;
+
+  if (cloudName && apiKey && apiSecret) {
+    cloudinary.config({
+      cloud_name: cloudName.trim().replace(/^["']|["']$/g, ''),
+      api_key: apiKey.trim().replace(/^["']|["']$/g, ''),
+      api_secret: apiSecret.trim().replace(/^["']|["']$/g, '')
+    });
+  }
+};
+
+const uploadDir = os.tmpdir();
+const upload = multer({ dest: uploadDir, limits: { fileSize: 1024 * 1024 * 500 } });
+
+// Enable CORS & HTTP caching headers for optimized asset delivery
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  if (req.method === 'GET') {
+    if (req.url.match(/\.(jpg|jpeg|png|webp|svg|gif|mp4|webm|woff2)$/i)) {
+      res.header('Cache-Control', 'public, max-age=31536000, immutable');
+    } else if (req.url.startsWith('/api/')) {
+      res.header('Cache-Control', 'no-cache');
+    }
+  }
   if (req.method === 'OPTIONS') {
     return res.sendStatus(200);
   }
@@ -150,9 +177,68 @@ app.get('/api/v1/results', (req, res) => {
   res.json({ success: true, count: ssfDataset.results.length, data: ssfDataset.results });
 });
 
-// Start Express Backend Server
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`=================================================`);
-  console.log(`  HASHLAY FESTIVAL BACKEND ENGINE RUNNING ON PORT ${PORT}`);
-  console.log(`=================================================`);
+// CLOUDINARY MEDIA UPLOAD ENDPOINTS
+app.post('/api/gallery/upload', upload.single('image'), async (req, res) => {
+  try {
+    const file = req.file;
+    if (!file) return res.status(400).json({ error: 'No image file provided' });
+    configureCloudinary();
+    const result = await cloudinary.uploader.upload(file.path, {
+      resource_type: 'image',
+      folder: 'sahityotsav_gallery'
+    });
+    if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+    res.status(201).json({ success: true, url: result.secure_url, public_id: result.public_id });
+  } catch (err) {
+    console.error('Cloudinary gallery upload error:', err);
+    if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+    res.status(500).json({ error: 'Cloudinary upload failed', details: err.message || String(err) });
+  }
 });
+
+app.post('/api/highlights/upload', upload.single('video'), async (req, res) => {
+  try {
+    const file = req.file;
+    if (!file) return res.status(400).json({ error: 'No video file provided' });
+    configureCloudinary();
+    const result = await cloudinary.uploader.upload(file.path, {
+      resource_type: 'video',
+      folder: 'sahityotsav_videos'
+    });
+    if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+    res.status(201).json({ success: true, url: result.secure_url, public_id: result.public_id });
+  } catch (err) {
+    console.error('Cloudinary video upload error:', err);
+    if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+    res.status(500).json({ error: 'Cloudinary upload failed', details: err.message || String(err) });
+  }
+});
+
+app.post('/api/upload', upload.single('image'), async (req, res) => {
+  try {
+    const file = req.file;
+    if (!file) return res.status(400).json({ error: 'No file provided' });
+    configureCloudinary();
+    const result = await cloudinary.uploader.upload(file.path, {
+      resource_type: 'auto',
+      folder: 'sahityotsav_uploads'
+    });
+    if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+    res.status(201).json({ success: true, url: result.secure_url, public_id: result.public_id });
+  } catch (err) {
+    console.error('Cloudinary upload error:', err);
+    if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+    res.status(500).json({ error: 'Cloudinary upload failed', details: err.message || String(err) });
+  }
+});
+
+// Start Express Backend Server
+if (!process.env.VERCEL) {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`=================================================`);
+    console.log(`  HASHLAY FESTIVAL BACKEND ENGINE RUNNING ON PORT ${PORT}`);
+    console.log(`=================================================`);
+  });
+}
+
+export default app;
