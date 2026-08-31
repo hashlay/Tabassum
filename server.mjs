@@ -39,6 +39,20 @@ const upload = multer({ dest: uploadDir, limits: { fileSize: 1024 * 1024 * 500 }
 // MongoDB Atlas Connection for Live Synchronization
 let cachedDb = null;
 
+function getMongoDatabaseName(uri) {
+  const mongoUri = uri || process.env.MONGO_URI || process.env.MONGODB_URI || '';
+  if (!mongoUri) return 'sector';
+  try {
+    const withoutParams = mongoUri.split('?')[0];
+    const parts = withoutParams.split('/');
+    const lastPart = parts[parts.length - 1];
+    if (lastPart && lastPart.length > 0 && !lastPart.includes(':')) {
+      return lastPart;
+    }
+  } catch (e) {}
+  return 'sector';
+}
+
 async function connectToDatabase() {
   if (cachedDb) return cachedDb;
   const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
@@ -47,9 +61,7 @@ async function connectToDatabase() {
   try {
     const client = new MongoClient(mongoUri);
     await client.connect();
-    const dbName = mongoUri.includes('/')
-      ? (mongoUri.split('/').pop()?.split('?')[0] || 'sahityotsav')
-      : 'sahityotsav';
+    const dbName = getMongoDatabaseName(mongoUri);
     cachedDb = client.db(dbName);
     console.log(`[Public API Server] Connected to MongoDB Atlas database: "${dbName}"`);
     return cachedDb;

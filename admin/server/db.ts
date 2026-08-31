@@ -24,6 +24,20 @@ let isMongoConnected = false;
 
 let mongoConnectedPromise: Promise<void> | null = null;
 
+function getMongoDatabaseName(uri?: string): string {
+  const mongoUri = uri || process.env.MONGO_URI || process.env.MONGODB_URI || '';
+  if (!mongoUri) return 'sector';
+  try {
+    const withoutParams = mongoUri.split('?')[0];
+    const parts = withoutParams.split('/');
+    const lastPart = parts[parts.length - 1];
+    if (lastPart && lastPart.length > 0 && !lastPart.includes(':')) {
+      return lastPart;
+    }
+  } catch (e) {}
+  return 'sector';
+}
+
 async function _connectToMongo() {
   const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
   if (!mongoUri) {
@@ -39,9 +53,7 @@ async function _connectToMongo() {
     mongoClient = new MongoClient(mongoUri);
     await mongoClient.connect();
 
-    const dbName = mongoUri.includes('/')
-      ? (mongoUri.split('/').pop()?.split('?')[0] || 'sahityotsav')
-      : 'sahityotsav';
+    const dbName = getMongoDatabaseName(mongoUri);
 
     const mongoDb = mongoClient.db(dbName);
     mongoCollection = mongoDb.collection('app_state');
@@ -337,9 +349,7 @@ setInterval(performHourlyBackup, 60 * 60 * 1000);
 async function _syncMongoNow() {
   if (isMongoConnected && mongoClient && !isMongoConnecting && db) {
     try {
-      const dbName = (process.env.MONGO_URI || process.env.MONGODB_URI || '').includes('/')
-        ? ((process.env.MONGO_URI || process.env.MONGODB_URI || '').split('/').pop()?.split('?')[0] || 'sahityotsav')
-        : 'sahityotsav';
+      const dbName = getMongoDatabaseName();
       const mongoDb = mongoClient.db(dbName);
 
       // Dedicated per-collection updates to strictly prevent MongoDB 16MB document limit
@@ -469,17 +479,13 @@ connectToMongo();
 
 export function getCollection(name: string): Collection<any> | null {
   if (!mongoClient || !isMongoConnected) return null;
-  const dbName = (process.env.MONGO_URI || process.env.MONGODB_URI || '').includes('/')
-    ? ((process.env.MONGO_URI || process.env.MONGODB_URI || '').split('/').pop()?.split('?')[0] || 'sahityotsav')
-    : 'sahityotsav';
+  const dbName = getMongoDatabaseName();
   return mongoClient.db(dbName).collection(name);
 }
 
 export function getDb() {
   if (!mongoClient || !isMongoConnected) return null;
-  const dbName = (process.env.MONGO_URI || process.env.MONGODB_URI || '').includes('/')
-    ? ((process.env.MONGO_URI || process.env.MONGODB_URI || '').split('/').pop()?.split('?')[0] || 'sahityotsav')
-    : 'sahityotsav';
+  const dbName = getMongoDatabaseName();
   return mongoClient.db(dbName);
 }
 
