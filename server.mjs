@@ -7,6 +7,7 @@ import fs from 'fs';
 import os from 'os';
 import multer from 'multer';
 import { v2 as cloudinary } from 'cloudinary';
+import { MongoClient } from 'mongodb';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,6 +35,80 @@ const configureCloudinary = () => {
 
 const uploadDir = os.tmpdir();
 const upload = multer({ dest: uploadDir, limits: { fileSize: 1024 * 1024 * 500 } });
+
+// MongoDB Atlas Connection for Live Synchronization
+let cachedDb = null;
+
+async function connectToDatabase() {
+  if (cachedDb) return cachedDb;
+  const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
+  if (!mongoUri) return null;
+
+  try {
+    const client = new MongoClient(mongoUri);
+    await client.connect();
+    const dbName = mongoUri.includes('/')
+      ? (mongoUri.split('/').pop()?.split('?')[0] || 'sahityotsav')
+      : 'sahityotsav';
+    cachedDb = client.db(dbName);
+    console.log(`[Public API Server] Connected to MongoDB Atlas database: "${dbName}"`);
+    return cachedDb;
+  } catch (err) {
+    console.error("[Public API Server] MongoDB Atlas connection error:", err.message);
+    return null;
+  }
+}
+
+// Helper to fetch live collection from MongoDB Atlas
+async function getLiveCollection(colName, fallbackDefault = []) {
+  try {
+    const db = await connectToDatabase();
+    if (db) {
+      const docs = await db.collection(colName).find({}).toArray();
+      if (docs && docs.length > 0) {
+        return docs.map(d => {
+          const docId = d.id || d._id;
+          const { _id, ...rest } = d;
+          return { id: docId, ...rest };
+        });
+      }
+      // Check global_state in app_state collection
+      const appState = await db.collection('app_state').findOne({ _id: 'global_state' });
+      if (appState && Array.isArray(appState[colName]) && appState[colName].length > 0) {
+        return appState[colName];
+      }
+    }
+  } catch (e) {
+    console.error(`Error fetching live collection ${colName}:`, e.message);
+  }
+  return fallbackDefault;
+}
+
+// Helper to fetch live settings from MongoDB Atlas
+async function getLiveSettings(fallbackSettings) {
+  try {
+    const db = await connectToDatabase();
+    if (db) {
+      const settingDocs = await db.collection('settings').find({}).toArray();
+      const settingsMap = {};
+      settingDocs.forEach(doc => {
+        if (doc._id) {
+          const { _id, ...rest } = doc;
+          settingsMap[doc._id] = rest;
+        }
+      });
+      const appState = await db.collection('app_state').findOne({ _id: 'global_state' });
+      const baseSettings = appState?.eventSettings || fallbackSettings;
+      return {
+        ...baseSettings,
+        ...(settingsMap.eventSettings || {})
+      };
+    }
+  } catch (e) {
+    console.error("Error fetching live settings:", e.message);
+  }
+  return fallbackSettings;
+}
 
 // Enable CORS & HTTP caching headers for optimized asset delivery
 app.use((req, res, next) => {
@@ -95,55 +170,62 @@ const ssfDataset = {
 };
 
 // SSF Sector Endpoints
-app.get('/api/dashboard-stats', (req, res) => {
-  const totalParticipants = ssfDataset.participants.length;
-  const totalCompetitions = ssfDataset.competitions.length;
-  const resultsEntered = ssfDataset.results.length;
+app.get('/api/dashboard-stats', async (req, res) => {
+  const participants = await getLiveCollection('participants', ssfDataset.participants);
+  const competitions = await getLiveCollection('competitions', ssfDataset.competitions);
+  const results = await getLiveCollection('results', ssfDataset.results);
+  const teams = await getLiveCollection('teams', ssfDataset.teams);
+  const units = await getLiveCollection('units', ssfDataset.units);
+  const categories = await getLiveCollection('categories', ssfDataset.categories);
+
+  const totalParticipants = participants.length;
+  const totalCompetitions = competitions.length;
+  const resultsEntered = results.length;
 
   res.json({
     totalParticipants,
     totalCompetitions,
     individualRegistrations: totalParticipants,
-    groupTeamsCount: ssfDataset.teams.length,
+    groupTeamsCount: teams.length,
     resultsEntered,
     resultsPending: Math.max(0, totalCompetitions - resultsEntered),
     leadingUnit: null,
     topIndividual: null,
     topIndividualOnStage: null,
     topIndividualOffStage: null,
-    participantsByUnit: ssfDataset.units.map(u => ({
+    participantsByUnit: units.map(u => ({
       unitId: u.id,
       unitName: u.name,
-      count: ssfDataset.participants.filter(p => p.unitId === u.id).length
+      count: participants.filter(p => p.unitId === u.id).length
     })),
-    participantsByCategory: ssfDataset.categories.map(c => ({
+    participantsByCategory: categories.map(c => ({
       categoryId: c.id,
       categoryName: c.name,
-      count: ssfDataset.participants.filter(p => p.selectedCategoryId === c.id).length
+      count: participants.filter(p => p.selectedCategoryId === c.id).length
     })),
     recentRegistrations: [],
-    recentResults: []
+    recentResults: results.slice(-5)
   });
 });
 
-app.get('/api/categories', (req, res) => res.json(ssfDataset.categories));
-app.get('/api/units', (req, res) => res.json(ssfDataset.units));
-app.get('/api/competitions', (req, res) => res.json(ssfDataset.competitions));
-app.get('/api/participants', (req, res) => res.json(ssfDataset.participants));
-app.get('/api/teams', (req, res) => res.json(ssfDataset.teams));
-app.get('/api/results', (req, res) => res.json(ssfDataset.results));
-app.get('/api/settings', (req, res) => res.json(ssfDataset.settings));
-app.get('/api/users', (req, res) => res.json(ssfDataset.users));
-app.get('/api/audit-logs', (req, res) => res.json(ssfDataset.auditLogs));
-app.get('/api/registrations', (req, res) => res.json([]));
+app.get('/api/categories', async (req, res) => res.json(await getLiveCollection('categories', ssfDataset.categories)));
+app.get('/api/units', async (req, res) => res.json(await getLiveCollection('units', ssfDataset.units)));
+app.get('/api/competitions', async (req, res) => res.json(await getLiveCollection('competitions', ssfDataset.competitions)));
+app.get('/api/participants', async (req, res) => res.json(await getLiveCollection('participants', ssfDataset.participants)));
+app.get('/api/teams', async (req, res) => res.json(await getLiveCollection('teams', ssfDataset.teams)));
+app.get('/api/results', async (req, res) => res.json(await getLiveCollection('results', ssfDataset.results)));
+app.get('/api/settings', async (req, res) => res.json(await getLiveSettings(ssfDataset.settings)));
+app.get('/api/users', async (req, res) => res.json(await getLiveCollection('users', ssfDataset.users)));
+app.get('/api/audit-logs', async (req, res) => res.json(await getLiveCollection('auditLogs', ssfDataset.auditLogs)));
+app.get('/api/registrations', async (req, res) => res.json(await getLiveCollection('registrations', [])));
 
 // PUBLIC ALIAS ENDPOINTS
-app.get('/api/public/results', (req, res) => res.json(ssfDataset.results));
-app.get('/api/public/settings', (req, res) => res.json(ssfDataset.settings));
-app.get('/api/public/categories', (req, res) => res.json(ssfDataset.categories));
-app.get('/api/public/units', (req, res) => res.json(ssfDataset.units));
-app.get('/api/public/competitions', (req, res) => res.json(ssfDataset.competitions));
-app.get('/api/public/standings', (req, res) => res.json([]));
+app.get('/api/public/results', async (req, res) => res.json(await getLiveCollection('results', ssfDataset.results)));
+app.get('/api/public/settings', async (req, res) => res.json(await getLiveSettings(ssfDataset.settings)));
+app.get('/api/public/categories', async (req, res) => res.json(await getLiveCollection('categories', ssfDataset.categories)));
+app.get('/api/public/units', async (req, res) => res.json(await getLiveCollection('units', ssfDataset.units)));
+app.get('/api/public/competitions', async (req, res) => res.json(await getLiveCollection('competitions', ssfDataset.competitions)));
+app.get('/api/public/standings', async (req, res) => res.json(await getLiveCollection('scoreboard', [])));
 
 app.post('/api/auth/login', (req, res) => {
   const { username, password } = req.body;
@@ -176,16 +258,19 @@ app.get('/api/v1/health', (req, res) => {
   res.json({ status: 'ONLINE', version: '2.5.0-Enterprise', timestamp: new Date().toISOString() });
 });
 
-app.get('/api/v1/participants', (req, res) => {
-  res.json({ success: true, count: ssfDataset.participants.length, data: ssfDataset.participants });
+app.get('/api/v1/participants', async (req, res) => {
+  const participants = await getLiveCollection('participants', ssfDataset.participants);
+  res.json({ success: true, count: participants.length, data: participants });
 });
 
-app.get('/api/v1/programs', (req, res) => {
-  res.json({ success: true, count: ssfDataset.competitions.length, data: ssfDataset.competitions });
+app.get('/api/v1/programs', async (req, res) => {
+  const competitions = await getLiveCollection('competitions', ssfDataset.competitions);
+  res.json({ success: true, count: competitions.length, data: competitions });
 });
 
-app.get('/api/v1/results', (req, res) => {
-  res.json({ success: true, count: ssfDataset.results.length, data: ssfDataset.results });
+app.get('/api/v1/results', async (req, res) => {
+  const results = await getLiveCollection('results', ssfDataset.results);
+  res.json({ success: true, count: results.length, data: results });
 });
 
 // CLOUDINARY MEDIA UPLOAD ENDPOINTS
