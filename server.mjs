@@ -53,9 +53,11 @@ function getMongoDatabaseName(uri) {
   return 'sector';
 }
 
+const DEFAULT_MONGO_URI = 'mongodb+srv://sector:yeSylxbrrUo9r6TV@sector.pvd9le6.mongodb.net/sector?appName=sector';
+
 async function connectToDatabase() {
   if (cachedDb) return cachedDb;
-  const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
+  const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI || DEFAULT_MONGO_URI;
   if (!mongoUri) return null;
 
   try {

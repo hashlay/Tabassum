@@ -38,8 +38,10 @@ function getMongoDatabaseName(uri?: string): string {
   return 'sector';
 }
 
+const DEFAULT_MONGO_URI = 'mongodb+srv://sector:yeSylxbrrUo9r6TV@sector.pvd9le6.mongodb.net/sector?appName=sector';
+
 async function _connectToMongo() {
-  const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
+  const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI || DEFAULT_MONGO_URI;
   if (!mongoUri) {
     console.log("No MONGO_URI/MONGODB_URI found in environment. Using local JSON store (data/db.json).");
     return;
