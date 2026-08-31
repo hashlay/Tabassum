@@ -1,5 +1,8 @@
 import dotenv from 'dotenv';
 dotenv.config();
+import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import fs from 'fs';
 import os from 'os';
 import multer from 'multer';
@@ -133,6 +136,14 @@ app.get('/api/settings', (req, res) => res.json(ssfDataset.settings));
 app.get('/api/users', (req, res) => res.json(ssfDataset.users));
 app.get('/api/audit-logs', (req, res) => res.json(ssfDataset.auditLogs));
 app.get('/api/registrations', (req, res) => res.json([]));
+
+// PUBLIC ALIAS ENDPOINTS
+app.get('/api/public/results', (req, res) => res.json(ssfDataset.results));
+app.get('/api/public/settings', (req, res) => res.json(ssfDataset.settings));
+app.get('/api/public/categories', (req, res) => res.json(ssfDataset.categories));
+app.get('/api/public/units', (req, res) => res.json(ssfDataset.units));
+app.get('/api/public/competitions', (req, res) => res.json(ssfDataset.competitions));
+app.get('/api/public/standings', (req, res) => res.json([]));
 
 app.post('/api/auth/login', (req, res) => {
   const { username, password } = req.body;
