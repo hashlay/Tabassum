@@ -219,13 +219,142 @@ app.get('/api/users', async (req, res) => res.json(await getLiveCollection('user
 app.get('/api/audit-logs', async (req, res) => res.json(await getLiveCollection('auditLogs', ssfDataset.auditLogs)));
 app.get('/api/registrations', async (req, res) => res.json(await getLiveCollection('registrations', [])));
 
+// Helper to compute unit standings dynamically from results and units
+async function getLiveStandings() {
+  try {
+    const units = await getLiveCollection('units', ssfDataset.units);
+    const results = await getLiveCollection('results', ssfDataset.results);
+    const settings = await getLiveSettings(ssfDataset.settings);
+
+    // Points mapping
+    const rankPoints = {
+      1: settings.globalPointsRank1 || 10,
+      2: settings.globalPointsRank2 || 7,
+      3: settings.globalPointsRank3 || 5,
+      4: settings.globalPointsRank4 || 3,
+      5: settings.globalPointsRank5 || 1
+    };
+
+    const standingsMap = {};
+    units.forEach(u => {
+      standingsMap[u.id] = {
+        unitId: u.id,
+        unitName: u.name,
+        code: u.code,
+        totalPoints: 0,
+        rank1Count: 0,
+        rank2Count: 0,
+        rank3Count: 0,
+        totalAwards: 0
+      };
+    });
+
+    results.forEach(r => {
+      if (r.unitId && standingsMap[r.unitId] && r.rank && rankPoints[r.rank]) {
+        const pts = rankPoints[r.rank] || 0;
+        standingsMap[r.unitId].totalPoints += pts;
+        if (r.rank === 1) standingsMap[r.unitId].rank1Count += 1;
+        if (r.rank === 2) standingsMap[r.unitId].rank2Count += 1;
+        if (r.rank === 3) standingsMap[r.unitId].rank3Count += 1;
+        standingsMap[r.unitId].totalAwards += 1;
+      }
+    });
+
+    const standingsList = Object.values(standingsMap);
+    standingsList.sort((a, b) => b.totalPoints - a.totalPoints);
+    return standingsList;
+  } catch (e) {
+    console.error("Error computing standings:", e);
+    return [];
+  }
+}
+
 // PUBLIC ALIAS ENDPOINTS
+app.get('/api/public/cms', async (req, res) => {
+  try {
+    const eventSettings = await getLiveSettings(ssfDataset.settings);
+    const dragBlocks = await getLiveCollection('dragBlocks', []);
+    const heroMedia = await getLiveCollection('heroMedia', []);
+    const db = await connectToDatabase();
+    let cmsSettings = {};
+    if (db) {
+      const cmsDoc = await db.collection('settings').findOne({ _id: 'cmsSettings' });
+      if (cmsDoc) {
+        const { _id, ...rest } = cmsDoc;
+        cmsSettings = rest;
+      }
+    }
+    res.json({
+      eventSettings,
+      cmsSettings,
+      dragBlocks,
+      heroMedia,
+      festivalName: eventSettings.eventTitle || 'Rendezvous Silver Edition',
+      campusName: eventSettings.sectorName || 'Imam Rabbani Festival'
+    });
+  } catch (e) {
+    res.status(500).json({ error: 'Error fetching CMS data', details: e.message });
+  }
+});
+
+app.get('/api/public/gallery', async (req, res) => {
+  const gallery = await getLiveCollection('gallery', []);
+  res.json(gallery);
+});
+
+app.get('/api/public/highlights', async (req, res) => {
+  const highlights = await getLiveCollection('videoHighlights', []);
+  res.json(highlights);
+});
+
 app.get('/api/public/results', async (req, res) => res.json(await getLiveCollection('results', ssfDataset.results)));
 app.get('/api/public/settings', async (req, res) => res.json(await getLiveSettings(ssfDataset.settings)));
 app.get('/api/public/categories', async (req, res) => res.json(await getLiveCollection('categories', ssfDataset.categories)));
 app.get('/api/public/units', async (req, res) => res.json(await getLiveCollection('units', ssfDataset.units)));
 app.get('/api/public/competitions', async (req, res) => res.json(await getLiveCollection('competitions', ssfDataset.competitions)));
-app.get('/api/public/standings', async (req, res) => res.json(await getLiveCollection('scoreboard', [])));
+app.get('/api/public/standings', async (req, res) => res.json(await getLiveStandings()));
+
+// PUBLIC PARTICIPANT PORTAL ENDPOINTS
+app.post('/api/public/auth/participant-login', async (req, res) => {
+  try {
+    const { chestNumber, dob } = req.body;
+    const participants = await getLiveCollection('participants', []);
+    const participant = participants.find(p => p.chestNumber === chestNumber || p.codeNumber === chestNumber);
+    if (!participant) {
+      return res.status(404).json({ error: 'Participant not found with given Chest / Code number' });
+    }
+    res.json({
+      success: true,
+      participant
+    });
+  } catch (e) {
+    res.status(500).json({ error: 'Login failed', details: e.message });
+  }
+});
+
+app.get('/api/public/participant/by-chest/:chestNumber', async (req, res) => {
+  try {
+    const { chestNumber } = req.params;
+    const participants = await getLiveCollection('participants', []);
+    const participant = participants.find(p => p.chestNumber === chestNumber || p.codeNumber === chestNumber || p.id === chestNumber);
+    if (!participant) {
+      return res.status(404).json({ error: 'Participant not found' });
+    }
+    const competitions = await getLiveCollection('competitions', []);
+    const results = await getLiveCollection('results', []);
+    const registeredComps = competitions.filter(c => (c.assignedParticipantIds || []).includes(participant.id));
+    const participantResults = results.filter(r => r.participantId === participant.id);
+
+    res.json({
+      participant,
+      competitions: registeredComps,
+      results: participantResults
+    });
+  } catch (e) {
+    res.status(500).json({ error: 'Error fetching participant details', details: e.message });
+  }
+});
+
 
 app.post('/api/auth/login', (req, res) => {
   const { username, password } = req.body;
