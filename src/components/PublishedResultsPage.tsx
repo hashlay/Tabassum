@@ -270,7 +270,7 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
                         {group.eventName}
                       </h3>
                       <p className="text-[11px] text-zinc-400 font-mono mt-0.5">
-                        {group.category} · {group.items[0]?.participationType || (group.eventName.toLowerCase().includes('group') || group.eventName.toLowerCase().includes('team') || group.eventName.toLowerCase().includes('choral') ? 'Group' : 'Individual')}
+                        {group.category} · {group.items[0]?.participationType || ((group.eventName || '').toLowerCase().includes('group') || (group.eventName || '').toLowerCase().includes('team') || (group.eventName || '').toLowerCase().includes('choral') ? 'Group' : 'Individual')}
                       </p>
                     </div>
                   </div>

@@ -248,15 +248,15 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
         if (standings.length > 0) {
           const scores: HouseScore[] = standings.map((s: any, i: number) => ({
-            id: s.unitId || `unit_${i}`,
-            name: s.unitName,
-            code: s.unitCode || s.unitName.substring(0, 3).toUpperCase(),
+            id: s.unitId || s.id || `unit_${i}`,
+            name: s.unitName || s.name || 'Unit',
+            code: s.code || s.unitCode || (s.unitName || s.name || 'UNI').substring(0, 3).toUpperCase(),
             color: colors[i % colors.length],
             accentColor: accents[i % accents.length],
-            totalPoints: s.overallPoints || 0,
-            goldCount: s.firstPlaceCount || 0,
-            silverCount: s.secondPlaceCount || 0,
-            bronzeCount: s.thirdPlaceCount || 0
+            totalPoints: Number(s.totalPoints ?? s.overallPoints ?? s.points ?? 0),
+            goldCount: Number(s.rank1Count ?? s.firstPlaceCount ?? s.goldCount ?? 0),
+            silverCount: Number(s.rank2Count ?? s.secondPlaceCount ?? s.silverCount ?? 0),
+            bronzeCount: Number(s.rank3Count ?? s.thirdPlaceCount ?? s.bronzeCount ?? 0)
           }));
           setHouseScores(scores);
           return;
@@ -265,10 +265,11 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         // Fallback: Calculate from results if standings endpoint is empty
         const scoreMap: Record<string, HouseScore> = {};
         units.forEach((u: any, i: number) => {
-          scoreMap[u.name] = { 
-            id: u.id, 
-            name: u.name, 
-            code: u.code, 
+          const uKey = u.id || u.name;
+          scoreMap[uKey] = { 
+            id: u.id || `unit_${i}`, 
+            name: u.name || 'Unit', 
+            code: u.code || (u.name || 'UNI').substring(0, 3).toUpperCase(), 
             color: colors[i % colors.length], 
             accentColor: accents[i % accents.length], 
             totalPoints: 0, 
@@ -279,12 +280,15 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         });
 
         (results || []).forEach(r => {
-          const h = scoreMap[r.department];
-          if (h) {
-            h.totalPoints += r.points || 0;
-            if (r.rank === 1) h.goldCount++;
-            if (r.rank === 2) h.silverCount++;
-            if (r.rank === 3) h.bronzeCount++;
+          const uId = r.unitId || r.unit;
+          const uName = r.department || r.unitName;
+          const target = Object.values(scoreMap).find(h => h.id === uId || h.name === uName);
+          if (target && r.rank) {
+            const pts = r.points || (r.rank === 1 ? 10 : r.rank === 2 ? 7 : r.rank === 3 ? 5 : r.rank === 4 ? 3 : r.rank === 5 ? 1 : 0);
+            target.totalPoints += pts;
+            if (r.rank === 1) target.goldCount++;
+            if (r.rank === 2) target.silverCount++;
+            if (r.rank === 3) target.bronzeCount++;
           }
         });
 
