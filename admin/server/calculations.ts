@@ -236,29 +236,26 @@ export const CalculationService = {
       const participantIds = participants.map(p => p.id);
       
       // Individual results for this unit's participants
-      const individualResults = db.results.filter(r => 
-        r.participantId && 
-        participantIds.includes(r.participantId) && 
-        r.status === ResultStatus.PARTICIPATED && 
-        r.publishedStatus &&
-        !r.deletedAt
-      );
+      const individualResults = db.results.filter(r => {
+        if (r.deletedAt) return false;
+        const matchesUnit = r.unitId === unit.id || r.unit === unit.id || r.department === unit.name || r.unitName === unit.name;
+        const matchesParticipant = r.participantId && (participantIds.includes(r.participantId) || participants.some(p => p.profilePhoto === r.participantId || p.chestNumber === r.participantId || p.codeNumber === r.participantId));
+        return (matchesUnit || matchesParticipant) && !r.teamId;
+      });
       
       // Group results for this unit's teams
-      // Team result is added ONLY once towards the unit total, not multiplied!
       let teams = db.teams.filter(t => t.unitId === unit.id && !t.deletedAt);
       if (filters.categoryId) {
         teams = teams.filter(t => t.categoryId === filters.categoryId);
       }
       const teamIds = teams.map(t => t.id);
       
-      const groupResults = db.results.filter(r => 
-        r.teamId && 
-        teamIds.includes(r.teamId) && 
-        r.status === ResultStatus.PARTICIPATED && 
-        r.publishedStatus &&
-        !r.deletedAt
-      );
+      const groupResults = db.results.filter(r => {
+        if (r.deletedAt) return false;
+        const matchesUnit = r.unitId === unit.id || r.unit === unit.id || r.department === unit.name || r.unitName === unit.name;
+        const matchesTeam = r.teamId && teamIds.includes(r.teamId);
+        return (matchesUnit || matchesTeam) && Boolean(r.teamId);
+      });
       
       // On-stage subtotals
       const onStageIndividual = individualResults.filter(r => {

@@ -328,7 +328,39 @@ app.get('/api/public/highlights', async (req, res) => {
   res.json(highlights);
 });
 
-app.get('/api/public/results', async (req, res) => res.json(await getLiveCollection('results', ssfDataset.results)));
+app.get('/api/public/results', async (req, res) => {
+  const data = await getFastCached('results_enriched', async () => {
+    const results = await getLiveCollection('results', ssfDataset.results);
+    const competitions = await getLiveCollection('competitions', ssfDataset.competitions);
+    const participants = await getLiveCollection('participants', ssfDataset.participants);
+    const teams = await getLiveCollection('teams', ssfDataset.teams);
+    const units = await getLiveCollection('units', ssfDataset.units);
+    const categories = await getLiveCollection('categories', ssfDataset.categories);
+
+    return results.map(r => {
+      const comp = competitions.find(c => c.id === r.competitionId);
+      const part = participants.find(p => p.id === r.participantId || p.profilePhoto === r.participantId || p.chestNumber === r.participantId);
+      const team = teams.find(t => t.id === r.teamId);
+      const unit = units.find(u => u.id === (r.unitId || r.unit || part?.unitId || team?.unitId));
+      const cat = categories.find(c => c.id === (r.categoryId || comp?.categoryId || part?.selectedCategoryId || team?.categoryId));
+
+      return {
+        ...r,
+        id: r.id || `res_${Math.random()}`,
+        competitionId: r.competitionId,
+        eventName: r.eventName || r.program || comp?.name || `Competition ${r.competitionId}`,
+        category: r.category || r.categoryName || cat?.name || 'General',
+        participantName: r.participantName || part?.fullName || team?.name || 'Participant',
+        department: r.department || r.unitName || unit?.name || 'Unit',
+        codeNumber: r.codeNumber || r.chestNumber || part?.profilePhoto || part?.chestNumber || team?.code || 'N/A',
+        rank: r.rank || 1,
+        totalMark: r.totalMark || r.averageMark || 0,
+        grade: r.grade || 'A'
+      };
+    });
+  });
+  res.json(data);
+});
 app.get('/api/public/settings', async (req, res) => res.json(await getLiveSettings(ssfDataset.settings)));
 app.get('/api/public/categories', async (req, res) => res.json(await getLiveCollection('categories', ssfDataset.categories)));
 app.get('/api/public/units', async (req, res) => res.json(await getLiveCollection('units', ssfDataset.units)));

@@ -2749,7 +2749,28 @@ apiRouter.get('/public/highlights', async (req, res) => {
 apiRouter.get('/public/results', async (req, res) => {
   const data = getFastCachedResponse('results', () => {
     const db = dbClient.get();
-    return (db.results || []).filter(r => (r.publishedStatus || r.status === ResultStatus.PARTICIPATED || (r as any).status === 'participated') && !r.deletedAt);
+    const rawResults = (db.results || []).filter(r => !r.deletedAt);
+    return rawResults.map(r => {
+      const comp = (db.competitions || []).find(c => c.id === r.competitionId);
+      const part = (db.participants || []).find(p => p.id === r.participantId || p.profilePhoto === r.participantId || p.chestNumber === r.participantId);
+      const team = (db.teams || []).find(t => t.id === r.teamId);
+      const unit = (db.units || []).find(u => u.id === (r.unitId || r.unit || part?.unitId || team?.unitId));
+      const cat = (db.categories || []).find(c => c.id === (r.categoryId || comp?.categoryId || part?.selectedCategoryId || team?.categoryId));
+
+      return {
+        ...r,
+        id: r.id || `res_${Math.random()}`,
+        competitionId: r.competitionId,
+        eventName: r.eventName || r.program || comp?.name || `Competition ${r.competitionId}`,
+        category: r.category || r.categoryName || cat?.name || 'General',
+        participantName: r.participantName || part?.fullName || team?.name || 'Participant',
+        department: r.department || r.unitName || unit?.name || 'Unit',
+        codeNumber: r.codeNumber || r.chestNumber || part?.profilePhoto || part?.chestNumber || team?.code || 'N/A',
+        rank: r.rank || 1,
+        totalMark: r.totalMark || r.averageMark || 0,
+        grade: r.grade || 'A'
+      };
+    });
   });
   res.json(data);
 });
