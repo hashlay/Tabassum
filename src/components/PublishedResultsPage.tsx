@@ -89,18 +89,25 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
   const groupedEvents = useMemo(() => {
     const map = new Map<string, { key: string; eventName: string; category: string; competitionId?: string; items: ResultItem[]; latestUpdatedAt: string }>();
     
-    // Filter to valid published ranks (Rank 1, 2, 3)
-    const validResults = (results || []).filter(r => r.rank !== undefined && r.rank > 0 && r.rank <= 3);
+    // Filter to valid published results or ranked items
+    const validResults = (results || []).filter(r => {
+      if (!r) return false;
+      const rk = Number(r.rank);
+      return (!isNaN(rk) && rk > 0) || Boolean(r.publishedStatus) || r.status === 'participated' || (r as any).status === 'PARTICIPATED';
+    });
     
     validResults.forEach((res) => {
-      const key = res.competitionId || `${res.eventName}__${res.category}`;
-      const updatedAt = res.raw?.updatedAt || res.raw?.createdAt || '';
+      const compId = res.competitionId || (res as any).programId || (res as any).id;
+      const evName = res.eventName || (res as any).program || `Competition ${compId || ''}`;
+      const catName = res.category || (res as any).categoryName || 'General';
+      const key = compId ? String(compId) : `${evName}__${catName}`;
+      const updatedAt = res.raw?.updatedAt || res.raw?.createdAt || (res as any).updatedAt || (res as any).createdAt || '';
       if (!map.has(key)) {
         map.set(key, {
           key,
-          eventName: res.eventName,
-          category: res.category,
-          competitionId: res.competitionId,
+          eventName: evName,
+          category: catName,
+          competitionId: compId ? String(compId) : undefined,
           items: [],
           latestUpdatedAt: updatedAt
         });
