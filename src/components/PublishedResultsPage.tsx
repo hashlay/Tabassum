@@ -131,16 +131,16 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
   const filteredEvents = useMemo(() => {
     return groupedEvents.filter((group) => {
       const matchesCategory = selectedCategory === 'All' || group.category === selectedCategory;
-      const matchesEvent = selectedEvent === 'All' || group.eventName.toLowerCase() === selectedEvent.toLowerCase();
+      const matchesEvent = selectedEvent === 'All' || (group.eventName || '').toLowerCase() === (selectedEvent || '').toLowerCase();
       const matchesQuery =
         searchQuery === '' ||
-        group.eventName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        group.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (group.eventName || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (group.category || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
         group.items.some(
           (i) =>
-            i.participantName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            i.codeNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            i.department.toLowerCase().includes(searchQuery.toLowerCase())
+            (i.participantName || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (i.codeNumber || i.chestNumber || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (i.department || i.unitName || '').toLowerCase().includes(searchQuery.toLowerCase())
         );
 
       return matchesCategory && matchesEvent && matchesQuery;

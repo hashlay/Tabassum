@@ -18,7 +18,7 @@ export const TeamPointsPage: React.FC = () => {
   // Remaining houses for table view
   const filteredHouses = useMemo(() => {
     return sortedHouses.filter((h) =>
-      searchQuery === '' ? true : h.name.toLowerCase().includes(searchQuery.toLowerCase()) || h.code.toLowerCase().includes(searchQuery.toLowerCase())
+      searchQuery === '' ? true : (h.name || h.unitName || '').toLowerCase().includes(searchQuery.toLowerCase()) || (h.code || h.unitCode || '').toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [sortedHouses, searchQuery]);
 

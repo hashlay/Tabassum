@@ -219,79 +219,100 @@ app.get('/api/users', async (req, res) => res.json(await getLiveCollection('user
 app.get('/api/audit-logs', async (req, res) => res.json(await getLiveCollection('auditLogs', ssfDataset.auditLogs)));
 app.get('/api/registrations', async (req, res) => res.json(await getLiveCollection('registrations', [])));
 
+// Fast In-Memory TTL Cache for Public API Endpoints
+const publicCache = new Map();
+const TTL_MS = 3000;
+
+async function getFastCached(key, fetcher) {
+  const now = Date.now();
+  const cached = publicCache.get(key);
+  if (cached && (now - cached.timestamp < TTL_MS)) {
+    return cached.data;
+  }
+  const data = await fetcher();
+  publicCache.set(key, { data, timestamp: now });
+  return data;
+}
+
 // Helper to compute unit standings dynamically from results and units
 async function getLiveStandings() {
-  try {
-    const units = await getLiveCollection('units', ssfDataset.units);
-    const results = await getLiveCollection('results', ssfDataset.results);
-    const settings = await getLiveSettings(ssfDataset.settings);
+  return getFastCached('standings', async () => {
+    try {
+      const units = await getLiveCollection('units', ssfDataset.units);
+      const results = await getLiveCollection('results', ssfDataset.results);
+      const settings = await getLiveSettings(ssfDataset.settings);
 
-    // Points mapping
-    const rankPoints = {
-      1: settings.globalPointsRank1 || 10,
-      2: settings.globalPointsRank2 || 7,
-      3: settings.globalPointsRank3 || 5,
-      4: settings.globalPointsRank4 || 3,
-      5: settings.globalPointsRank5 || 1
-    };
-
-    const standingsMap = {};
-    units.forEach(u => {
-      standingsMap[u.id] = {
-        unitId: u.id,
-        unitName: u.name,
-        code: u.code,
-        totalPoints: 0,
-        rank1Count: 0,
-        rank2Count: 0,
-        rank3Count: 0,
-        totalAwards: 0
+      // Points mapping
+      const rankPoints = {
+        1: settings.globalPointsRank1 || 10,
+        2: settings.globalPointsRank2 || 7,
+        3: settings.globalPointsRank3 || 5,
+        4: settings.globalPointsRank4 || 3,
+        5: settings.globalPointsRank5 || 1
       };
-    });
 
-    results.forEach(r => {
-      if (r.unitId && standingsMap[r.unitId] && r.rank && rankPoints[r.rank]) {
-        const pts = rankPoints[r.rank] || 0;
-        standingsMap[r.unitId].totalPoints += pts;
-        if (r.rank === 1) standingsMap[r.unitId].rank1Count += 1;
-        if (r.rank === 2) standingsMap[r.unitId].rank2Count += 1;
-        if (r.rank === 3) standingsMap[r.unitId].rank3Count += 1;
-        standingsMap[r.unitId].totalAwards += 1;
-      }
-    });
+      const standingsMap = {};
+      units.forEach(u => {
+        standingsMap[u.id] = {
+          unitId: u.id,
+          unitName: u.name,
+          code: u.code,
+          totalPoints: 0,
+          rank1Count: 0,
+          rank2Count: 0,
+          rank3Count: 0,
+          totalAwards: 0
+        };
+      });
 
-    const standingsList = Object.values(standingsMap);
-    standingsList.sort((a, b) => b.totalPoints - a.totalPoints);
-    return standingsList;
-  } catch (e) {
-    console.error("Error computing standings:", e);
-    return [];
-  }
+      results.forEach(r => {
+        const uId = r.unitId || r.unit;
+        if (uId && standingsMap[uId] && r.rank && rankPoints[r.rank]) {
+          const pts = rankPoints[r.rank] || 0;
+          standingsMap[uId].totalPoints += pts;
+          if (r.rank === 1) standingsMap[uId].rank1Count += 1;
+          if (r.rank === 2) standingsMap[uId].rank2Count += 1;
+          if (r.rank === 3) standingsMap[uId].rank3Count += 1;
+          standingsMap[uId].totalAwards += 1;
+        }
+      });
+
+      const standingsList = Object.values(standingsMap);
+      standingsList.sort((a, b) => b.totalPoints - a.totalPoints);
+      return standingsList;
+    } catch (e) {
+      console.error("Error computing standings:", e);
+      return [];
+    }
+  });
 }
 
 // PUBLIC ALIAS ENDPOINTS
 app.get('/api/public/cms', async (req, res) => {
   try {
-    const eventSettings = await getLiveSettings(ssfDataset.settings);
-    const dragBlocks = await getLiveCollection('dragBlocks', []);
-    const heroMedia = await getLiveCollection('heroMedia', []);
-    const db = await connectToDatabase();
-    let cmsSettings = {};
-    if (db) {
-      const cmsDoc = await db.collection('settings').findOne({ _id: 'cmsSettings' });
-      if (cmsDoc) {
-        const { _id, ...rest } = cmsDoc;
-        cmsSettings = rest;
+    const data = await getFastCached('cms', async () => {
+      const eventSettings = await getLiveSettings(ssfDataset.settings);
+      const dragBlocks = await getLiveCollection('dragBlocks', []);
+      const heroMedia = await getLiveCollection('heroMedia', []);
+      const db = await connectToDatabase();
+      let cmsSettings = {};
+      if (db) {
+        const cmsDoc = await db.collection('settings').findOne({ _id: 'cmsSettings' });
+        if (cmsDoc) {
+          const { _id, ...rest } = cmsDoc;
+          cmsSettings = rest;
+        }
       }
-    }
-    res.json({
-      eventSettings,
-      cmsSettings,
-      dragBlocks,
-      heroMedia,
-      festivalName: eventSettings.eventTitle || 'Rendezvous Silver Edition',
-      campusName: eventSettings.sectorName || 'Imam Rabbani Festival'
+      return {
+        eventSettings,
+        cmsSettings,
+        dragBlocks,
+        heroMedia,
+        festivalName: eventSettings.eventTitle || 'Rendezvous Silver Edition',
+        campusName: eventSettings.sectorName || 'Imam Rabbani Festival'
+      };
     });
+    res.json(data);
   } catch (e) {
     res.status(500).json({ error: 'Error fetching CMS data', details: e.message });
   }

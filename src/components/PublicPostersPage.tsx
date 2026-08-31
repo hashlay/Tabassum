@@ -72,8 +72,8 @@ export const PublicPostersPage: React.FC = () => {
       const matchesCategory = selectedCategory === 'All' || poster.category === selectedCategory;
       const matchesQuery =
         searchQuery === '' ||
-        poster.eventName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        poster.category.toLowerCase().includes(searchQuery.toLowerCase());
+        (poster.eventName || poster.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (poster.category || poster.categoryName || '').toLowerCase().includes(searchQuery.toLowerCase());
 
       return matchesCategory && matchesQuery;
     });

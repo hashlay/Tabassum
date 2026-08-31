@@ -54,8 +54,8 @@ export const PublicGalleryPage: React.FC = () => {
       const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
       const matchesQuery =
         searchQuery.trim() === '' ||
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (item.title || item.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (item.category || item.categoryName || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
         (item.caption && item.caption.toLowerCase().includes(searchQuery.toLowerCase())) ||
         (item.photographer && item.photographer.toLowerCase().includes(searchQuery.toLowerCase()));
 

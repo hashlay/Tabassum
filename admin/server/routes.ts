@@ -2701,58 +2701,98 @@ apiRouter.get('/standings', authenticate, async (req, res) => {
 });
 
 // --- PUBLIC UNAUTHENTICATED ENDPOINTS (ACCESSIBLE TO ALL VISITORS & PUBLIC FRONTEND) ---
+const publicApiCache = new Map<string, { data: any; timestamp: number }>();
+const CACHE_TTL_MS = 3000; // 3 seconds in-memory TTL for instant lightning speed
+
+function getFastCachedResponse(key: string, fetcher: () => any) {
+  const now = Date.now();
+  const cached = publicApiCache.get(key);
+  if (cached && (now - cached.timestamp < CACHE_TTL_MS)) {
+    return cached.data;
+  }
+  const data = fetcher();
+  publicApiCache.set(key, { data, timestamp: now });
+  return data;
+}
+
 apiRouter.get('/public/cms', async (req, res) => {
-  const db = dbClient.get();
-  res.json({
-    eventSettings: db.eventSettings || {},
-    cmsSettings: db.cmsSettings || {},
-    dragBlocks: db.dragBlocks || [],
-    heroMedia: db.heroMedia || [],
-    festivalName: db.eventSettings?.eventTitle || 'Rendezvous Silver Edition',
-    campusName: db.eventSettings?.sectorName || 'Imam Rabbani Festival'
+  const data = getFastCachedResponse('cms', () => {
+    const db = dbClient.get();
+    return {
+      eventSettings: db.eventSettings || {},
+      cmsSettings: db.cmsSettings || {},
+      dragBlocks: db.dragBlocks || [],
+      heroMedia: db.heroMedia || [],
+      festivalName: db.eventSettings?.eventTitle || 'Rendezvous Silver Edition',
+      campusName: db.eventSettings?.sectorName || 'Imam Rabbani Festival'
+    };
   });
+  res.json(data);
 });
 
 apiRouter.get('/public/gallery', async (req, res) => {
-  const db = dbClient.get();
-  res.json(db.gallery || []);
+  const data = getFastCachedResponse('gallery', () => {
+    const db = dbClient.get();
+    return db.gallery || [];
+  });
+  res.json(data);
 });
 
 apiRouter.get('/public/highlights', async (req, res) => {
-  const db = dbClient.get();
-  res.json(db.videoHighlights || []);
+  const data = getFastCachedResponse('highlights', () => {
+    const db = dbClient.get();
+    return db.videoHighlights || [];
+  });
+  res.json(data);
 });
 
 apiRouter.get('/public/results', async (req, res) => {
-  const db = dbClient.get();
-  const publishedResults = (db.results || []).filter(r => r.publishedStatus && !r.deletedAt);
-  res.json(publishedResults);
+  const data = getFastCachedResponse('results', () => {
+    const db = dbClient.get();
+    return (db.results || []).filter(r => (r.publishedStatus || r.status === ResultStatus.PARTICIPATED || (r as any).status === 'participated') && !r.deletedAt);
+  });
+  res.json(data);
 });
 
 apiRouter.get('/public/settings', async (req, res) => {
-  const db = dbClient.get();
-  res.json(db.eventSettings || {});
+  const data = getFastCachedResponse('settings', () => {
+    const db = dbClient.get();
+    return db.eventSettings || {};
+  });
+  res.json(data);
 });
 
 apiRouter.get('/public/categories', async (req, res) => {
-  const db = dbClient.get();
-  res.json(db.categories || []);
+  const data = getFastCachedResponse('categories', () => {
+    const db = dbClient.get();
+    return db.categories || [];
+  });
+  res.json(data);
 });
 
 apiRouter.get('/public/units', async (req, res) => {
-  const db = dbClient.get();
-  res.json(db.units || []);
+  const data = getFastCachedResponse('units', () => {
+    const db = dbClient.get();
+    return db.units || [];
+  });
+  res.json(data);
 });
 
 apiRouter.get('/public/competitions', async (req, res) => {
-  const db = dbClient.get();
-  res.json(db.competitions || []);
+  const data = getFastCachedResponse('competitions', () => {
+    const db = dbClient.get();
+    return db.competitions || [];
+  });
+  res.json(data);
 });
 
 apiRouter.get('/public/standings', async (req, res) => {
   const categoryId = req.query.categoryId ? String(req.query.categoryId) : undefined;
-  const standings = CalculationService.getUnitStandings({ categoryId });
-  res.json(standings);
+  const cacheKey = `standings_${categoryId || 'all'}`;
+  const data = getFastCachedResponse(cacheKey, () => {
+    return CalculationService.getUnitStandings({ categoryId });
+  });
+  res.json(data);
 });
 
 apiRouter.post('/public/auth/participant-login', async (req, res) => {
