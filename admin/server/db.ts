@@ -111,6 +111,24 @@ async function _connectToMongo() {
         }
       } catch (_) { }
     }
+    // If MongoDB has no participants data yet, attempt to hydrate from repository db.json file
+    const currentParticipantsCount = Array.isArray(db?.participants) ? db.participants.length : 0;
+    if (currentParticipantsCount === 0) {
+      const repositoryDbFile = findLocalDbFile();
+      if (repositoryDbFile) {
+        try {
+          console.log(`📦 Hydrating MongoDB Atlas from repository database file (${repositoryDbFile})...`);
+          const fileContent = fs.readFileSync(repositoryDbFile, 'utf-8');
+          const parsed = JSON.parse(fileContent);
+          if (parsed && Array.isArray(parsed.participants) && parsed.participants.length > 0) {
+            db = { ...db, ...parsed };
+            console.log(`✅ Successfully loaded ${parsed.participants.length} participants, ${parsed.competitions?.length || 0} competitions, ${parsed.results?.length || 0} results from repository db.json!`);
+          }
+        } catch (fileErr: any) {
+          console.error("Failed to hydrate from repository db.json file:", fileErr.message);
+        }
+      }
+    }
 
     // Sanitize broken legacy local uploads from gallery & videoHighlights
     if (Array.isArray(db.gallery)) {
@@ -178,6 +196,25 @@ export interface DatabaseSchema {
 // Simple in-memory cache synchronized with the file
 let db: DatabaseSchema;
 
+function findLocalDbFile(): string | null {
+  const possiblePaths = [
+    path.join(process.cwd(), 'admin', 'data', 'db.json'),
+    path.join(process.cwd(), 'data', 'db.json'),
+    path.join(process.cwd(), '..', 'admin', 'data', 'db.json')
+  ];
+  for (const p of possiblePaths) {
+    if (fs.existsSync(p)) {
+      try {
+        const stats = fs.statSync(p);
+        if (stats.size > 1000) {
+          return p;
+        }
+      } catch (_) {}
+    }
+  }
+  return null;
+}
+
 function ensureDbExists() {
   if (db) return; // Prevent reloading from disk if already in memory
 
@@ -189,10 +226,14 @@ function ensureDbExists() {
     }
   }
 
-  if (fs.existsSync(DB_FILE)) {
+  const repoFile = findLocalDbFile();
+  const fileToRead = fs.existsSync(DB_FILE) ? DB_FILE : repoFile;
+
+  if (fileToRead && fs.existsSync(fileToRead)) {
     try {
-      const data = fs.readFileSync(DB_FILE, 'utf-8');
+      const data = fs.readFileSync(fileToRead, 'utf-8');
       db = JSON.parse(data);
+      console.log(`✅ Loaded database from ${fileToRead} (${db.participants?.length || 0} participants, ${db.results?.length || 0} results)`);
       // Ensure all arrays exist
       if (!db.users) db.users = [];
       if (!db.loginAudits) db.loginAudits = [];
