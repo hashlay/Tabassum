@@ -13,7 +13,9 @@ import {
 } from '../src/types.js';
 import { MongoClient, Collection } from 'mongodb';
 
-const DB_DIR = path.join(process.cwd(), 'data');
+import os from 'os';
+
+const DB_DIR = process.env.VERCEL ? os.tmpdir() : path.join(process.cwd(), 'data');
 const DB_FILE = path.join(DB_DIR, 'db.json');
 
 // MongoDB Client Connection Setup
@@ -452,25 +454,24 @@ export async function saveDb() {
     db.loginAudits = db.loginAudits.slice(-500);
   }
 
-  // Write to local file (compact JSON, non-blocking)
+  // Write to local temp file (compact JSON, safe fallback)
   try {
     const data = JSON.stringify(db);
     const tempFile = DB_FILE + '.tmp';
+    if (!fs.existsSync(DB_DIR)) {
+      fs.mkdirSync(DB_DIR, { recursive: true });
+    }
     fs.writeFile(tempFile, data, 'utf-8', (err) => {
-      if (err) {
-        console.error("Failed to write temp db file:", err);
-        return;
+      if (!err) {
+        fs.rename(tempFile, DB_FILE, () => {});
       }
-      fs.rename(tempFile, DB_FILE, (renameErr) => {
-        if (renameErr) console.error("Failed to rename temp db file:", renameErr);
-      });
     });
   } catch (e) {
-    console.error("Failed to serialize database", e);
+    console.error("Failed to serialize local temp database file", e);
   }
 
-  // Schedule a debounced MongoDB sync (non-blocking)
-  _scheduleMongSync();
+  // Synchronize to MongoDB Atlas IMMEDIATELY on Vercel
+  await _syncMongoNow();
 }
 
 // Initialize on import
