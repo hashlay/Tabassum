@@ -2699,6 +2699,89 @@ apiRouter.get('/standings', authenticate, async (req, res) => {
   const standings = CalculationService.getUnitStandings({ categoryId });
   res.json(standings);
 });
+
+// --- PUBLIC UNAUTHENTICATED ENDPOINTS (ACCESSIBLE TO ALL VISITORS & PUBLIC FRONTEND) ---
+apiRouter.get('/public/cms', async (req, res) => {
+  const db = dbClient.get();
+  res.json({
+    eventSettings: db.eventSettings || {},
+    cmsSettings: db.cmsSettings || {},
+    dragBlocks: db.dragBlocks || [],
+    heroMedia: db.heroMedia || [],
+    festivalName: db.eventSettings?.eventTitle || 'Rendezvous Silver Edition',
+    campusName: db.eventSettings?.sectorName || 'Imam Rabbani Festival'
+  });
+});
+
+apiRouter.get('/public/gallery', async (req, res) => {
+  const db = dbClient.get();
+  res.json(db.gallery || []);
+});
+
+apiRouter.get('/public/highlights', async (req, res) => {
+  const db = dbClient.get();
+  res.json(db.videoHighlights || []);
+});
+
+apiRouter.get('/public/results', async (req, res) => {
+  const db = dbClient.get();
+  const publishedResults = (db.results || []).filter(r => r.publishedStatus && !r.deletedAt);
+  res.json(publishedResults);
+});
+
+apiRouter.get('/public/settings', async (req, res) => {
+  const db = dbClient.get();
+  res.json(db.eventSettings || {});
+});
+
+apiRouter.get('/public/categories', async (req, res) => {
+  const db = dbClient.get();
+  res.json(db.categories || []);
+});
+
+apiRouter.get('/public/units', async (req, res) => {
+  const db = dbClient.get();
+  res.json(db.units || []);
+});
+
+apiRouter.get('/public/competitions', async (req, res) => {
+  const db = dbClient.get();
+  res.json(db.competitions || []);
+});
+
+apiRouter.get('/public/standings', async (req, res) => {
+  const categoryId = req.query.categoryId ? String(req.query.categoryId) : undefined;
+  const standings = CalculationService.getUnitStandings({ categoryId });
+  res.json(standings);
+});
+
+apiRouter.post('/public/auth/participant-login', async (req, res) => {
+  const { chestNumber } = req.body;
+  const db = dbClient.get();
+  const participant = (db.participants || []).find(p => (p.profilePhoto === chestNumber || p.id === chestNumber) && !p.deletedAt);
+  if (!participant) {
+    return res.status(404).json({ error: 'Participant not found' });
+  }
+  res.json({ success: true, participant });
+});
+
+apiRouter.get('/public/participant/by-chest/:chestNumber', async (req, res) => {
+  const { chestNumber } = req.params;
+  const db = dbClient.get();
+  const participant = (db.participants || []).find(p => (p.profilePhoto === chestNumber || p.id === chestNumber) && !p.deletedAt);
+  if (!participant) {
+    return res.status(404).json({ error: 'Participant not found' });
+  }
+  const registeredComps = (db.competitions || []).filter(c => (c.assignedParticipantIds || []).includes(participant.id));
+  const participantResults = (db.results || []).filter(r => r.participantId === participant.id && !r.deletedAt);
+
+  res.json({
+    participant,
+    competitions: registeredComps,
+    results: participantResults
+  });
+});
+
 // 12. USER MANAGEMENT (SUPER ADMIN ONLY)
 
 // Read users
