@@ -293,11 +293,17 @@ export interface EventSettings {
   globalPointsRank9?: number;
   globalPointsRank10?: number;
   
+  // Poster & Certificate Overrides
+  chestNumberOverrides?: any;
+  posterOverrides?: any;
+  certificateOverrides?: any;
+
   // Poster Generation System
   posterTemplateConfig?: any; // Stores themes and coordinates for dynamic poster generation
   
   // Certificate Generation System
   certificateTemplateConfig?: any; // Stores themes and coordinates for dynamic certificate generation
+
 
   // Participant Verification & Login Criteria
   participantLoginCriteria?: 'dob' | 'class';

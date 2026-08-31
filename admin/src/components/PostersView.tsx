@@ -14,6 +14,7 @@ interface PosterGeneratorViewProps {
   user: User;
   token: string;
   eventSettings?: any;
+  onSettingsUpdated?: () => void;
 }
 
 const FONT_OPTIONS = [
@@ -158,7 +159,7 @@ function migrateOldConfig(templateConfig: any, defaultThemes: string[]): any {
   return { customThemes, themeRules, themeConfigs };
 }
 
-export default function PosterGeneratorView({ user, token, eventSettings }: PosterGeneratorViewProps) {
+export default function PosterGeneratorView({ user, token, eventSettings, onSettingsUpdated }: PosterGeneratorViewProps) {
   const entityLabel = eventSettings?.entityMode === 'house' ? 'House' : eventSettings?.entityMode === 'team' ? 'Team' : 'Unit';
   const festivalName = eventSettings?.festivalName || 'Sahityotsav';
   const campusName = eventSettings?.campusName || eventSettings?.sectorName || 'Campus';
@@ -1114,10 +1115,10 @@ export default function PosterGeneratorView({ user, token, eventSettings }: Post
                             type="button"
                             onClick={() => {
                               if (confirm('Reset poster layout and overrides to theme defaults?')) {
-                                const def = getDefaultThemeConfig(selectedThemeIdx);
+                                const def = getDefaultThemeConfig();
                                 setLocalThemeConfigs(prev => ({
                                   ...prev,
-                                  [selectedThemeIdx]: def
+                                  [themeIdx]: def
                                 }));
                               }
                             }}
@@ -1301,3 +1302,5 @@ export default function PosterGeneratorView({ user, token, eventSettings }: Post
     </div>
   );
 }
+
+

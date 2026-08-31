@@ -29,6 +29,6 @@
   "exclude": [
     "node_modules",
     "dist",
-    "ssf-ninthikal-sector-sahityotsav-management-system (2)"
+    "admin"
   ]
 }
